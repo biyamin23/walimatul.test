@@ -19,6 +19,10 @@ export interface Profile {
   updated_at: string;
 }
 
+/** Alias used by auth utilities */
+export type UserProfile = Profile;
+
+
 // ─── Template ─────────────────────────────────────────────────────────────────
 
 export interface Template {

@@ -2,15 +2,15 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/Card";
 import type { Metadata } from "next";
-import RegisterForm from "./RegisterForm";
+import ForgotPasswordForm from "./ForgotPasswordForm";
 
 export const metadata: Metadata = {
-  title: "Create Account — WALIMATUL",
+  title: "Forgot Password — WALIMATUL",
   description:
-    "Create your WALIMATUL account and start building your beautiful digital wedding invitation.",
+    "Reset your WALIMATUL account password. Enter your email and we'll send you a link.",
 };
 
-export default function RegisterPage() {
+export default function ForgotPasswordPage() {
   return (
     <>
       <Navbar />
@@ -21,7 +21,7 @@ export default function RegisterPage() {
       >
         <div className="w-full max-w-md">
           <Card variant="default" padding="lg">
-            <RegisterForm />
+            <ForgotPasswordForm />
           </Card>
         </div>
       </main>
