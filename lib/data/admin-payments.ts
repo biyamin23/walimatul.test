@@ -5,7 +5,10 @@ import type { Order, PaymentProof, Invitation, Template, Profile } from "@/types
 
 export interface AdminPaymentQueueItem extends Order {
   client: Pick<Profile, "id" | "full_name"> & { email: string };
-  invitation: Pick<Invitation, "id" | "groom_name" | "groom_short_name" | "bride_name" | "bride_short_name" | "slug" | "status">;
+  invitation: Pick<
+    Invitation,
+    "id" | "groom_name" | "groom_short_name" | "bride_name" | "bride_short_name" | "slug" | "status"
+  >;
   template: Pick<Template, "id" | "name" | "slug">;
   latest_proof?: Pick<PaymentProof, "id" | "storage_path" | "transaction_reference" | "submitted_at"> | null;
 }
@@ -36,6 +39,7 @@ export async function getAdminPaymentStats(): Promise<AdminPaymentStats> {
 
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
   if (claimsError || !claimsData?.claims?.sub) {
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentStats: Unauthenticated claims.");
     return {
       pendingVerificationCount: 0,
       paidCount: 0,
@@ -49,7 +53,12 @@ export async function getAdminPaymentStats(): Promise<AdminPaymentStats> {
     .select("payment_status");
 
   if (error || !orders) {
-    console.error("[WALIMATUL] getAdminPaymentStats error:", error?.message);
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentStats query failed:", {
+      code: error?.code,
+      message: error?.message,
+      details: error?.details,
+      hint: error?.hint,
+    });
     return {
       pendingVerificationCount: 0,
       paidCount: 0,
@@ -77,7 +86,8 @@ export async function getAdminPaymentStats(): Promise<AdminPaymentStats> {
 }
 
 /**
- * Fetch the list of orders for the Admin payment queue.
+ * Fetch the list of orders for the Admin payment queue using decoupled sequential queries.
+ * Guarantees zero dropped rows if related records are missing.
  */
 export async function getAdminPaymentQueue(
   statusFilter?: string
@@ -86,67 +96,169 @@ export async function getAdminPaymentQueue(
 
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
   if (claimsError || !claimsData?.claims?.sub) {
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentQueue: Unauthenticated claims.");
     return [];
   }
 
-  let query = supabase
-    .from("orders")
-    .select(`
-      *,
-      invitation:invitations (id, groom_name, groom_short_name, bride_name, bride_short_name, slug, status),
-      template:templates (id, name, slug)
-    `);
+  // ── STEP A: Fetch raw orders (no joins) ──
+  let query = supabase.from("orders").select("*");
 
   if (statusFilter && statusFilter !== "all") {
     query = query.eq("payment_status", statusFilter);
   }
 
-  const { data: orders, error } = await query.order("created_at", {
+  const { data: orders, error: ordersError } = await query.order("created_at", {
     ascending: false,
   });
 
-  if (error || !orders) {
-    console.error("[WALIMATUL] getAdminPaymentQueue error:", error?.message);
+  if (ordersError) {
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] Step A (orders query) failed:", {
+      code: ordersError.code,
+      message: ordersError.message,
+      details: ordersError.details,
+      hint: ordersError.hint,
+    });
     return [];
   }
 
-  // Fetch client profiles for the unique user_ids
-  const userIds = [...new Set(orders.map((o) => o.user_id))];
+  if (!orders || orders.length === 0) {
+    console.log("[WALIMATUL_ADMIN_DIAGNOSTIC] Step A returned 0 orders.");
+    return [];
+  }
+
+  console.log(`[WALIMATUL_ADMIN_DIAGNOSTIC] Step A loaded ${orders.length} orders.`);
+
+  // ── STEP B: Fetch linked invitations ──
+  const invitationIds = [
+    ...new Set(orders.map((o) => o.invitation_id).filter(Boolean)),
+  ];
+  const invitationMap = new Map<
+    string,
+    Pick<
+      Invitation,
+      | "id"
+      | "groom_name"
+      | "groom_short_name"
+      | "bride_name"
+      | "bride_short_name"
+      | "slug"
+      | "status"
+    >
+  >();
+
+  if (invitationIds.length > 0) {
+    const { data: invs, error: invsError } = await supabase
+      .from("invitations")
+      .select(
+        "id, groom_name, groom_short_name, bride_name, bride_short_name, slug, status"
+      )
+      .in("id", invitationIds);
+
+    if (invsError) {
+      console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] Step B (invitations query) failed:", {
+        code: invsError.code,
+        message: invsError.message,
+        details: invsError.details,
+        hint: invsError.hint,
+      });
+    } else if (invs) {
+      for (const inv of invs) {
+        invitationMap.set(inv.id, inv);
+      }
+      console.log(`[WALIMATUL_ADMIN_DIAGNOSTIC] Step B loaded ${invs.length} invitations.`);
+    }
+  }
+
+  // ── STEP C: Fetch client profiles ──
+  const userIds = [...new Set(orders.map((o) => o.user_id).filter(Boolean))];
   const profileMap = new Map<string, Pick<Profile, "id" | "full_name">>();
 
   if (userIds.length > 0) {
-    const { data: profiles, error: profileErr } = await supabase
+    const { data: profiles, error: profError } = await supabase
       .from("profiles")
       .select("id, full_name")
       .in("id", userIds);
 
-    if (!profileErr && profiles) {
+    if (profError) {
+      console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] Step C (profiles query) failed:", {
+        code: profError.code,
+        message: profError.message,
+        details: profError.details,
+        hint: profError.hint,
+      });
+    } else if (profiles) {
       for (const p of profiles) {
         profileMap.set(p.id, p);
       }
+      console.log(`[WALIMATUL_ADMIN_DIAGNOSTIC] Step C loaded ${profiles.length} profiles.`);
     }
   }
 
+  // ── STEP D: Fetch templates ──
+  const templateIds = [
+    ...new Set(orders.map((o) => o.template_id).filter(Boolean)),
+  ];
+  const templateMap = new Map<
+    string,
+    Pick<Template, "id" | "name" | "slug">
+  >();
+
+  if (templateIds.length > 0) {
+    const { data: templates, error: tplError } = await supabase
+      .from("templates")
+      .select("id, name, slug")
+      .in("id", templateIds);
+
+    if (tplError) {
+      console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] Step D (templates query) failed:", {
+        code: tplError.code,
+        message: tplError.message,
+        details: tplError.details,
+        hint: tplError.hint,
+      });
+    } else if (templates) {
+      for (const t of templates) {
+        templateMap.set(t.id, t);
+      }
+      console.log(`[WALIMATUL_ADMIN_DIAGNOSTIC] Step D loaded ${templates.length} templates.`);
+    }
+  }
+
+  // ── STEP E: Compose queue with zero-drop guarantee ──
   return orders.map((o) => {
-    const rawInv = Array.isArray(o.invitation) ? o.invitation[0] : o.invitation;
-    const rawTpl = Array.isArray(o.template) ? o.template[0] : o.template;
-    const matchedProfile = profileMap.get(o.user_id);
+    const inv = invitationMap.get(o.invitation_id) || {
+      id: o.invitation_id,
+      groom_name: "Pengantin Lelaki",
+      groom_short_name: "Lelaki",
+      bride_name: "Pengantin Perempuan",
+      bride_short_name: "Perempuan",
+      slug: null,
+      status: "draft" as const,
+    };
+
+    const tpl = templateMap.get(o.template_id) || {
+      id: o.template_id,
+      name: "Blush Garden",
+      slug: "blush-garden",
+    };
+
+    const prof = profileMap.get(o.user_id);
 
     return {
       ...o,
       client: {
         id: o.user_id,
-        full_name: matchedProfile?.full_name || "Klien",
+        full_name: prof?.full_name || "Klien",
         email: "",
       },
-      invitation: rawInv,
-      template: rawTpl,
+      invitation: inv,
+      template: tpl,
     };
   });
 }
 
 /**
- * Fetch detailed order information and secure short-lived signed URLs for proofs.
+ * Fetch detailed order information using decoupled sequential queries.
  */
 export async function getAdminPaymentById(
   orderId: string
@@ -158,36 +270,109 @@ export async function getAdminPaymentById(
 
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
   if (claimsError || !claimsData?.claims?.sub) {
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentById: Unauthenticated claims.");
     return null;
   }
 
-  // 1. Fetch order with invitation and template
+  // 1. Fetch raw order
   const { data: order, error: orderError } = await supabase
     .from("orders")
-    .select(`
-      *,
-      invitation:invitations (*),
-      template:templates (*)
-    `)
+    .select("*")
     .eq("id", orderId)
     .single();
 
   if (orderError || !order) {
-    console.error("[WALIMATUL] getAdminPaymentById error:", orderError?.message);
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentById order query failed:", {
+      code: orderError?.code,
+      message: orderError?.message,
+      details: orderError?.details,
+      hint: orderError?.hint,
+    });
     return null;
   }
 
-  const rawInv = Array.isArray(order.invitation) ? order.invitation[0] : order.invitation;
-  const rawTpl = Array.isArray(order.template) ? order.template[0] : order.template;
+  // 2. Fetch linked invitation
+  const { data: invData, error: invError } = await supabase
+    .from("invitations")
+    .select("*")
+    .eq("id", order.invitation_id)
+    .single();
 
-  // 2. Fetch client profile
-  const { data: clientProfile } = await supabase
+  if (invError) {
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentById invitation query error:", invError.message);
+  }
+
+  const invitation: Invitation = invData || {
+    id: order.invitation_id,
+    user_id: order.user_id,
+    template_id: order.template_id,
+    groom_name: "Pengantin Lelaki",
+    groom_short_name: "Lelaki",
+    bride_name: "Pengantin Perempuan",
+    bride_short_name: "Perempuan",
+    groom_parents: null,
+    bride_parents: null,
+    wedding_date: "",
+    event_start_time: "",
+    event_end_time: "",
+    timezone: "Asia/Kuala_Lumpur",
+    venue_name: "",
+    venue_address: null,
+    google_maps_url: null,
+    waze_url: null,
+    music_url: null,
+    music_autoplay: false,
+    custom_message: null,
+    rsvp_enabled: true,
+    rsvp_deadline: null,
+    max_guests_per_rsvp: 5,
+    slug: null,
+    status: "draft",
+    published_at: null,
+    expires_at: null,
+    created_at: order.created_at,
+    updated_at: order.created_at,
+  };
+
+  // 3. Fetch linked template
+  const { data: tplData, error: tplError } = await supabase
+    .from("templates")
+    .select("*")
+    .eq("id", order.template_id)
+    .single();
+
+  if (tplError) {
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentById template query error:", tplError.message);
+  }
+
+  const template: Template = tplData || {
+    id: order.template_id,
+    name: "Blush Garden",
+    slug: "blush-garden",
+    description: "Standard wedding invitation template",
+    price: 49.0,
+    currency: "MYR",
+    validity_months: 6,
+    is_active: true,
+    features: [],
+    thumbnail_url: null,
+    component_key: "blush-garden",
+    created_at: order.created_at,
+    updated_at: order.created_at,
+  };
+
+  // 4. Fetch client profile
+  const { data: clientProfile, error: profError } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", order.user_id)
     .single();
 
-  // 3. Fetch reviewer profile if reviewed_by is set
+  if (profError) {
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentById profile query error:", profError.message);
+  }
+
+  // 5. Fetch reviewer profile if reviewed_by is set
   let reviewerProfile: Pick<Profile, "full_name"> | null = null;
   if (order.reviewed_by) {
     const { data: revData } = await supabase
@@ -200,7 +385,7 @@ export async function getAdminPaymentById(
     }
   }
 
-  // 4. Fetch payment proofs for this order
+  // 6. Fetch payment proofs for this order
   const { data: proofs, error: proofsError } = await supabase
     .from("payment_proofs")
     .select("*")
@@ -208,12 +393,12 @@ export async function getAdminPaymentById(
     .order("submitted_at", { ascending: false });
 
   if (proofsError) {
-    console.error("[WALIMATUL] fetch proofs error:", proofsError.message);
+    console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] getAdminPaymentById proofs query error:", proofsError.message);
   }
 
   const proofList = proofs || [];
 
-  // 5. Generate short-lived (1 hour) signed URLs for private storage paths
+  // 7. Generate short-lived (1 hour) signed URLs for private storage paths
   const proofsWithSignedUrls: AdminProofWithSignedUrl[] = await Promise.all(
     proofList.map(async (p) => {
       let signedUrl: string | null = null;
@@ -225,7 +410,7 @@ export async function getAdminPaymentById(
         if (!signError && signedData?.signedUrl) {
           signedUrl = signedData.signedUrl;
         } else {
-          console.error("[WALIMATUL] createSignedUrl error:", signError?.message);
+          console.error("[WALIMATUL_ADMIN_DIAGNOSTIC] createSignedUrl error:", signError?.message);
         }
       }
       return {
@@ -250,8 +435,8 @@ export async function getAdminPaymentById(
         }),
         email: "",
       },
-      invitation: rawInv,
-      template: rawTpl,
+      invitation,
+      template,
       reviewer: reviewerProfile,
     },
     proofs: proofsWithSignedUrls,

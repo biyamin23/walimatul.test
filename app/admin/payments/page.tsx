@@ -18,6 +18,10 @@ export default async function AdminPaymentsPage() {
     getAdminPaymentStats(),
   ]);
 
+  console.log(
+    `[AdminPaymentsPage] stats: pending=${stats.pendingVerificationCount}, total=${stats.totalCount}, queue length=${orders.length}`
+  );
+
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* ── Page Header ── */}
