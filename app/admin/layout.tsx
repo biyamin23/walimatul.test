@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth/permissions";
 import { signOut } from "@/app/actions/auth";
 import { BRAND } from "@/lib/constants/brand";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -41,12 +42,12 @@ export default async function AdminLayout({
           <span className="text-sm text-white/70 font-ui hidden sm:block">
             {user.email}
           </span>
-          <a
+          <Link
             href="/dashboard"
             className="text-sm text-white/80 hover:text-white font-ui transition-colors"
           >
             Client View →
-          </a>
+          </Link>
           <form action={signOut}>
             <button
               id="admin-btn-sign-out"

@@ -148,7 +148,11 @@ RLS enforces ownership — the server client inherits the user's JWT session.
 | 4 | Blush Garden Production Renderer | ✅ Complete |
 | 4.1 | Mobile Preview Toolbar Refinement | ✅ Complete |
 | 5 | Invitation Editor, Draft Creation & Live Preview | ✅ Complete |
-| 6 | Public Invitation Route & Guest View | Next |
-| 7 | Guest RSVP Submission | Future |
+| 5.1 | Form UX Standardization & Responsive Overflow | ✅ Complete |
+| 5.2 | Date/Time & RSVP Form Responsive Fix | ✅ Complete |
+| 5.3 | Final Editor Form Layout Polish | ✅ Complete |
+| 5.4 | Final iOS Date Input Width Fix | ✅ Complete |
+| 6 | Public Invitation Route & Guest View | ✅ Complete |
+| 7 | Guest RSVP Submission | Next |
 | 8 | RSVP Management Dashboard | Future |
 | 9+ | Payment UI, Admin Verification, Receipt & PDF | Future |
