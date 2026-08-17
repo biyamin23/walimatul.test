@@ -34,8 +34,6 @@ const navItems = [
         <polyline points="3 7 12 13 21 7" />
       </svg>
     ),
-    disabled: true,
-    badge: "Soon",
   },
   {
     href: "/dashboard/rsvp",

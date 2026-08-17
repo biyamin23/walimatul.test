@@ -8,6 +8,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getActiveTemplates } from "@/lib/data/templates";
 import { isTemplateComponentAvailable } from "@/templates/registry";
+import { CreateDraftButton } from "@/components/invitations/CreateDraftButton";
 import type { Template } from "@/types/database";
 
 export const metadata: Metadata = {
@@ -152,13 +153,12 @@ function TemplateCard({ template }: { template: Template }) {
                 >
                   Preview
                 </Link>
-                <Link
-                  href={`/templates/${template.slug}/preview`}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2"
-                  aria-label={`Use the ${template.name} template`}
-                >
-                  Select →
-                </Link>
+                <CreateDraftButton
+                  templateSlug={template.slug}
+                  label="Select →"
+                  loadingLabel="Creating..."
+                  className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2"
+                />
               </div>
             ) : (
               <span className="text-xs text-[var(--text-subtle)] font-ui">

@@ -38,10 +38,9 @@ export default function DashboardPage() {
         <QuickActionCard
           icon="📋"
           title="My Invitations"
-          description="View and manage your invitations"
+          description="View and manage your invitations and drafts"
           href="/dashboard/invitations"
-          cta="Coming Soon"
-          disabled
+          cta="View Invitations"
         />
         <QuickActionCard
           icon="📊"

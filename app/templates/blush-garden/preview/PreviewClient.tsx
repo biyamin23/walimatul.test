@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { BlushGardenTemplate } from "@/templates/blush-garden/Template";
+import { CreateDraftButton } from "@/components/invitations/CreateDraftButton";
 import {
   BLUSH_GARDEN_PREVIEW_DATA,
   LONG_CONTENT_PREVIEW_DATA,
@@ -79,12 +80,12 @@ export function BlushGardenPreviewClient() {
           </div>
 
           {/* Compact Use CTA */}
-          <Link
-            href="/register"
-            className="flex-shrink-0 inline-flex items-center justify-center px-2.5 py-1.5 rounded-full bg-[#B8955A] text-white text-xs font-inter font-semibold hover:bg-[#a6844c] active:scale-95 transition-all shadow-sm focus-visible:outline-2 focus-visible:outline-white whitespace-nowrap"
-          >
-            Use →
-          </Link>
+          <CreateDraftButton
+            templateSlug="blush-garden"
+            label="Use →"
+            loadingLabel="Creating..."
+            className="flex-shrink-0 px-2.5 py-1.5 rounded-full bg-[#B8955A] text-white text-xs font-inter font-semibold hover:bg-[#a6844c] active:scale-95 shadow-sm focus-visible:outline-2 focus-visible:outline-white whitespace-nowrap"
+          />
         </div>
 
         {/* Desktop Toolbar (Retains Existing Layout) */}
@@ -155,12 +156,12 @@ export function BlushGardenPreviewClient() {
 
           {/* Right CTA */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-[#B8955A] text-white text-xs font-inter font-semibold hover:bg-[#a6844c] transition-colors shadow-sm focus-visible:outline-2 focus-visible:outline-white"
-            >
-              Use This Template →
-            </Link>
+            <CreateDraftButton
+              templateSlug="blush-garden"
+              label="Use This Template →"
+              loadingLabel="Creating Draft..."
+              className="px-4 py-1.5 rounded-full bg-[#B8955A] text-white text-xs font-inter font-semibold hover:bg-[#a6844c] transition-colors shadow-sm focus-visible:outline-2 focus-visible:outline-white"
+            />
           </div>
         </div>
       </header>
