@@ -24,7 +24,11 @@ export function InvitationForm({
   const inputClass =
     "w-full max-w-full min-w-0 box-border px-3.5 py-2.5 min-h-[48px] sm:min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]";
 
-  const dateTimeInputClass =
+  // Dedicated iOS-safe date input class
+  const iosDateInputClass =
+    "w-full max-w-full min-w-0 box-border block px-3.5 py-2.5 min-h-[48px] sm:min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all";
+
+  const timeInputClass =
     "w-full max-w-full min-w-0 box-border block px-3.5 py-2.5 min-h-[48px] sm:min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all";
 
   const urlInputClass =
@@ -127,18 +131,20 @@ export function InvitationForm({
         </legend>
 
         <div className="space-y-4 w-full min-w-0">
-          {/* Wedding Date (Full-width row) */}
+          {/* Wedding Date (Full-width row, iOS-safe constrained) */}
           <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="wedding-date" className={labelClass}>
               Tarikh Majlis
             </label>
-            <input
-              id="wedding-date"
-              type="date"
-              value={values.weddingDate || ""}
-              onChange={(e) => onChange("weddingDate", e.target.value)}
-              className={dateTimeInputClass}
-            />
+            <div className="relative w-full min-w-0 max-w-full">
+              <input
+                id="wedding-date"
+                type="date"
+                value={values.weddingDate || ""}
+                onChange={(e) => onChange("weddingDate", e.target.value)}
+                className={iosDateInputClass}
+              />
+            </div>
             {errors.weddingDate && <p className={errorClass}>{errors.weddingDate[0]}</p>}
           </div>
 
@@ -154,7 +160,7 @@ export function InvitationForm({
                 type="time"
                 value={values.startTime || ""}
                 onChange={(e) => onChange("startTime", e.target.value)}
-                className={dateTimeInputClass}
+                className={timeInputClass}
               />
             </div>
 
@@ -168,7 +174,7 @@ export function InvitationForm({
                 type="time"
                 value={values.endTime || ""}
                 onChange={(e) => onChange("endTime", e.target.value)}
-                className={dateTimeInputClass}
+                className={timeInputClass}
               />
               {errors.endTime && <p className={errorClass}>{errors.endTime[0]}</p>}
             </div>
@@ -336,18 +342,20 @@ export function InvitationForm({
 
           {values.rsvpEnabled && (
             <div className="space-y-4 pt-1 w-full min-w-0">
-              {/* RSVP Deadline (Full-width row on all breakpoints) */}
+              {/* RSVP Deadline (Full-width row, iOS-safe constrained) */}
               <div className="space-y-1 min-w-0 w-full">
                 <label htmlFor="rsvp-deadline" className={labelClass}>
                   Tarikh Akhir RSVP
                 </label>
-                <input
-                  id="rsvp-deadline"
-                  type="date"
-                  value={values.rsvpDeadline || ""}
-                  onChange={(e) => onChange("rsvpDeadline", e.target.value)}
-                  className={dateTimeInputClass}
-                />
+                <div className="relative w-full min-w-0 max-w-full">
+                  <input
+                    id="rsvp-deadline"
+                    type="date"
+                    value={values.rsvpDeadline || ""}
+                    onChange={(e) => onChange("rsvpDeadline", e.target.value)}
+                    className={iosDateInputClass}
+                  />
+                </div>
               </div>
 
               {/* Max Pax (Full-width row on all breakpoints) */}

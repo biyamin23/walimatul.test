@@ -332,28 +332,36 @@ fieldset {
   max-width: 100%;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   iOS Safari & WebKit Native Date & Time Normalization
+   ───────────────────────────────────────────────────────────────────────────── */
+
 input[type="date"],
 input[type="time"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
   display: block;
 }
 
-/* Ensure WebKit calendar/clock picker indicators align cleanly and do not force overflow */
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  opacity: 0.7;
-  padding: 0;
+/* iOS Safari internal date/time text rendering reset */
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: auto;
+  min-width: 0;
   margin: 0;
-  transition: opacity 0.15s ease;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator:hover,
-input[type="time"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
+  padding: 0;
+  line-height: inherit;
+  height: auto;
+  box-sizing: border-box;
 }
 
 /* Ensure WebKit date/time text wrapper obeys width */
@@ -362,5 +370,24 @@ input[type="time"]::-webkit-datetime-edit {
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
+
+/* Ensure WebKit calendar/clock picker indicators align cleanly inside input */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
 
