@@ -131,10 +131,13 @@ RLS enforces ownership — the server client inherits the user's JWT session.
 2. Server Actions verify user authentication via `getClaims()` and filter by `user_id`
 3. Unique constraint on `invitations.slug` in database + realtime availability check with reserved route blacklist
 
-### Payment Status Fraud
+### Payment Status Fraud & Proof Protection
 1. `REVOKE UPDATE (payment_status, reviewed_by, paid_at, ...) FROM authenticated`
-2. `protect_order_admin_fields()` trigger
+2. `protect_order_admin_fields()` trigger prevents unauthorized modification of admin/financial fields
 3. INSERT policy forces `payment_status = 'pending_payment'`
+4. Transition from `pending_payment` / `payment_rejected` to `pending_verification` is strictly managed via PostgreSQL RPC `submit_payment_proof`
+5. Payment proof storage bucket `payment-proofs` is strictly private with path-level RLS (`{user_id}/{order_id}/{timestamp}-{filename}`)
+6. Partial unique index `idx_orders_active_unpaid` enforces at most one active unpaid order per invitation
 
 ---
 
@@ -154,6 +157,6 @@ RLS enforces ownership — the server client inherits the user's JWT session.
 | 5.4 | Final iOS Date Input Width Fix | ✅ Complete |
 | 6 | Public Invitation Route & Guest View | ✅ Complete |
 | 7 | Guest RSVP Submission & Client RSVP Dashboard | ✅ Complete |
-| 8 | Payment UI & Proof Upload (Client Flow) | Next |
-| 9 | Admin Payment Approval & Activation | Future |
+| 8 | Payment UI & Proof Upload (Client Flow) | ✅ Complete |
+| 9 | Admin Payment Approval & Activation | Next |
 | 10 | Receipt PDF & Approval Email | Future |

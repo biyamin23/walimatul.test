@@ -245,6 +245,30 @@ export function InvitationEditor({
               onChange={handleFieldChange}
               errors={errors}
             />
+
+            {/* Payment CTA Card */}
+            <div className="p-5 rounded-2xl bg-[var(--surface)] border border-[var(--primary)]/30 shadow-sm space-y-3">
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--gold)] font-ui block">
+                  Langkah Seterusnya
+                </span>
+                <h3 className="font-display text-base font-bold text-[var(--text)]">
+                  Pengaktifan &amp; Pembayaran Jemputan
+                </h3>
+                <p className="text-xs font-ui text-[var(--text-muted)] mt-0.5">
+                  Selesai mengisi butiran? Teruskan ke pembayaran Touch ’n Go eWallet (RM49) untuk mengaktifkan jemputan rasmi anda.
+                </p>
+              </div>
+              <Link
+                href={`/dashboard/invitations/${invitation.id}/payment`}
+                className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-full bg-[var(--primary)] text-white font-ui text-xs font-semibold hover:bg-[var(--primary-hover)] transition-all shadow-sm"
+              >
+                <span>Teruskan ke Pembayaran (RM49)</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* Right: Sticky Live Preview */}
@@ -272,6 +296,30 @@ export function InvitationEditor({
                 onChange={handleFieldChange}
                 errors={errors}
               />
+
+              {/* Payment CTA Card */}
+              <div className="p-5 rounded-2xl bg-[var(--surface)] border border-[var(--primary)]/30 shadow-sm space-y-3">
+                <div>
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--gold)] font-ui block">
+                    Langkah Seterusnya
+                  </span>
+                  <h3 className="font-display text-base font-bold text-[var(--text)]">
+                    Pengaktifan &amp; Pembayaran Jemputan
+                  </h3>
+                  <p className="text-xs font-ui text-[var(--text-muted)] mt-0.5">
+                    Selesai mengisi butiran? Teruskan ke pembayaran Touch ’n Go eWallet (RM49) untuk mengaktifkan jemputan rasmi anda.
+                  </p>
+                </div>
+                <Link
+                  href={`/dashboard/invitations/${invitation.id}/payment`}
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-full bg-[var(--primary)] text-white font-ui text-xs font-semibold hover:bg-[var(--primary-hover)] transition-all shadow-sm"
+                >
+                  <span>Teruskan ke Pembayaran (RM49)</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="rounded-2xl overflow-hidden shadow-2xl pb-16 w-full max-w-full min-w-0">

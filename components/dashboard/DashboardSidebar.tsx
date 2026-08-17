@@ -11,7 +11,16 @@ interface DashboardSidebarProps {
   email: string;
 }
 
-const navItems = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  exact?: boolean;
+  disabled?: boolean;
+  badge?: string;
+}
+
+const navItems: NavItem[] = [
   {
     href: "/dashboard",
     label: "Dashboard",
@@ -56,8 +65,6 @@ const navItems = [
         <line x1="1" y1="10" x2="23" y2="10" />
       </svg>
     ),
-    disabled: true,
-    badge: "Soon",
   },
 ];
 

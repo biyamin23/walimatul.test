@@ -145,6 +145,12 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
           >
             RSVP
           </Link>
+          <Link
+            href={`/dashboard/invitations/${invitation.id}/payment`}
+            className="inline-flex items-center justify-center px-3 py-2 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
+          >
+            Bayar
+          </Link>
         </div>
 
         {invitation.status === "draft" && (
