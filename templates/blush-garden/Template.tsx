@@ -1,180 +1,73 @@
-/**
- * WALIMATUL — Blush Garden Template (Phase 3 Placeholder)
- *
- * This is a structural placeholder for the Blush Garden invitation design.
- * The full, production-ready Blush Garden template will be implemented in Phase 4.
- *
- * Current state: renders a branded preview placeholder with couple + date info.
- * Phase 4: full Playfair Display / blush / ivory / muted gold invitation design.
- *
- * @see templates/types.ts for InvitationTemplateData contract
- * @see templates/blush-garden/config.ts for static config
- */
-
+import React from "react";
 import type { TemplateComponentProps } from "../types";
+import { greatVibes, cormorantGaramond, inter } from "./fonts";
+import { CoverSection } from "./components/CoverSection";
+import { OpeningSection } from "./components/OpeningSection";
+import { CoupleSection } from "./components/CoupleSection";
+import { EventDetailsSection } from "./components/EventDetailsSection";
+import { GallerySection } from "./components/GallerySection";
+import { RsvpPreviewSection } from "./components/RsvpPreviewSection";
+import { ClosingSection } from "./components/ClosingSection";
 
+/**
+ * WALIMATUL — Blush Garden Invitation Template
+ *
+ * Production-ready React renderer for the Blush Garden design.
+ *
+ * Design characteristics:
+ * - Romantic floral aesthetic with ivory (#FCF8F3), soft blush (#F5DDD6), deep green (#174F3A), and muted gold (#B8955A).
+ * - Typography: Great Vibes (script names), Cormorant Garamond (ceremonial titles & dates), Inter (functional text).
+ * - Mobile-first layout with smooth editorial rhythm and max-width desktop centering.
+ *
+ * Architectural purity:
+ * - Receives normalized InvitationTemplateData only.
+ * - Zero database access or session dependencies inside this component.
+ */
 export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentProps) {
-  const groomDisplay = data.groomShortName || data.groomName || "Groom";
-  const brideDisplay = data.brideShortName || data.brideName || "Bride";
-
-  // Format wedding date for display
-  let formattedDate = "Date TBC";
-  if (data.weddingDate) {
-    try {
-      formattedDate = new Date(data.weddingDate).toLocaleDateString("en-MY", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-    } catch {
-      formattedDate = data.weddingDate;
-    }
-  }
-
   return (
     <div
+      className={`min-h-screen bg-[#F5EDE6] sm:bg-[#EFE6DC] flex flex-col items-center justify-start ${greatVibes.variable} ${cormorantGaramond.variable} ${inter.variable}`}
       style={{
-        fontFamily: "'Playfair Display', Georgia, serif",
-        minHeight: "100vh",
-        background: "#FCF8F3",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        color: "#174F3A",
+        WebkitFontSmoothing: "antialiased",
+        MozOsxFontSmoothing: "grayscale",
       }}
     >
-      {/* Phase 3 placeholder indicator — remove in Phase 4 */}
-      {mode === "preview" && (
-        <div
-          style={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            fontSize: "10px",
-            fontFamily: "Inter, sans-serif",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "#B8955A",
-            background: "#FCF8F3",
-            border: "1px solid #F5DDD6",
-            padding: "4px 10px",
-            borderRadius: "999px",
-          }}
-        >
-          Preview
-        </div>
-      )}
+      {/* Outer Invitation Container (Intimate mobile/editorial viewport) */}
+      <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl min-h-screen bg-[#FCF8F3] shadow-2xl relative flex flex-col overflow-x-hidden border-x border-[#E8DDD5]/60">
+        {/* Editor or Preview Mode Banner */}
+        {mode === "preview" && (
+          <aside
+            aria-label="Preview notice"
+            className="sticky top-0 z-50 bg-[#174F3A] text-white text-[11px] font-inter font-medium py-2 px-4 text-center tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm"
+          >
+            <span className="w-2 h-2 rounded-full bg-[#B8955A] animate-pulse" aria-hidden="true" />
+            <span>Blush Garden · Preview Mode</span>
+          </aside>
+        )}
 
-      {/* Decorative top border */}
-      <div
-        style={{
-          width: "60px",
-          height: "2px",
-          background: "linear-gradient(90deg, #B8955A, #F5DDD6)",
-          marginBottom: "2rem",
-        }}
-      />
+        <main className="flex-1 flex flex-col justify-start">
+          {/* 1. Cover / Hero Section */}
+          <CoverSection data={data} />
 
-      {/* Template name (placeholder only) */}
-      <p
-        style={{
-          fontSize: "10px",
-          letterSpacing: "0.25em",
-          textTransform: "uppercase",
-          color: "#B8955A",
-          fontFamily: "Inter, sans-serif",
-          marginBottom: "2rem",
-        }}
-      >
-        Blush Garden
-      </p>
+          {/* 2. Opening Greetings & Quotation */}
+          <OpeningSection data={data} />
 
-      {/* Couple names */}
-      <h1
-        style={{
-          fontSize: "clamp(2rem, 8vw, 3.5rem)",
-          fontWeight: 400,
-          lineHeight: 1.1,
-          textAlign: "center",
-          color: "#174F3A",
-          margin: "0 0 1rem",
-        }}
-      >
-        {groomDisplay}
-        <br />
-        <span style={{ color: "#B8955A", fontSize: "0.6em" }}>&amp;</span>
-        <br />
-        {brideDisplay}
-      </h1>
+          {/* 3. Formal Couple Presentation */}
+          <CoupleSection data={data} />
 
-      {/* Separator */}
-      <div
-        style={{
-          width: "40px",
-          height: "1px",
-          background: "#B8955A",
-          margin: "1.5rem auto",
-        }}
-      />
+          {/* 4. Event Schedule, Date & Venue */}
+          <EventDetailsSection data={data} />
 
-      {/* Wedding date */}
-      <p
-        style={{
-          fontSize: "0.875rem",
-          letterSpacing: "0.15em",
-          textTransform: "uppercase",
-          color: "#174F3A",
-          fontFamily: "Inter, sans-serif",
-          opacity: 0.7,
-          marginBottom: "0.5rem",
-        }}
-      >
-        {formattedDate}
-      </p>
+          {/* 5. Photo Gallery */}
+          <GallerySection data={data} />
 
-      {/* Venue */}
-      {data.venueName && (
-        <p
-          style={{
-            fontSize: "0.875rem",
-            color: "#174F3A",
-            fontFamily: "Inter, sans-serif",
-            opacity: 0.6,
-            textAlign: "center",
-            maxWidth: "300px",
-          }}
-        >
-          {data.venueName}
-        </p>
-      )}
+          {/* 6. RSVP Preview Section */}
+          <RsvpPreviewSection data={data} />
 
-      {/* Decorative bottom border */}
-      <div
-        style={{
-          width: "60px",
-          height: "2px",
-          background: "linear-gradient(90deg, #F5DDD6, #B8955A)",
-          marginTop: "2rem",
-        }}
-      />
-
-      {/* Phase 4 placeholder notice (only shown outside live mode) */}
-      {mode !== "live" && (
-        <p
-          style={{
-            marginTop: "3rem",
-            fontSize: "11px",
-            fontFamily: "Inter, sans-serif",
-            color: "#B8955A",
-            textAlign: "center",
-            opacity: 0.6,
-          }}
-        >
-          Full Blush Garden design — Phase 4
-        </p>
-      )}
+          {/* 7. Closing Blessing & Attribution */}
+          <ClosingSection data={data} />
+        </main>
+      </div>
     </div>
   );
 }

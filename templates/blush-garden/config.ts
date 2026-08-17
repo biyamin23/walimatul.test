@@ -1,27 +1,36 @@
 /**
- * WALIMATUL — Blush Garden Static Config
+ * WALIMATUL — Blush Garden Template Configuration
  *
- * Static metadata for the Blush Garden template.
- * Use for display purposes when DB is not available (e.g. error states, build-time).
- * The DB templates table is the authoritative source for pricing and status.
+ * Design metadata and theme configuration for Blush Garden.
+ * Commercial data (pricing, validity, activation status) is stored in the database.
  */
 
 export const BLUSH_GARDEN_CONFIG = {
-  componentKey: "blush-garden",
+  key: "blush-garden",
   name: "Blush Garden",
   slug: "blush-garden",
   category: "Floral",
+  version: 1,
   description:
     "A romantic floral wedding invitation with ivory, blush, and muted gold tones. Elegant, warm, and timeless.",
-  /** Brand palette tokens */
+
+  /** Theme palette tokens */
   palette: {
     background: "#FCF8F3", // Warm Ivory
-    blush: "#F5DDD6", // Blush
+    blush: "#F5DDD6", // Soft Blush
+    lightBlush: "#FCF1EE", // Light Blush
     primary: "#174F3A", // Deep Green
     gold: "#B8955A", // Muted Gold
+    textWarm: "#746F6B", // Warm Charcoal
+    borderWarm: "#E8DDD5", // Warm Border
   },
-  /** Price in MYR — DB is authoritative; this is a build-time fallback */
-  priceDisplay: "RM49",
-  /** Validity in months — DB is authoritative */
-  validityMonths: 6,
+
+  /** Typography metadata */
+  fonts: {
+    script: "Great Vibes",
+    serif: "Cormorant Garamond",
+    sans: "Inter",
+  },
 } as const;
+
+export type BlushGardenConfig = typeof BLUSH_GARDEN_CONFIG;

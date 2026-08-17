@@ -166,6 +166,19 @@ body {
   font-family: var(--font-inter-var), system-ui, sans-serif;
 }
 
+/* Template Scoped Typography */
+.font-great-vibes {
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive, sans-serif;
+}
+
+.font-cormorant {
+  font-family: var(--font-cormorant), "Times New Roman", Garamond, serif;
+}
+
+.font-inter {
+  font-family: var(--font-inter-bg, var(--font-inter-var)), system-ui, sans-serif;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    Reduced Motion
    ───────────────────────────────────────────────────────────────────────────── */

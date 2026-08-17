@@ -144,13 +144,22 @@ function TemplateCard({ template }: { template: Template }) {
               {priceDisplay}
             </span>
             {isAvailable ? (
-              <Link
-                href={`/templates/${template.slug}`}
-                className="text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
-                aria-label={`Use the ${template.name} template`}
-              >
-                Use This Template →
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link
+                  href={`/templates/${template.slug}/preview`}
+                  className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
+                  aria-label={`Preview the ${template.name} template`}
+                >
+                  Preview
+                </Link>
+                <Link
+                  href={`/templates/${template.slug}/preview`}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2"
+                  aria-label={`Use the ${template.name} template`}
+                >
+                  Select →
+                </Link>
+              </div>
             ) : (
               <span className="text-xs text-[var(--text-subtle)] font-ui">
                 Coming soon

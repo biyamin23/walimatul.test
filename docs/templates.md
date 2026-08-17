@@ -4,12 +4,23 @@
 
 ```
 templates/
-  types.ts           — InvitationTemplateData contract, TemplateComponent type
-  registry.ts        — Map component_key → React component
+  types.ts                      — InvitationTemplateData contract, TemplateComponent type
+  registry.ts                   — Map component_key → React component
   blush-garden/
-    Template.tsx     — Blush Garden invitation component (placeholder in Phase 3)
-    config.ts        — Static palette + metadata
-  shared/            — Future: shared utilities, ornaments, layout primitives
+    Template.tsx                — Blush Garden production invitation component
+    config.ts                   — Design metadata + theme tokens
+    fonts.ts                    — Scoped Google Fonts (Great Vibes, Cormorant Garamond, Inter)
+    preview-data.ts             — Sample & edge-case datasets for preview & visual testing
+    components/
+      BotanicalOrnaments.tsx    — SVG corner accents, botanical dividers & flourishes
+      CoverSection.tsx          — Responsive cover / hero section (Great Vibes script names)
+      OpeningSection.tsx        — Bismillah motif, opening quotation & blessing
+      CoupleSection.tsx         — Formal couple presentation
+      EventDetailsSection.tsx   — Ceremonial date/time, venue & Maps/Waze actions
+      GallerySection.tsx        — Responsive photo gallery layout
+      RsvpPreviewSection.tsx    — RSVP presentation details & guest settings
+      ClosingSection.tsx        — Doa, blessing & subtle WALIMATUL attribution
+  shared/                       — Shared utilities, ornaments, layout primitives
 ```
 
 ---
@@ -20,32 +31,46 @@ Every template component accepts exactly this shape (from `templates/types.ts`):
 
 ```ts
 interface InvitationTemplateData {
-  id: string
-  groomName: string
-  groomShortName: string
-  brideName: string
-  brideShortName: string
-  weddingDate: string | null
-  startTime: string | null
-  endTime: string | null
-  venueName: string | null
-  venueAddress: string | null
-  googleMapsUrl: string | null
-  wazeUrl: string | null
-  openingMessage: string | null
-  invitationMessage: string | null
-  closingMessage: string | null
-  gallery: GalleryItem[]
-  rsvpEnabled: boolean
-  rsvpDeadline: string | null
-  maxPax: number
-  allowGuestMessage: boolean
-  musicEnabled: boolean
-  musicKey: string | null
+  id: string;
+  groomName: string;
+  groomShortName: string;
+  brideName: string;
+  brideShortName: string;
+  weddingDate: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  venueName: string | null;
+  venueAddress: string | null;
+  googleMapsUrl: string | null;
+  wazeUrl: string | null;
+  openingMessage: string | null;
+  invitationMessage: string | null;
+  closingMessage: string | null;
+  gallery: GalleryItem[];
+  rsvpEnabled: boolean;
+  rsvpDeadline: string | null;
+  maxPax: number;
+  allowGuestMessage: boolean;
+  musicEnabled: boolean;
+  musicKey: string | null;
 }
 ```
 
 Templates must NOT define their own incompatible data interfaces.
+
+---
+
+## Database Mapper Layer
+
+The mapper in `lib/templates/map-invitation.ts` converts Supabase snake_case rows to `InvitationTemplateData`:
+
+```ts
+import { mapInvitationToTemplateData } from "@/lib/templates/map-invitation";
+
+const templateData = mapInvitationToTemplateData(invitationRow, galleryRows);
+```
+
+**Rule:** Template components must never access database fields directly or contain data-fetching logic.
 
 ---
 
@@ -58,8 +83,8 @@ A template is actionable only when BOTH are true:
 | `templates.is_active = true` | Supabase DB |
 | `component_key in registry` | `templates/registry.ts` |
 
-If is_active but no component: show "unavailable" state — never crash.
-If component exists but is_active = false: do not show in catalogue.
+If `is_active` in DB but no component: show "unavailable" state — never crash.
+If component exists but `is_active = false`: do not show in catalogue.
 
 ---
 
@@ -82,53 +107,33 @@ return <Template data={data} mode="live" />
 | Mode | Usage |
 |------|-------|
 | `"live"` | Public invitation page (full features) |
-| `"preview"` | Template card preview (lightweight) |
-| `"editor"` | Editor pane (real-time, placeholder data allowed) |
+| `"preview"` | Preview route / template card preview (shows preview badge, presentation buttons) |
+| `"editor"` | Editor live preview pane (real-time, placeholder data allowed) |
 
 ---
 
-## Adding a New Template
+## Blush Garden Design Specifications
 
-1. Create `templates/{slug}/Template.tsx` implementing `TemplateComponent`
-2. Create `templates/{slug}/config.ts` with static metadata
-3. Add to `TEMPLATE_REGISTRY` in `templates/registry.ts`
-4. Add a migration seeding the DB row with matching `component_key`
-5. Set `is_active = true` only when the component is production-ready
-
----
-
-## Blush Garden (Phase 3 → Phase 4)
-
-| Phase | State |
-|-------|-------|
-| Phase 3 | Structural placeholder — renders couple names + date in brand palette |
-| Phase 4 | Full Playfair Display / ivory / blush / muted gold floral design |
-| Phase 5 | Editor integration with live preview |
-| Phase 6 | Public route with full UX |
-
-### Blush Garden Design Tokens
+### Palette Tokens
 ```
-Background: #FCF8F3 (Warm Ivory)
-Blush:      #F5DDD6
-Primary:    #174F3A (Deep Green)
-Gold:       #B8955A (Muted Gold)
-Fonts:      Playfair Display (headings), Inter (body)
+Background:  #FCF8F3 (Warm Ivory)
+Soft Blush:  #F5DDD6
+Light Blush: #FCF1EE
+Primary:     #174F3A (Deep Green)
+Gold:        #B8955A (Muted Gold)
+Warm Text:   #746F6B (Warm Charcoal)
+Warm Border: #E8DDD5
 ```
 
----
+### Typography
+- **Couple Names**: Great Vibes (fluid `clamp(2.75rem, 11vw, 5.25rem)` with graceful wrapping)
+- **Ceremonial Headings & Dates**: Cormorant Garamond
+- **Body & Functional Text**: Inter
 
-## Data Flow
+### Responsive Viewports Tested
+- **Mobile (360px – 430px)**: Primary target, full touch-friendly targets, no horizontal overflow.
+- **Tablet (768px – 1024px)**: Centered editorial container (~640-720px max-width) with soft backdrop.
+- **Desktop (1440px+)**: Intimate invitation container with warm ambient border and shadows.
 
-```
-invitations (DB row)
-    ↓
-toTemplateData() [future utility]
-    ↓
-InvitationTemplateData (normalized)
-    ↓
-getTemplateComponent(component_key)
-    ↓
-<BlushGardenTemplate data={...} mode="live" />
-    ↓
-Rendered invitation
-```
+### Preview Route
+Accessible at `/templates/blush-garden/preview` with interactive dataset switcher (Standard, Long Names, Minimal).
