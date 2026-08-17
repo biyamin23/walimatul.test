@@ -34,6 +34,16 @@ export interface AdminPaymentStats {
 export async function getAdminPaymentStats(): Promise<AdminPaymentStats> {
   const supabase = await createClient();
 
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  if (claimsError || !claimsData?.claims?.sub) {
+    return {
+      pendingVerificationCount: 0,
+      paidCount: 0,
+      rejectedCount: 0,
+      totalCount: 0,
+    };
+  }
+
   const { data: orders, error } = await supabase
     .from("orders")
     .select("payment_status");
@@ -74,11 +84,15 @@ export async function getAdminPaymentQueue(
 ): Promise<AdminPaymentQueueItem[]> {
   const supabase = await createClient();
 
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  if (claimsError || !claimsData?.claims?.sub) {
+    return [];
+  }
+
   let query = supabase
     .from("orders")
     .select(`
       *,
-      client:profiles!orders_user_id_fkey (id, full_name),
       invitation:invitations (id, groom_name, groom_short_name, bride_name, bride_short_name, slug, status),
       template:templates (id, name, slug)
     `);
@@ -96,16 +110,33 @@ export async function getAdminPaymentQueue(
     return [];
   }
 
+  // Fetch client profiles for the unique user_ids
+  const userIds = [...new Set(orders.map((o) => o.user_id))];
+  const profileMap = new Map<string, Pick<Profile, "id" | "full_name">>();
+
+  if (userIds.length > 0) {
+    const { data: profiles, error: profileErr } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", userIds);
+
+    if (!profileErr && profiles) {
+      for (const p of profiles) {
+        profileMap.set(p.id, p);
+      }
+    }
+  }
+
   return orders.map((o) => {
-    const rawClient = Array.isArray(o.client) ? o.client[0] : o.client;
     const rawInv = Array.isArray(o.invitation) ? o.invitation[0] : o.invitation;
     const rawTpl = Array.isArray(o.template) ? o.template[0] : o.template;
+    const matchedProfile = profileMap.get(o.user_id);
 
     return {
       ...o,
       client: {
-        id: rawClient?.id || o.user_id,
-        full_name: rawClient?.full_name || "Client",
+        id: o.user_id,
+        full_name: matchedProfile?.full_name || "Klien",
         email: "",
       },
       invitation: rawInv,
@@ -125,15 +156,18 @@ export async function getAdminPaymentById(
 } | null> {
   const supabase = await createClient();
 
-  // 1. Fetch order with client, invitation, template, and reviewer
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  if (claimsError || !claimsData?.claims?.sub) {
+    return null;
+  }
+
+  // 1. Fetch order with invitation and template
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .select(`
       *,
-      client:profiles!orders_user_id_fkey (*),
       invitation:invitations (*),
-      template:templates (*),
-      reviewer:profiles!orders_reviewed_by_fkey (full_name)
+      template:templates (*)
     `)
     .eq("id", orderId)
     .single();
@@ -143,12 +177,30 @@ export async function getAdminPaymentById(
     return null;
   }
 
-  const rawClient = Array.isArray(order.client) ? order.client[0] : order.client;
   const rawInv = Array.isArray(order.invitation) ? order.invitation[0] : order.invitation;
   const rawTpl = Array.isArray(order.template) ? order.template[0] : order.template;
-  const rawRev = Array.isArray(order.reviewer) ? order.reviewer[0] : order.reviewer;
 
-  // 2. Fetch payment proofs for this order
+  // 2. Fetch client profile
+  const { data: clientProfile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", order.user_id)
+    .single();
+
+  // 3. Fetch reviewer profile if reviewed_by is set
+  let reviewerProfile: Pick<Profile, "full_name"> | null = null;
+  if (order.reviewed_by) {
+    const { data: revData } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", order.reviewed_by)
+      .single();
+    if (revData) {
+      reviewerProfile = revData;
+    }
+  }
+
+  // 4. Fetch payment proofs for this order
   const { data: proofs, error: proofsError } = await supabase
     .from("payment_proofs")
     .select("*")
@@ -161,7 +213,7 @@ export async function getAdminPaymentById(
 
   const proofList = proofs || [];
 
-  // 3. Generate short-lived (1 hour) signed URLs for private storage paths
+  // 5. Generate short-lived (1 hour) signed URLs for private storage paths
   const proofsWithSignedUrls: AdminProofWithSignedUrl[] = await Promise.all(
     proofList.map(async (p) => {
       let signedUrl: string | null = null;
@@ -187,12 +239,20 @@ export async function getAdminPaymentById(
     order: {
       ...order,
       client: {
-        ...(rawClient || {}),
+        ...(clientProfile || {
+          id: order.user_id,
+          full_name: "Klien",
+          phone: null,
+          avatar_url: null,
+          role: "client",
+          created_at: "",
+          updated_at: "",
+        }),
         email: "",
       },
       invitation: rawInv,
       template: rawTpl,
-      reviewer: rawRev || null,
+      reviewer: reviewerProfile,
     },
     proofs: proofsWithSignedUrls,
   };

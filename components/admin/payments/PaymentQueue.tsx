@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { getPaymentStatusInfo } from "@/lib/constants/payment";
 import type { AdminPaymentQueueItem, AdminPaymentStats } from "@/lib/data/admin-payments";
 
 export interface PaymentQueueProps {
@@ -33,33 +34,11 @@ export function PaymentQueue({ initialOrders, stats }: PaymentQueueProps) {
   }
 
   function getStatusBadge(status: string) {
-    switch (status) {
-      case "pending_verification":
-        return {
-          label: "Menunggu Pengesahan",
-          className: "bg-blue-50 text-blue-800 border-blue-200",
-        };
-      case "paid":
-        return {
-          label: "Telah Dibayar",
-          className: "bg-emerald-50 text-emerald-800 border-emerald-200",
-        };
-      case "payment_rejected":
-        return {
-          label: "Bayaran Ditolak",
-          className: "bg-red-50 text-red-800 border-red-200",
-        };
-      case "pending_payment":
-        return {
-          label: "Menunggu Bayaran",
-          className: "bg-amber-50 text-amber-800 border-amber-200",
-        };
-      default:
-        return {
-          label: status,
-          className: "bg-stone-100 text-stone-600 border-stone-200",
-        };
-    }
+    const info = getPaymentStatusInfo(status);
+    return {
+      label: info.label,
+      className: info.badgeClass,
+    };
   }
 
   return (
