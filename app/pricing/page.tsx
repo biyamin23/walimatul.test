@@ -118,8 +118,8 @@ export default function PricingPage() {
                     Touch &apos;n Go eWallet
                   </p>
                   <p className="text-xs text-[var(--text-subtle)] mt-1">
-                    Scan the payment QR, upload your payment proof, and our team
-                    will activate your invitation within 24 hours.
+                    Scan the payment QR, upload your payment proof. Once your
+                    payment is verified, your invitation will be activated.
                   </p>
                 </div>
 
