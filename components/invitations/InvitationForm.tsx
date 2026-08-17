@@ -20,21 +20,40 @@ export function InvitationForm({
   onChange,
   errors = {},
 }: InvitationFormProps) {
+  // Shared styling classes for consistent field presentation & iOS zoom prevention
+  const inputClass =
+    "w-full max-w-full min-w-0 box-border px-3.5 py-2.5 min-h-[48px] sm:min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]";
+
+  const urlInputClass =
+    "w-full max-w-full min-w-0 box-border px-3.5 py-2.5 min-h-[48px] sm:min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-xs font-mono text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]";
+
+  const textareaClass =
+    "w-full max-w-full min-w-0 box-border px-3.5 py-2.5 min-h-[110px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)] resize-y";
+
+  const labelClass =
+    "block text-xs sm:text-xs font-semibold font-ui text-[var(--text)] mb-1.5 break-words max-w-full";
+
+  const helperClass =
+    "text-[11px] sm:text-xs text-[var(--text-subtle)] font-ui mt-1.5 leading-relaxed break-words max-w-full";
+
+  const errorClass =
+    "text-xs text-red-600 font-ui mt-1.5 font-medium break-words max-w-full";
+
+  const fieldsetClass =
+    "p-4 sm:p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-4 sm:space-y-5 w-full max-w-full min-w-0 box-border overflow-hidden";
+
   return (
-    <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+    <form className="space-y-6 sm:space-y-8 w-full max-w-full min-w-0 box-border" onSubmit={(e) => e.preventDefault()}>
       {/* ── Section 1: Couple Details ── */}
-      <fieldset className="p-5 sm:p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
-        <legend className="text-base font-semibold font-display text-[var(--primary)] px-2">
+      <fieldset className={fieldsetClass}>
+        <legend className="text-sm sm:text-base font-semibold font-display text-[var(--primary)] px-2 max-w-full break-words">
           1. Maklumat Mempelai (Couple Details)
         </legend>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
           {/* Groom Full Name */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="groom-name"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="groom-name" className={labelClass}>
               Nama Penuh Pengantin Lelaki
             </label>
             <input
@@ -43,19 +62,14 @@ export function InvitationForm({
               value={values.groomName || ""}
               onChange={(e) => onChange("groomName", e.target.value)}
               placeholder="Abu Bakar bin Abdullah"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={inputClass}
             />
-            {errors.groomName && (
-              <p className="text-xs text-red-600 font-ui">{errors.groomName[0]}</p>
-            )}
+            {errors.groomName && <p className={errorClass}>{errors.groomName[0]}</p>}
           </div>
 
           {/* Groom Short Name */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="groom-short-name"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="groom-short-name" className={labelClass}>
               Nama Panggilan / Ringkas (Lelaki)
             </label>
             <input
@@ -64,19 +78,14 @@ export function InvitationForm({
               value={values.groomShortName || ""}
               onChange={(e) => onChange("groomShortName", e.target.value)}
               placeholder="Abu"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={inputClass}
             />
-            <p className="text-[11px] text-[var(--text-subtle)] font-ui">
-              Dipaparkan besar pada muka depan jemputan.
-            </p>
+            <p className={helperClass}>Dipaparkan besar pada muka depan jemputan.</p>
           </div>
 
           {/* Bride Full Name */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="bride-name"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="bride-name" className={labelClass}>
               Nama Penuh Pengantin Perempuan
             </label>
             <input
@@ -85,19 +94,14 @@ export function InvitationForm({
               value={values.brideName || ""}
               onChange={(e) => onChange("brideName", e.target.value)}
               placeholder="Siti Hana binti Roslan"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={inputClass}
             />
-            {errors.brideName && (
-              <p className="text-xs text-red-600 font-ui">{errors.brideName[0]}</p>
-            )}
+            {errors.brideName && <p className={errorClass}>{errors.brideName[0]}</p>}
           </div>
 
           {/* Bride Short Name */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="bride-short-name"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="bride-short-name" className={labelClass}>
               Nama Panggilan / Ringkas (Perempuan)
             </label>
             <input
@@ -106,28 +110,23 @@ export function InvitationForm({
               value={values.brideShortName || ""}
               onChange={(e) => onChange("brideShortName", e.target.value)}
               placeholder="Hana"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={inputClass}
             />
-            <p className="text-[11px] text-[var(--text-subtle)] font-ui">
-              Dipaparkan besar pada muka depan jemputan.
-            </p>
+            <p className={helperClass}>Dipaparkan besar pada muka depan jemputan.</p>
           </div>
         </div>
       </fieldset>
 
       {/* ── Section 2: Date & Time ── */}
-      <fieldset className="p-5 sm:p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
-        <legend className="text-base font-semibold font-display text-[var(--primary)] px-2">
+      <fieldset className={fieldsetClass}>
+        <legend className="text-sm sm:text-base font-semibold font-display text-[var(--primary)] px-2 max-w-full break-words">
           2. Tarikh &amp; Masa (Date &amp; Time)
         </legend>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full min-w-0">
           {/* Wedding Date */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="wedding-date"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="wedding-date" className={labelClass}>
               Tarikh Majlis
             </label>
             <input
@@ -135,19 +134,14 @@ export function InvitationForm({
               type="date"
               value={values.weddingDate || ""}
               onChange={(e) => onChange("weddingDate", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all"
+              className={inputClass}
             />
-            {errors.weddingDate && (
-              <p className="text-xs text-red-600 font-ui">{errors.weddingDate[0]}</p>
-            )}
+            {errors.weddingDate && <p className={errorClass}>{errors.weddingDate[0]}</p>}
           </div>
 
           {/* Start Time */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="start-time"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="start-time" className={labelClass}>
               Masa Mula
             </label>
             <input
@@ -155,16 +149,13 @@ export function InvitationForm({
               type="time"
               value={values.startTime || ""}
               onChange={(e) => onChange("startTime", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all"
+              className={inputClass}
             />
           </div>
 
           {/* End Time */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="end-time"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="end-time" className={labelClass}>
               Masa Tamat
             </label>
             <input
@@ -172,28 +163,23 @@ export function InvitationForm({
               type="time"
               value={values.endTime || ""}
               onChange={(e) => onChange("endTime", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all"
+              className={inputClass}
             />
-            {errors.endTime && (
-              <p className="text-xs text-red-600 font-ui">{errors.endTime[0]}</p>
-            )}
+            {errors.endTime && <p className={errorClass}>{errors.endTime[0]}</p>}
           </div>
         </div>
       </fieldset>
 
       {/* ── Section 3: Venue & Location ── */}
-      <fieldset className="p-5 sm:p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
-        <legend className="text-base font-semibold font-display text-[var(--primary)] px-2">
+      <fieldset className={fieldsetClass}>
+        <legend className="text-sm sm:text-base font-semibold font-display text-[var(--primary)] px-2 max-w-full break-words">
           3. Lokasi Majlis (Venue &amp; Location)
         </legend>
 
-        <div className="space-y-4">
+        <div className="space-y-4 w-full min-w-0">
           {/* Venue Name */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="venue-name"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="venue-name" className={labelClass}>
               Nama Tempat / Dewan / Kediaman
             </label>
             <input
@@ -202,16 +188,13 @@ export function InvitationForm({
               value={values.venueName || ""}
               onChange={(e) => onChange("venueName", e.target.value)}
               placeholder="Dewan Seri Melati"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={inputClass}
             />
           </div>
 
           {/* Venue Address */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="venue-address"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="venue-address" className={labelClass}>
               Alamat Penuh
             </label>
             <textarea
@@ -220,17 +203,14 @@ export function InvitationForm({
               value={values.venueAddress || ""}
               onChange={(e) => onChange("venueAddress", e.target.value)}
               placeholder="Jalan Tuanku Abdul Rahman, 50100 Kuala Lumpur, Malaysia"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={textareaClass}
             />
           </div>
 
           {/* Navigation Links */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div className="space-y-1.5">
-              <label
-                htmlFor="maps-url"
-                className="block text-xs font-semibold font-ui text-[var(--text)]"
-              >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 w-full min-w-0">
+            <div className="space-y-1 min-w-0">
+              <label htmlFor="maps-url" className={labelClass}>
                 Pautan Google Maps (Pilihan)
               </label>
               <input
@@ -239,20 +219,15 @@ export function InvitationForm({
                 value={values.googleMapsUrl || ""}
                 onChange={(e) => onChange("googleMapsUrl", e.target.value)}
                 placeholder="https://maps.google.com/..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-xs font-mono text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+                className={urlInputClass}
               />
               {errors.googleMapsUrl && (
-                <p className="text-xs text-red-600 font-ui">
-                  {errors.googleMapsUrl[0]}
-                </p>
+                <p className={errorClass}>{errors.googleMapsUrl[0]}</p>
               )}
             </div>
 
-            <div className="space-y-1.5">
-              <label
-                htmlFor="waze-url"
-                className="block text-xs font-semibold font-ui text-[var(--text)]"
-              >
+            <div className="space-y-1 min-w-0">
+              <label htmlFor="waze-url" className={labelClass}>
                 Pautan Waze (Pilihan)
               </label>
               <input
@@ -261,10 +236,10 @@ export function InvitationForm({
                 value={values.wazeUrl || ""}
                 onChange={(e) => onChange("wazeUrl", e.target.value)}
                 placeholder="https://waze.com/..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-xs font-mono text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+                className={urlInputClass}
               />
               {errors.wazeUrl && (
-                <p className="text-xs text-red-600 font-ui">{errors.wazeUrl[0]}</p>
+                <p className={errorClass}>{errors.wazeUrl[0]}</p>
               )}
             </div>
           </div>
@@ -272,18 +247,15 @@ export function InvitationForm({
       </fieldset>
 
       {/* ── Section 4: Messages ── */}
-      <fieldset className="p-5 sm:p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
-        <legend className="text-base font-semibold font-display text-[var(--primary)] px-2">
+      <fieldset className={fieldsetClass}>
+        <legend className="text-sm sm:text-base font-semibold font-display text-[var(--primary)] px-2 max-w-full break-words">
           4. Ucapan &amp; Mesej (Invitation Messages)
         </legend>
 
-        <div className="space-y-4">
+        <div className="space-y-4 w-full min-w-0">
           {/* Opening Quote */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="opening-message"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="opening-message" className={labelClass}>
               Kata Aluan / Ayat Al-Quran / Doa Permulaan
             </label>
             <textarea
@@ -292,16 +264,13 @@ export function InvitationForm({
               value={values.openingMessage || ""}
               onChange={(e) => onChange("openingMessage", e.target.value)}
               placeholder="“Dan di antara tanda-tanda kebesaran-Nya...”"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={textareaClass}
             />
           </div>
 
           {/* Formal Invitation Text */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="invitation-message"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="invitation-message" className={labelClass}>
               Teks Jemputan Rasmi
             </label>
             <textarea
@@ -310,16 +279,13 @@ export function InvitationForm({
               value={values.invitationMessage || ""}
               onChange={(e) => onChange("invitationMessage", e.target.value)}
               placeholder="Dengan penuh kesyukuran ke hadrat Ilahi, kami menjemput..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={textareaClass}
             />
           </div>
 
           {/* Closing Message */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="closing-message"
-              className="block text-xs font-semibold font-ui text-[var(--text)]"
-            >
+          <div className="space-y-1 min-w-0">
+            <label htmlFor="closing-message" className={labelClass}>
               Ucapan Penutup / Harapan
             </label>
             <textarea
@@ -328,26 +294,29 @@ export function InvitationForm({
               value={values.closingMessage || ""}
               onChange={(e) => onChange("closingMessage", e.target.value)}
               placeholder="Semoga dengan kehadiran dan doa restu hadirin..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+              className={textareaClass}
             />
           </div>
         </div>
       </fieldset>
 
       {/* ── Section 5: RSVP Settings ── */}
-      <fieldset className="p-5 sm:p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
-        <legend className="text-base font-semibold font-display text-[var(--primary)] px-2">
+      <fieldset className={fieldsetClass}>
+        <legend className="text-sm sm:text-base font-semibold font-display text-[var(--primary)] px-2 max-w-full break-words">
           5. Tetapan RSVP (Guest Attendance)
         </legend>
 
-        <div className="space-y-4">
-          {/* RSVP Toggle */}
-          <div className="flex items-center justify-between p-3.5 rounded-xl bg-[var(--surface-warm)] border border-[var(--border-soft)]">
-            <div>
-              <p className="text-sm font-semibold font-ui text-[var(--text)]">
+        <div className="space-y-4 w-full min-w-0">
+          {/* RSVP Toggle Card */}
+          <label
+            htmlFor="rsvp-enabled-checkbox"
+            className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-[var(--surface-warm)] border border-[var(--border-soft)] gap-3 min-w-0 w-full cursor-pointer hover:border-[var(--border)] transition-colors select-none"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold font-ui text-[var(--text)] break-words">
                 Aktifkan Borang RSVP
               </p>
-              <p className="text-xs text-[var(--text-muted)] font-ui">
+              <p className="text-xs text-[var(--text-muted)] font-ui mt-0.5 break-words">
                 Membolehkan tetamu mengesahkan kehadiran dan jumlah pax.
               </p>
             </div>
@@ -356,18 +325,15 @@ export function InvitationForm({
               id="rsvp-enabled-checkbox"
               checked={values.rsvpEnabled}
               onChange={(e) => onChange("rsvpEnabled", e.target.checked)}
-              className="w-5 h-5 accent-[var(--primary)] rounded cursor-pointer"
+              className="shrink-0 w-5 h-5 accent-[var(--primary)] rounded cursor-pointer"
             />
-          </div>
+          </label>
 
           {values.rsvpEnabled && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 w-full min-w-0">
               {/* RSVP Deadline */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="rsvp-deadline"
-                  className="block text-xs font-semibold font-ui text-[var(--text)]"
-                >
+              <div className="space-y-1 min-w-0">
+                <label htmlFor="rsvp-deadline" className={labelClass}>
                   Tarikh Akhir Pengesahan (RSVP Deadline)
                 </label>
                 <input
@@ -375,16 +341,13 @@ export function InvitationForm({
                   type="date"
                   value={values.rsvpDeadline || ""}
                   onChange={(e) => onChange("rsvpDeadline", e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all"
+                  className={inputClass}
                 />
               </div>
 
               {/* Max Pax */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="max-pax"
-                  className="block text-xs font-semibold font-ui text-[var(--text)]"
-                >
+              <div className="space-y-1 min-w-0">
+                <label htmlFor="max-pax" className={labelClass}>
                   Maksimum Pax bagi Setiap Tetamu
                 </label>
                 <input
@@ -394,24 +357,26 @@ export function InvitationForm({
                   max={20}
                   value={values.maxPax}
                   onChange={(e) => onChange("maxPax", parseInt(e.target.value, 10) || 1)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all"
+                  className={inputClass}
                 />
               </div>
 
               {/* Allow Guest Message */}
-              <div className="sm:col-span-2 flex items-center gap-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="allow-guest-message-checkbox"
-                  checked={values.allowGuestMessage}
-                  onChange={(e) => onChange("allowGuestMessage", e.target.checked)}
-                  className="w-4 h-4 accent-[var(--primary)] rounded cursor-pointer"
-                />
+              <div className="sm:col-span-2 pt-1 min-w-0">
                 <label
                   htmlFor="allow-guest-message-checkbox"
-                  className="text-xs font-ui text-[var(--text)] cursor-pointer select-none"
+                  className="flex items-start gap-2.5 min-w-0 w-full cursor-pointer select-none"
                 >
-                  Benarkan tetamu menulis ucapan / doa bersama borang RSVP
+                  <input
+                    type="checkbox"
+                    id="allow-guest-message-checkbox"
+                    checked={values.allowGuestMessage}
+                    onChange={(e) => onChange("allowGuestMessage", e.target.checked)}
+                    className="mt-0.5 shrink-0 w-4 h-4 accent-[var(--primary)] rounded cursor-pointer"
+                  />
+                  <span className="text-xs font-ui text-[var(--text)] leading-normal break-words flex-1">
+                    Benarkan tetamu menulis ucapan / doa bersama borang RSVP
+                  </span>
                 </label>
               </div>
             </div>
@@ -420,8 +385,8 @@ export function InvitationForm({
       </fieldset>
 
       {/* ── Section 6: Invitation URL (Slug) ── */}
-      <fieldset className="p-5 sm:p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
-        <legend className="text-base font-semibold font-display text-[var(--primary)] px-2">
+      <fieldset className={fieldsetClass}>
+        <legend className="text-sm sm:text-base font-semibold font-display text-[var(--primary)] px-2 max-w-full break-words">
           6. Pautan Jemputan (Unique URL)
         </legend>
 

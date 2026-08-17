@@ -15,13 +15,13 @@ export function SaveStatusIndicator({
 }: SaveStatusIndicatorProps) {
   return (
     <div
-      className={`inline-flex items-center gap-1.5 text-xs font-ui ${className}`}
+      className={`inline-flex items-center gap-1.5 text-xs font-ui whitespace-nowrap select-none ${className}`}
       aria-live="polite"
     >
       {status === "saving" && (
         <>
           <svg
-            className="animate-spin h-3.5 w-3.5 text-[var(--gold)]"
+            className="animate-spin h-3.5 w-3.5 text-[var(--gold)] shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -41,14 +41,14 @@ export function SaveStatusIndicator({
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          <span className="text-[var(--text-muted)]">Saving...</span>
+          <span className="text-[var(--text-muted)] text-[11px] sm:text-xs">Saving…</span>
         </>
       )}
 
       {status === "saved" && (
         <>
           <svg
-            className="h-3.5 w-3.5 text-emerald-600"
+            className="h-3.5 w-3.5 text-emerald-600 shrink-0"
             viewBox="0 0 20 20"
             fill="currentColor"
             aria-hidden="true"
@@ -59,21 +59,21 @@ export function SaveStatusIndicator({
               clipRule="evenodd"
             />
           </svg>
-          <span className="text-emerald-700 font-medium">Saved</span>
+          <span className="text-emerald-700 font-medium text-[11px] sm:text-xs">Saved ✓</span>
         </>
       )}
 
       {status === "unsaved" && (
         <>
-          <span className="w-2 h-2 rounded-full bg-[var(--gold)]" aria-hidden="true" />
-          <span className="text-[var(--text-muted)]">Unsaved changes</span>
+          <span className="w-2 h-2 rounded-full bg-[var(--gold)] shrink-0" aria-hidden="true" />
+          <span className="text-[var(--text-muted)] text-[11px] sm:text-xs">Unsaved</span>
         </>
       )}
 
       {status === "error" && (
         <>
           <svg
-            className="h-3.5 w-3.5 text-red-600"
+            className="h-3.5 w-3.5 text-red-600 shrink-0"
             viewBox="0 0 20 20"
             fill="currentColor"
             aria-hidden="true"
@@ -84,8 +84,11 @@ export function SaveStatusIndicator({
               clipRule="evenodd"
             />
           </svg>
-          <span className="text-red-600 font-medium" title={errorMessage}>
-            {errorMessage || "Couldn't save"}
+          <span
+            className="text-red-600 font-medium text-[11px] sm:text-xs truncate max-w-[120px] sm:max-w-[200px]"
+            title={errorMessage}
+          >
+            {errorMessage || "Save failed"}
           </span>
         </>
       )}

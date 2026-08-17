@@ -73,7 +73,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
       padding="none"
       className="overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-elevated)] transition-all"
     >
-      <div className="p-5 sm:p-6">
+      <div className="p-4 sm:p-6">
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-3">
           <Badge variant={statusBadgeVariant}>{statusLabel}</Badge>
@@ -125,7 +125,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
       </div>
 
       {/* Footer Actions */}
-      <div className="px-5 py-3.5 bg-[var(--surface-warm)] border-t border-[var(--border-soft)] flex items-center justify-between gap-2">
+      <div className="px-4 sm:px-5 py-3 sm:py-3.5 bg-[var(--surface-warm)] border-t border-[var(--border-soft)] flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Link
             href={`/dashboard/invitations/${invitation.id}/edit`}

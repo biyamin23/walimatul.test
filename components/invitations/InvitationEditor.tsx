@@ -140,98 +140,99 @@ export function InvitationEditor({
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--background)]">
-      {/* ── Sticky Top Bar ── */}
-      <header className="sticky top-0 z-40 bg-[var(--surface)] border-b border-[var(--border)] px-4 py-3 shadow-xs">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          {/* Left: Back Link & Title */}
-          <div className="flex items-center gap-3 min-w-0">
-            <Link
-              href="/dashboard/invitations"
-              aria-label="Back to My Invitations"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold font-ui text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] rounded py-1 px-1.5 -ml-1.5"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+    <div className="min-h-screen flex flex-col bg-[var(--background)] max-w-full overflow-x-hidden">
+      {/* ── Compact Sticky Top Bar ── */}
+      <header className="sticky top-0 z-40 bg-[var(--surface)] border-b border-[var(--border)] px-3 sm:px-4 py-2 sm:py-3 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-col gap-2">
+          {/* Top Row: Navigation, Title & Save Status */}
+          <div className="flex items-center justify-between gap-2 min-w-0 w-full">
+            {/* Left: Back Link & Title */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Link
+                href="/dashboard/invitations"
+                aria-label="Back to My Invitations"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-full text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--surface-warm)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] shrink-0"
               >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-              <span className="hidden sm:inline">My Invitations</span>
-            </Link>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </Link>
 
-            <span className="text-[var(--border)] hidden sm:inline">|</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 truncate min-w-0">
+                <h1 className="font-display text-sm sm:text-base font-semibold text-[var(--text)] truncate">
+                  {invitation.template?.name || "Blush Garden"}
+                </h1>
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-[var(--gold)]/15 text-[var(--gold)] font-ui shrink-0">
+                  Draft
+                </span>
+              </div>
+            </div>
 
-            <div className="flex items-center gap-2 truncate">
-              <h1 className="font-display text-sm sm:text-base font-semibold text-[var(--text)] truncate">
-                {invitation.template?.name || "Blush Garden"}
-              </h1>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[var(--gold)]/15 text-[var(--gold)] font-ui shrink-0">
-                Draft
-              </span>
+            {/* Right: Single Canonical Save Status & Action */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <SaveStatusIndicator
+                status={saveStatus}
+                errorMessage={errorMessage}
+              />
+
+              <button
+                type="button"
+                onClick={handleManualSave}
+                disabled={saveStatus === "saving"}
+                className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 rounded-full bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] active:scale-95 transition-all shadow-xs disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
+              >
+                {saveStatus === "saving" ? "Saving..." : "Save Draft"}
+              </button>
             </div>
           </div>
 
-          {/* Center on Mobile: Edit / Preview Tab Switcher */}
-          <div className="flex lg:hidden items-center bg-[var(--surface-warm)] p-1 rounded-full border border-[var(--border)] text-xs font-ui">
-            <button
-              type="button"
-              onClick={() => setActiveTab("edit")}
-              className={`px-4 py-1.5 rounded-full font-semibold transition-all ${
-                activeTab === "edit"
-                  ? "bg-[var(--primary)] text-white shadow-xs"
-                  : "text-[var(--text-muted)] hover:text-[var(--text)]"
-              }`}
-            >
-              Edit Form
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("preview")}
-              className={`px-4 py-1.5 rounded-full font-semibold transition-all ${
-                activeTab === "preview"
-                  ? "bg-[var(--primary)] text-white shadow-xs"
-                  : "text-[var(--text-muted)] hover:text-[var(--text)]"
-              }`}
-            >
-              Live Preview
-            </button>
-          </div>
-
-          {/* Right: Save Status & Manual Save Button */}
-          <div className="flex items-center gap-3 shrink-0">
-            <SaveStatusIndicator
-              status={saveStatus}
-              errorMessage={errorMessage}
-              className="hidden sm:inline-flex"
-            />
-
-            <button
-              type="button"
-              onClick={handleManualSave}
-              disabled={saveStatus === "saving"}
-              className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] active:scale-95 transition-all shadow-xs disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
-            >
-              {saveStatus === "saving" ? "Saving..." : "Save Draft"}
-            </button>
+          {/* Bottom Row on Mobile Only: Segmented Tab Switcher */}
+          <div className="flex lg:hidden items-center justify-center w-full pt-0.5">
+            <div className="flex items-center bg-[var(--surface-warm)] p-0.5 rounded-full border border-[var(--border)] text-xs font-ui w-full max-w-xs">
+              <button
+                type="button"
+                onClick={() => setActiveTab("edit")}
+                className={`flex-1 py-1.5 rounded-full font-semibold transition-all text-center ${
+                  activeTab === "edit"
+                    ? "bg-[var(--primary)] text-white shadow-xs"
+                    : "text-[var(--text-muted)] hover:text-[var(--text)]"
+                }`}
+              >
+                Edit Form
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("preview")}
+                className={`flex-1 py-1.5 rounded-full font-semibold transition-all text-center ${
+                  activeTab === "preview"
+                    ? "bg-[var(--primary)] text-white shadow-xs"
+                    : "text-[var(--text-muted)] hover:text-[var(--text)]"
+                }`}
+              >
+                Live Preview
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* ── Main Editor Body ── */}
-      <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full p-3.5 sm:p-6 lg:p-8 min-w-0 box-border">
         {/* Desktop Split View: Form (Left 42%) | Sticky Live Preview (Right 58%) */}
-        <div className="hidden lg:grid lg:grid-cols-12 gap-8 items-start">
+        <div className="hidden lg:grid lg:grid-cols-12 gap-8 items-start min-w-0 w-full">
           {/* Left: Scrollable Form */}
-          <div className="lg:col-span-5 space-y-6 pb-24">
-            <div className="bg-[var(--surface-warm)] p-4 rounded-xl border border-[var(--border-soft)] text-xs font-ui text-[var(--text-muted)]">
+          <div className="lg:col-span-5 min-w-0 space-y-6 pb-24">
+            <div className="bg-[var(--surface-warm)] p-4 rounded-xl border border-[var(--border-soft)] text-xs font-ui text-[var(--text-muted)] leading-relaxed">
               <p>
                 Perubahan pada borang akan dikemaskini secara langsung pada
                 paparan jemputan di sebelah kanan dan disimpan secara automatik.
@@ -247,7 +248,7 @@ export function InvitationEditor({
           </div>
 
           {/* Right: Sticky Live Preview */}
-          <div className="lg:col-span-7 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-3xl border border-[var(--border)] shadow-xl bg-[#1A2E26] p-4 flex flex-col items-center">
+          <div className="lg:col-span-7 min-w-0 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-3xl border border-[var(--border)] shadow-xl bg-[#1A2E26] p-4 flex flex-col items-center">
             <div className="w-full flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-white text-xs font-ui">
               <span className="font-semibold text-[#F5DDD6]">Live Preview</span>
               <span className="text-[10px] text-white/50">
@@ -261,16 +262,10 @@ export function InvitationEditor({
         </div>
 
         {/* Mobile / Tablet Tabbed View */}
-        <div className="lg:hidden">
+        <div className="lg:hidden w-full max-w-full min-w-0">
           {activeTab === "edit" ? (
-            <div className="space-y-6 pb-24">
-              <div className="flex items-center justify-between px-1">
-                <SaveStatusIndicator
-                  status={saveStatus}
-                  errorMessage={errorMessage}
-                />
-              </div>
-
+            <div className="space-y-6 pb-24 w-full max-w-full min-w-0">
+              {/* Note: Duplicate save status indicator removed. Single indicator is in top bar. */}
               <InvitationForm
                 invitationId={invitation.id}
                 values={formValues}
@@ -279,12 +274,12 @@ export function InvitationEditor({
               />
             </div>
           ) : (
-            <div className="rounded-2xl overflow-hidden shadow-2xl pb-16">
+            <div className="rounded-2xl overflow-hidden shadow-2xl pb-16 w-full max-w-full min-w-0">
               <BlushGardenTemplate data={liveTemplateData} mode="editor" />
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
