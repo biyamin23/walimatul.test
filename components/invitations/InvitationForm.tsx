@@ -126,8 +126,8 @@ export function InvitationForm({
           2. Tarikh &amp; Masa (Date &amp; Time)
         </legend>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full min-w-0">
-          {/* Wedding Date */}
+        <div className="space-y-4 w-full min-w-0">
+          {/* Wedding Date (Full-width row) */}
           <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="wedding-date" className={labelClass}>
               Tarikh Majlis
@@ -142,33 +142,36 @@ export function InvitationForm({
             {errors.weddingDate && <p className={errorClass}>{errors.weddingDate[0]}</p>}
           </div>
 
-          {/* Start Time */}
-          <div className="space-y-1 min-w-0 w-full">
-            <label htmlFor="start-time" className={labelClass}>
-              Masa Mula
-            </label>
-            <input
-              id="start-time"
-              type="time"
-              value={values.startTime || ""}
-              onChange={(e) => onChange("startTime", e.target.value)}
-              className={dateTimeInputClass}
-            />
-          </div>
+          {/* Time Row (Stacked on mobile, 2-column on desktop) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
+            {/* Start Time */}
+            <div className="space-y-1 min-w-0 w-full">
+              <label htmlFor="start-time" className={labelClass}>
+                Masa Mula
+              </label>
+              <input
+                id="start-time"
+                type="time"
+                value={values.startTime || ""}
+                onChange={(e) => onChange("startTime", e.target.value)}
+                className={dateTimeInputClass}
+              />
+            </div>
 
-          {/* End Time */}
-          <div className="space-y-1 min-w-0 w-full">
-            <label htmlFor="end-time" className={labelClass}>
-              Masa Tamat
-            </label>
-            <input
-              id="end-time"
-              type="time"
-              value={values.endTime || ""}
-              onChange={(e) => onChange("endTime", e.target.value)}
-              className={dateTimeInputClass}
-            />
-            {errors.endTime && <p className={errorClass}>{errors.endTime[0]}</p>}
+            {/* End Time */}
+            <div className="space-y-1 min-w-0 w-full">
+              <label htmlFor="end-time" className={labelClass}>
+                Masa Tamat
+              </label>
+              <input
+                id="end-time"
+                type="time"
+                value={values.endTime || ""}
+                onChange={(e) => onChange("endTime", e.target.value)}
+                className={dateTimeInputClass}
+              />
+              {errors.endTime && <p className={errorClass}>{errors.endTime[0]}</p>}
+            </div>
           </div>
         </div>
       </fieldset>
@@ -210,41 +213,40 @@ export function InvitationForm({
             />
           </div>
 
-          {/* Navigation Links */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 w-full min-w-0">
-            <div className="space-y-1 min-w-0 w-full">
-              <label htmlFor="maps-url" className={labelClass}>
-                Pautan Google Maps (Pilihan)
-              </label>
-              <input
-                id="maps-url"
-                type="url"
-                value={values.googleMapsUrl || ""}
-                onChange={(e) => onChange("googleMapsUrl", e.target.value)}
-                placeholder="https://maps.google.com/..."
-                className={urlInputClass}
-              />
-              {errors.googleMapsUrl && (
-                <p className={errorClass}>{errors.googleMapsUrl[0]}</p>
-              )}
-            </div>
+          {/* Google Maps URL (Full-width row on all breakpoints) */}
+          <div className="space-y-1 min-w-0 w-full">
+            <label htmlFor="maps-url" className={labelClass}>
+              Pautan Google Maps (Pilihan)
+            </label>
+            <input
+              id="maps-url"
+              type="url"
+              value={values.googleMapsUrl || ""}
+              onChange={(e) => onChange("googleMapsUrl", e.target.value)}
+              placeholder="https://maps.google.com/..."
+              className={urlInputClass}
+            />
+            {errors.googleMapsUrl && (
+              <p className={errorClass}>{errors.googleMapsUrl[0]}</p>
+            )}
+          </div>
 
-            <div className="space-y-1 min-w-0 w-full">
-              <label htmlFor="waze-url" className={labelClass}>
-                Pautan Waze (Pilihan)
-              </label>
-              <input
-                id="waze-url"
-                type="url"
-                value={values.wazeUrl || ""}
-                onChange={(e) => onChange("wazeUrl", e.target.value)}
-                placeholder="https://waze.com/..."
-                className={urlInputClass}
-              />
-              {errors.wazeUrl && (
-                <p className={errorClass}>{errors.wazeUrl[0]}</p>
-              )}
-            </div>
+          {/* Waze URL (Full-width row on all breakpoints) */}
+          <div className="space-y-1 min-w-0 w-full">
+            <label htmlFor="waze-url" className={labelClass}>
+              Pautan Waze (Pilihan)
+            </label>
+            <input
+              id="waze-url"
+              type="url"
+              value={values.wazeUrl || ""}
+              onChange={(e) => onChange("wazeUrl", e.target.value)}
+              placeholder="https://waze.com/..."
+              className={urlInputClass}
+            />
+            {errors.wazeUrl && (
+              <p className={errorClass}>{errors.wazeUrl[0]}</p>
+            )}
           </div>
         </div>
       </fieldset>
@@ -333,8 +335,8 @@ export function InvitationForm({
           </label>
 
           {values.rsvpEnabled && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 w-full min-w-0">
-              {/* RSVP Deadline */}
+            <div className="space-y-4 pt-1 w-full min-w-0">
+              {/* RSVP Deadline (Full-width row on all breakpoints) */}
               <div className="space-y-1 min-w-0 w-full">
                 <label htmlFor="rsvp-deadline" className={labelClass}>
                   Tarikh Akhir RSVP
@@ -348,7 +350,7 @@ export function InvitationForm({
                 />
               </div>
 
-              {/* Max Pax */}
+              {/* Max Pax (Full-width row on all breakpoints) */}
               <div className="space-y-1 min-w-0 w-full">
                 <label htmlFor="max-pax" className={labelClass}>
                   Maksimum Pax bagi Setiap Tetamu
@@ -365,7 +367,7 @@ export function InvitationForm({
               </div>
 
               {/* Allow Guest Message */}
-              <div className="sm:col-span-2 pt-1 min-w-0 w-full">
+              <div className="pt-1 min-w-0 w-full">
                 <label
                   htmlFor="allow-guest-message-checkbox"
                   className="flex items-start gap-2.5 min-w-0 w-full cursor-pointer select-none"

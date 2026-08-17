@@ -325,9 +325,12 @@ body {
   background-clip: text;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Form Controls Responsive Normalization
-   ───────────────────────────────────────────────────────────────────────────── */
+/* Ensure fieldset elements obey container bounds across all browsers */
+fieldset {
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+}
 
 input[type="date"],
 input[type="time"] {
