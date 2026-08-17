@@ -190,6 +190,16 @@ export async function submitPaymentProofAction(
     };
   }
 
+  // Revalidate paths for immediate consistency
+  const { data: orderData } = await supabase
+    .from("orders")
+    .select("invitation_id")
+    .eq("id", parsed.data.orderId)
+    .single();
+
+  if (orderData?.invitation_id) {
+    revalidatePath(`/dashboard/invitations/${orderData.invitation_id}/payment`);
+  }
   revalidatePath("/dashboard/billing");
   revalidatePath("/dashboard/invitations");
 

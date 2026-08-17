@@ -62,6 +62,24 @@ export function PaymentCheckoutClient({
     }
   }, [invitation.id, order, isPending, template, userId]);
 
+  function handleProofSubmitted(submittedData: {
+    storagePath: string;
+    transactionReference?: string | null;
+  }) {
+    setIsRetryingRejected(false);
+    setOrder((prev) =>
+      prev
+        ? {
+            ...prev,
+            payment_status: "pending_verification",
+            submitted_at: new Date().toISOString(),
+            payment_reference:
+              submittedData.transactionReference || prev.payment_reference,
+          }
+        : null
+    );
+  }
+
   // If order is paid or pending verification, display the status card
   if (order && (order.payment_status === "pending_verification" || order.payment_status === "paid")) {
     return (
@@ -106,6 +124,7 @@ export function PaymentCheckoutClient({
         <PaymentProofUploader
           orderId={order.id}
           userId={userId}
+          onSuccess={handleProofSubmitted}
         />
       ) : (
         <div className="p-8 rounded-3xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-2">

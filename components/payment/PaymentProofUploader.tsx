@@ -10,11 +10,16 @@ import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 export interface PaymentProofUploaderProps {
   orderId: string;
   userId: string;
+  onSuccess?: (data: {
+    storagePath: string;
+    transactionReference?: string | null;
+  }) => void;
 }
 
 export function PaymentProofUploader({
   orderId,
   userId,
+  onSuccess,
 }: PaymentProofUploaderProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -78,48 +83,77 @@ export function PaymentProofUploader({
     setIsUploading(true);
     setErrorMessage(null);
 
+    // Timeout guard (30 seconds) to prevent infinite pending state
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(
+        () =>
+          reject(
+            new Error(
+              "Masa muat naik tamat. Sila periksa sambungan internet anda dan cuba lagi."
+            )
+          ),
+        30000
+      )
+    );
+
     try {
-      const supabase = createClient();
+      const uploadAndSubmitPromise = async () => {
+        const supabase = createClient();
 
-      // 1. Sanitize file name
-      const sanitizedName = selectedFile.name
-        .toLowerCase()
-        .replace(/[^a-z0-9.]/g, "-");
-      const storagePath = `${userId}/${orderId}/${Date.now()}-${sanitizedName}`;
+        // 1. Sanitize file name
+        const sanitizedName = selectedFile.name
+          .toLowerCase()
+          .replace(/[^a-z0-9.]/g, "-");
+        const storagePath = `${userId}/${orderId}/${Date.now()}-${sanitizedName}`;
 
-      // 2. Upload file to Supabase Storage private bucket
-      const { error: uploadError } = await supabase.storage
-        .from(PAYMENT_CONFIG.storageBucket)
-        .upload(storagePath, selectedFile, {
-          cacheControl: "3600",
-          upsert: false,
+        // 2. Upload file to Supabase Storage private bucket
+        const { error: uploadError } = await supabase.storage
+          .from(PAYMENT_CONFIG.storageBucket)
+          .upload(storagePath, selectedFile, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error("[WALIMATUL] Storage upload error:", uploadError.message);
+          throw new Error("Gagal memuat naik fail resit. Sila cuba lagi.");
+        }
+
+        // 3. Submit proof via Server Action
+        const result = await submitPaymentProofAction({
+          orderId,
+          storagePath,
+          transactionReference: transactionRef.trim() || null,
         });
 
-      if (uploadError) {
-        console.error("[WALIMATUL] Storage upload error:", uploadError.message);
-        setErrorMessage("Gagal memuat naik fail resit. Sila cuba lagi.");
-        setIsUploading(false);
-        return;
+        if (!result.success) {
+          throw new Error(result.error || "Gagal menghantar pengesahan. Sila cuba lagi.");
+        }
+
+        return { storagePath };
+      };
+
+      const { storagePath } = await Promise.race([
+        uploadAndSubmitPromise(),
+        timeoutPromise,
+      ]);
+
+      // 4. Immediately notify parent component and trigger refresh
+      setIsUploading(false);
+      if (onSuccess) {
+        onSuccess({
+          storagePath,
+          transactionReference: transactionRef.trim() || null,
+        });
       }
-
-      // 3. Submit proof via Server Action
-      const result = await submitPaymentProofAction({
-        orderId,
-        storagePath,
-        transactionReference: transactionRef.trim() || null,
-      });
-
-      if (!result.success) {
-        setErrorMessage(result.error || "Gagal menghantar pengesahan. Sila cuba lagi.");
-        setIsUploading(false);
-        return;
-      }
-
-      // 4. Refresh page state on success
       router.refresh();
-    } catch (err) {
-      console.error("[WALIMATUL] Unexpected upload error:", err);
-      setErrorMessage("Ralat tidak dijangka berlaku. Sila cuba lagi.");
+    } catch (err: unknown) {
+      console.error("[WALIMATUL] Upload/submit error:", err);
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Ralat tidak dijangka berlaku. Sila cuba lagi.";
+      setErrorMessage(msg);
       setIsUploading(false);
     }
   }
