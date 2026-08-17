@@ -153,6 +153,7 @@ RLS enforces ownership — the server client inherits the user's JWT session.
 | 5.3 | Final Editor Form Layout Polish | ✅ Complete |
 | 5.4 | Final iOS Date Input Width Fix | ✅ Complete |
 | 6 | Public Invitation Route & Guest View | ✅ Complete |
-| 7 | Guest RSVP Submission | Next |
-| 8 | RSVP Management Dashboard | Future |
-| 9+ | Payment UI, Admin Verification, Receipt & PDF | Future |
+| 7 | Guest RSVP Submission & Client RSVP Dashboard | ✅ Complete |
+| 8 | Payment UI & Proof Upload (Client Flow) | Next |
+| 9 | Admin Payment Approval & Activation | Future |
+| 10 | Receipt PDF & Approval Email | Future |

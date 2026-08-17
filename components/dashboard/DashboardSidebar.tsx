@@ -36,7 +36,7 @@ const navItems = [
     ),
   },
   {
-    href: "/dashboard/rsvp",
+    href: "/dashboard/invitations",
     label: "RSVP Tracker",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -46,8 +46,6 @@ const navItems = [
         <path d="M16 3.13a4 4 0 010 7.75" />
       </svg>
     ),
-    disabled: true,
-    badge: "Soon",
   },
   {
     href: "/dashboard/billing",

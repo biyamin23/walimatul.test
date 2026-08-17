@@ -1,21 +1,32 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import type { InvitationTemplateData } from "../../types";
 import { formatWeddingDate } from "@/lib/templates/formatters";
+import { GuestRsvpModal } from "@/components/rsvp/GuestRsvpModal";
 
 interface RsvpPreviewSectionProps {
   data: InvitationTemplateData;
+  mode?: "preview" | "live" | "editor";
 }
 
-export function RsvpPreviewSection({ data }: RsvpPreviewSectionProps) {
+export function RsvpPreviewSection({ data, mode = "live" }: RsvpPreviewSectionProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   if (!data.rsvpEnabled) {
     return null;
   }
 
   const deadlineFormatted = data.rsvpDeadline ? formatWeddingDate(data.rsvpDeadline) : null;
 
+  // Check if RSVP deadline has passed (using end-of-day Malaysian local / calendar semantics)
+  const isDeadlinePassed = data.rsvpDeadline
+    ? new Date(`${data.rsvpDeadline}T23:59:59+08:00`) < new Date()
+    : false;
+
   return (
     <section
-      aria-label="RSVP Preview"
+      aria-label="Pengesahan Kehadiran"
       className="relative px-4 sm:px-6 py-10 sm:py-14 max-w-xl mx-auto text-center"
     >
       <div className="rounded-3xl p-6 sm:p-10 bg-gradient-to-b from-[#FCF1EE] via-[#FCF8F3] to-[#FCF1EE] border border-[#B8955A]/35 shadow-sm">
@@ -32,8 +43,16 @@ export function RsvpPreviewSection({ data }: RsvpPreviewSectionProps) {
 
         {deadlineFormatted && (
           <div className="inline-block px-4 py-1.5 rounded-full bg-[#FCF8F3] border border-[#B8955A]/40 text-xs font-inter text-[#174F3A] font-medium mb-6">
-            Mohon sahkan sebelum{" "}
-            <span className="font-semibold text-[#B8955A]">{deadlineFormatted}</span>
+            {isDeadlinePassed ? (
+              <span className="text-red-700 font-semibold">
+                Tarikh akhir RSVP telah tamat ({deadlineFormatted})
+              </span>
+            ) : (
+              <>
+                Mohon sahkan sebelum{" "}
+                <span className="font-semibold text-[#B8955A]">{deadlineFormatted}</span>
+              </>
+            )}
           </div>
         )}
 
@@ -82,19 +101,57 @@ export function RsvpPreviewSection({ data }: RsvpPreviewSectionProps) {
           )}
         </div>
 
-        {/* Presentation RSVP CTA (Non-submitting preview state) */}
-        <button
-          type="button"
-          disabled
-          className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#174F3A] text-white font-inter text-sm font-semibold tracking-wide shadow-md opacity-90 cursor-not-allowed select-none"
-          title="RSVP function is enabled for guests in published invitations"
-        >
-          Sahkan Kehadiran (RSVP)
-        </button>
-        <p className="font-inter text-[11px] text-[#746F6B]/80 mt-2.5">
-          (Borang interaktif aktif pada pautan jemputan rasmi)
-        </p>
+        {/* CTA Button */}
+        {mode === "preview" ? (
+          <div>
+            <button
+              type="button"
+              disabled
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#174F3A] text-white font-inter text-sm font-semibold tracking-wide shadow-md opacity-90 cursor-not-allowed select-none"
+              title="Borang RSVP interaktif aktif pada pautan rasmi jemputan"
+            >
+              Sahkan Kehadiran (RSVP)
+            </button>
+            <p className="font-inter text-[11px] text-[#746F6B]/80 mt-2.5">
+              (Borang interaktif aktif pada pautan jemputan rasmi)
+            </p>
+          </div>
+        ) : isDeadlinePassed ? (
+          <div>
+            <button
+              type="button"
+              disabled
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#746F6B]/30 text-[#746F6B] font-inter text-sm font-semibold tracking-wide cursor-not-allowed select-none"
+            >
+              RSVP Telah Ditutup
+            </button>
+            <p className="font-inter text-[11px] text-red-700/80 mt-2.5 font-medium">
+              Tempoh pengesahan kehadiran bagi majlis ini telah tamat.
+            </p>
+          </div>
+        ) : (
+          <div>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#174F3A] text-white font-inter text-sm font-semibold tracking-wide shadow-md hover:bg-[#123e2d] active:scale-95 transition-all focus-visible:outline-2 focus-visible:outline-[#174F3A] focus-visible:outline-offset-2"
+            >
+              Sahkan Kehadiran (RSVP)
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Interactive Guest RSVP Modal (Active in live mode) */}
+      {mode === "live" && !isDeadlinePassed && (
+        <GuestRsvpModal
+          invitationId={data.id}
+          maxPax={data.maxPax}
+          allowGuestMessage={data.allowGuestMessage}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </section>
   );
 }

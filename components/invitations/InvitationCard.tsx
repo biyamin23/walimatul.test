@@ -131,13 +131,19 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
             href={`/dashboard/invitations/${invitation.id}/edit`}
             className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
           >
-            Edit Draft
+            Edit
           </Link>
           <Link
             href={`/dashboard/invitations/${invitation.id}/edit?mode=preview`}
             className="inline-flex items-center justify-center px-3 py-2 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
           >
             Preview
+          </Link>
+          <Link
+            href={`/dashboard/invitations/${invitation.id}/rsvp`}
+            className="inline-flex items-center justify-center px-3 py-2 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
+          >
+            RSVP
           </Link>
         </div>
 

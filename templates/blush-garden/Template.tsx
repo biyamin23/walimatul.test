@@ -62,7 +62,7 @@ export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentPr
           <GallerySection data={data} />
 
           {/* 6. RSVP Preview Section */}
-          <RsvpPreviewSection data={data} />
+          <RsvpPreviewSection data={data} mode={mode} />
 
           {/* 7. Closing Blessing & Attribution */}
           <ClosingSection data={data} />

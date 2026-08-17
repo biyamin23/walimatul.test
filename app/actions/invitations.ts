@@ -6,6 +6,11 @@ import { createClient } from "@/lib/supabase/server";
 import { updateInvitationSchema, slugSchema } from "@/lib/validation/invitation";
 import { isTemplateComponentAvailable } from "@/templates/registry";
 import { isReservedSlug } from "@/lib/constants/reserved-slugs";
+import {
+  DEFAULT_OPENING_MESSAGE,
+  DEFAULT_INVITATION_MESSAGE,
+  DEFAULT_CLOSING_MESSAGE,
+} from "@/lib/constants/default-invitation-text";
 
 export interface ActionResponse<T = unknown> {
   success: boolean;
@@ -77,6 +82,9 @@ export async function createDraftInvitationAction(
       user_id: userId,
       template_id: template.id,
       status: "draft",
+      opening_message: DEFAULT_OPENING_MESSAGE,
+      invitation_message: DEFAULT_INVITATION_MESSAGE,
+      closing_message: DEFAULT_CLOSING_MESSAGE,
       rsvp_enabled: true,
       max_pax: 5,
       allow_guest_message: true,
