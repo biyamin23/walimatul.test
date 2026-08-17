@@ -47,8 +47,7 @@ export default function DashboardPage() {
           title="RSVP Tracker"
           description="See who's attending your event"
           href="/dashboard/rsvp"
-          cta="Coming Soon"
-          disabled
+          cta="View RSVP Tracker"
         />
       </div>
 
