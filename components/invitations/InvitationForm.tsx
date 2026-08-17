@@ -24,6 +24,9 @@ export function InvitationForm({
   const inputClass =
     "w-full max-w-full min-w-0 box-border px-3.5 py-2.5 min-h-[48px] sm:min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]";
 
+  const dateTimeInputClass =
+    "w-full max-w-full min-w-0 box-border block px-3.5 py-2.5 min-h-[48px] sm:min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all";
+
   const urlInputClass =
     "w-full max-w-full min-w-0 box-border px-3.5 py-2.5 min-h-[48px] sm:min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-base sm:text-xs font-mono text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]";
 
@@ -52,7 +55,7 @@ export function InvitationForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
           {/* Groom Full Name */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="groom-name" className={labelClass}>
               Nama Penuh Pengantin Lelaki
             </label>
@@ -68,7 +71,7 @@ export function InvitationForm({
           </div>
 
           {/* Groom Short Name */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="groom-short-name" className={labelClass}>
               Nama Panggilan / Ringkas (Lelaki)
             </label>
@@ -84,7 +87,7 @@ export function InvitationForm({
           </div>
 
           {/* Bride Full Name */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="bride-name" className={labelClass}>
               Nama Penuh Pengantin Perempuan
             </label>
@@ -100,7 +103,7 @@ export function InvitationForm({
           </div>
 
           {/* Bride Short Name */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="bride-short-name" className={labelClass}>
               Nama Panggilan / Ringkas (Perempuan)
             </label>
@@ -125,7 +128,7 @@ export function InvitationForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full min-w-0">
           {/* Wedding Date */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="wedding-date" className={labelClass}>
               Tarikh Majlis
             </label>
@@ -134,13 +137,13 @@ export function InvitationForm({
               type="date"
               value={values.weddingDate || ""}
               onChange={(e) => onChange("weddingDate", e.target.value)}
-              className={inputClass}
+              className={dateTimeInputClass}
             />
             {errors.weddingDate && <p className={errorClass}>{errors.weddingDate[0]}</p>}
           </div>
 
           {/* Start Time */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="start-time" className={labelClass}>
               Masa Mula
             </label>
@@ -149,12 +152,12 @@ export function InvitationForm({
               type="time"
               value={values.startTime || ""}
               onChange={(e) => onChange("startTime", e.target.value)}
-              className={inputClass}
+              className={dateTimeInputClass}
             />
           </div>
 
           {/* End Time */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="end-time" className={labelClass}>
               Masa Tamat
             </label>
@@ -163,7 +166,7 @@ export function InvitationForm({
               type="time"
               value={values.endTime || ""}
               onChange={(e) => onChange("endTime", e.target.value)}
-              className={inputClass}
+              className={dateTimeInputClass}
             />
             {errors.endTime && <p className={errorClass}>{errors.endTime[0]}</p>}
           </div>
@@ -178,7 +181,7 @@ export function InvitationForm({
 
         <div className="space-y-4 w-full min-w-0">
           {/* Venue Name */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="venue-name" className={labelClass}>
               Nama Tempat / Dewan / Kediaman
             </label>
@@ -193,7 +196,7 @@ export function InvitationForm({
           </div>
 
           {/* Venue Address */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="venue-address" className={labelClass}>
               Alamat Penuh
             </label>
@@ -209,7 +212,7 @@ export function InvitationForm({
 
           {/* Navigation Links */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 w-full min-w-0">
-            <div className="space-y-1 min-w-0">
+            <div className="space-y-1 min-w-0 w-full">
               <label htmlFor="maps-url" className={labelClass}>
                 Pautan Google Maps (Pilihan)
               </label>
@@ -226,7 +229,7 @@ export function InvitationForm({
               )}
             </div>
 
-            <div className="space-y-1 min-w-0">
+            <div className="space-y-1 min-w-0 w-full">
               <label htmlFor="waze-url" className={labelClass}>
                 Pautan Waze (Pilihan)
               </label>
@@ -254,7 +257,7 @@ export function InvitationForm({
 
         <div className="space-y-4 w-full min-w-0">
           {/* Opening Quote */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="opening-message" className={labelClass}>
               Kata Aluan / Ayat Al-Quran / Doa Permulaan
             </label>
@@ -269,7 +272,7 @@ export function InvitationForm({
           </div>
 
           {/* Formal Invitation Text */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="invitation-message" className={labelClass}>
               Teks Jemputan Rasmi
             </label>
@@ -284,7 +287,7 @@ export function InvitationForm({
           </div>
 
           {/* Closing Message */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 w-full">
             <label htmlFor="closing-message" className={labelClass}>
               Ucapan Penutup / Harapan
             </label>
@@ -332,21 +335,21 @@ export function InvitationForm({
           {values.rsvpEnabled && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 w-full min-w-0">
               {/* RSVP Deadline */}
-              <div className="space-y-1 min-w-0">
+              <div className="space-y-1 min-w-0 w-full">
                 <label htmlFor="rsvp-deadline" className={labelClass}>
-                  Tarikh Akhir Pengesahan (RSVP Deadline)
+                  Tarikh Akhir RSVP
                 </label>
                 <input
                   id="rsvp-deadline"
                   type="date"
                   value={values.rsvpDeadline || ""}
                   onChange={(e) => onChange("rsvpDeadline", e.target.value)}
-                  className={inputClass}
+                  className={dateTimeInputClass}
                 />
               </div>
 
               {/* Max Pax */}
-              <div className="space-y-1 min-w-0">
+              <div className="space-y-1 min-w-0 w-full">
                 <label htmlFor="max-pax" className={labelClass}>
                   Maksimum Pax bagi Setiap Tetamu
                 </label>
@@ -362,7 +365,7 @@ export function InvitationForm({
               </div>
 
               {/* Allow Guest Message */}
-              <div className="sm:col-span-2 pt-1 min-w-0">
+              <div className="sm:col-span-2 pt-1 min-w-0 w-full">
                 <label
                   htmlFor="allow-guest-message-checkbox"
                   className="flex items-start gap-2.5 min-w-0 w-full cursor-pointer select-none"

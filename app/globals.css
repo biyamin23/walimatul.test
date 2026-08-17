@@ -324,3 +324,40 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Form Controls Responsive Normalization
+   ───────────────────────────────────────────────────────────────────────────── */
+
+input[type="date"],
+input[type="time"] {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: block;
+}
+
+/* Ensure WebKit calendar/clock picker indicators align cleanly and do not force overflow */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 0;
+  margin: 0;
+  transition: opacity 0.15s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Ensure WebKit date/time text wrapper obeys width */
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
