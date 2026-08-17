@@ -17,8 +17,8 @@ export const PAYMENT_CONFIG = {
   validityLabel: "6 bulan akses",
 
   // Canonical QR asset path
-  // Replace with real Touch 'n Go merchant/personal QR asset in production
-  qrAssetPath: "/images/payment/tng-payment-qr.svg",
+  // Real Touch 'n Go QR code provided in /public/images/payment/
+  qrAssetPath: "/images/payment/tng-payment-qr.JPG",
 
   // Upload constraints
   allowedMimeTypes: [
