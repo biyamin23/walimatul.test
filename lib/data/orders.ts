@@ -19,9 +19,18 @@ import type { Order, OrderWithInvitation } from "@/types/database";
 export async function getOwnOrders(): Promise<Order[]> {
   const supabase = await createClient();
 
+  const { data: claimsData, error: claimsError } =
+    await supabase.auth.getClaims();
+
+  if (claimsError || !claimsData?.claims?.sub) {
+    return [];
+  }
+  const userId = claimsData.claims.sub;
+
   const { data, error } = await supabase
     .from("orders")
     .select("*")
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -41,6 +50,14 @@ export async function getOwnOrderById(
 ): Promise<OrderWithInvitation | null> {
   const supabase = await createClient();
 
+  const { data: claimsData, error: claimsError } =
+    await supabase.auth.getClaims();
+
+  if (claimsError || !claimsData?.claims?.sub) {
+    return null;
+  }
+  const userId = claimsData.claims.sub;
+
   const { data, error } = await supabase
     .from("orders")
     .select(`
@@ -48,6 +65,7 @@ export async function getOwnOrderById(
       invitation:invitations (id, slug, groom_name, bride_name, status)
     `)
     .eq("id", id)
+    .eq("user_id", userId)
     .single();
 
   if (error) {

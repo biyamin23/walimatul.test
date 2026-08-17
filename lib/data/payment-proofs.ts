@@ -19,13 +19,34 @@ import type { PaymentProof } from "@/types/database";
 
 /**
  * Fetch all payment proofs for a given order.
- * RLS ensures the caller owns the parent order.
+ * Verifies that the caller owns the parent order.
  */
 export async function getPaymentProofsForOrder(
   orderId: string,
 ): Promise<PaymentProof[]> {
   const supabase = await createClient();
 
+  const { data: claimsData, error: claimsError } =
+    await supabase.auth.getClaims();
+
+  if (claimsError || !claimsData?.claims?.sub) {
+    return [];
+  }
+  const userId = claimsData.claims.sub;
+
+  // 1. Verify caller owns the parent order
+  const { data: order, error: orderError } = await supabase
+    .from("orders")
+    .select("id")
+    .eq("id", orderId)
+    .eq("user_id", userId)
+    .single();
+
+  if (orderError || !order) {
+    return [];
+  }
+
+  // 2. Fetch proofs
   const { data, error } = await supabase
     .from("payment_proofs")
     .select("*")

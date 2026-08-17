@@ -16,9 +16,18 @@ import type { Invitation, InvitationWithTemplate } from "@/types/database";
 export async function getOwnInvitations(): Promise<Invitation[]> {
   const supabase = await createClient();
 
+  const { data: claimsData, error: claimsError } =
+    await supabase.auth.getClaims();
+
+  if (claimsError || !claimsData?.claims?.sub) {
+    return [];
+  }
+  const userId = claimsData.claims.sub;
+
   const { data, error } = await supabase
     .from("invitations")
     .select("*")
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -31,12 +40,20 @@ export async function getOwnInvitations(): Promise<Invitation[]> {
 
 /**
  * Fetch a single invitation by ID, with its template details joined.
- * Returns null if not found or not owned by the current user (RLS enforces ownership).
+ * Returns null if not found or not owned by the current user.
  */
 export async function getOwnInvitationById(
   id: string,
 ): Promise<InvitationWithTemplate | null> {
   const supabase = await createClient();
+
+  const { data: claimsData, error: claimsError } =
+    await supabase.auth.getClaims();
+
+  if (claimsError || !claimsData?.claims?.sub) {
+    return null;
+  }
+  const userId = claimsData.claims.sub;
 
   const { data, error } = await supabase
     .from("invitations")
@@ -45,6 +62,7 @@ export async function getOwnInvitationById(
       template:templates (*)
     `)
     .eq("id", id)
+    .eq("user_id", userId)
     .single();
 
   if (error) {

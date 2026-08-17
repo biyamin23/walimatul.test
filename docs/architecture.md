@@ -104,12 +104,20 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function getOwnInvitations() {
   const supabase = await createClient();
-  const { data } = await supabase.from("invitations").select("*").order("created_at", { ascending: false });
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims?.sub;
+  if (!userId) return [];
+
+  const { data } = await supabase
+    .from("invitations")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
   return data ?? [];
 }
 ```
 
-RLS enforces ownership — the server client inherits the user's JWT session.
+Multi-tenant data isolation is enforced both at the database level via RLS and at the data access layer via explicit `user_id = auth.uid()` query scoping.
 
 ---
 
