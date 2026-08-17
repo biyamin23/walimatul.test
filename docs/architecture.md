@@ -146,6 +146,17 @@ Multi-tenant data isolation is enforced both at the database level via RLS and a
 4. Transition from `pending_payment` / `payment_rejected` to `pending_verification` is strictly managed via PostgreSQL RPC `submit_payment_proof`
 5. Payment proof storage bucket `payment-proofs` is strictly private with path-level RLS (`{user_id}/{order_id}/{timestamp}-{filename}`)
 6. Partial unique index `idx_orders_active_unpaid` enforces at most one active unpaid order per invitation
+7. Atomic Admin approval via PostgreSQL RPC `admin_approve_payment_order`:
+   - Enforces `profiles.role = 'admin'`
+   - Acquires `FOR UPDATE` locks on `orders` and `invitations`
+   - Idempotent: safe against double-clicks/retries
+   - Generates sequential receipt numbers (`WAL-YYYY-000001`) via sequence `public.receipt_number_seq`
+   - Transitions order to `paid`, sets `paid_at`, `reviewed_at`, `reviewed_by`
+   - Publishes invitation (`status = 'published'`, `published_at = now()`, `expires_at = published_at + order.validity_months`)
+8. Admin rejection via PostgreSQL RPC `admin_reject_payment_order`:
+   - Transitions order to `payment_rejected`, stores sanitized `rejection_reason`
+   - Leaves invitation unpublished and private
+   - Client can resubmit new proof, transitioning order back to `pending_verification`
 
 ---
 
@@ -166,5 +177,7 @@ Multi-tenant data isolation is enforced both at the database level via RLS and a
 | 6 | Public Invitation Route & Guest View | ✅ Complete |
 | 7 | Guest RSVP Submission & Client RSVP Dashboard | ✅ Complete |
 | 8 | Payment UI & Proof Upload (Client Flow) | ✅ Complete |
-| 9 | Admin Payment Approval & Activation | Next |
-| 10 | Receipt PDF & Approval Email | Future |
+| 8.1 | Multi-Tenant Data Isolation Security Hotfix | ✅ Complete |
+| 9 | Admin Payment Approval & Invitation Activation | ✅ Complete |
+| 10 | Receipt PDF & Approval Email Notification | Next |
+

@@ -170,14 +170,27 @@ export default async function BillingPage() {
                       </div>
                       <div className="py-1.5 flex justify-between">
                         <span className="text-[var(--text-muted)]">Resit:</span>
-                        <span className="text-[var(--text-subtle)] italic">
+                        <span className={`text-[var(--text-subtle)] ${order.receipt_number ? "font-mono font-bold text-emerald-800" : "italic"}`}>
                           {order.receipt_number || "Tersedia selepas pengesahan"}
                         </span>
                       </div>
                     </div>
 
+                    {order.payment_status === "payment_rejected" && order.rejection_reason && (
+                      <div className="p-3 rounded-xl bg-red-50 border border-red-100 text-xs font-ui text-red-800 leading-relaxed">
+                        <span className="font-bold">Sebab Penolakan:</span> {order.rejection_reason}
+                      </div>
+                    )}
+
                     <div>
-                      {order.payment_status === "pending_payment" || order.payment_status === "payment_rejected" ? (
+                      {order.payment_status === "payment_rejected" ? (
+                        <Link
+                          href={`/dashboard/invitations/${order.invitation.id}/payment`}
+                          className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors"
+                        >
+                          Muat Naik Semula Bukti →
+                        </Link>
+                      ) : order.payment_status === "pending_payment" ? (
                         <Link
                           href={`/dashboard/invitations/${order.invitation.id}/payment`}
                           className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors"

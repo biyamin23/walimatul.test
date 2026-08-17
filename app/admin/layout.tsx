@@ -27,15 +27,21 @@ export default async function AdminLayout({
         }}
       >
         <div className="flex items-center gap-4">
-          <span className="font-display text-lg font-bold text-white">
+          <Link href="/admin" className="font-display text-lg font-bold text-white hover:text-white/90">
             {BRAND.name}
-          </span>
+          </Link>
           <span
             className="text-xs font-ui font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
             style={{ background: "rgba(255,255,255,0.2)", color: "white" }}
           >
             Admin
           </span>
+          <Link
+            href="/admin/payments"
+            className="text-xs font-ui font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ml-2"
+          >
+            Payments
+          </Link>
         </div>
 
         <div className="flex items-center gap-4">
