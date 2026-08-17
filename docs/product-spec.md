@@ -1,121 +1,156 @@
 # WALIMATUL — Product Specification
 
-**Version:** 1.0 (Phase 1)
-**Brand:** WALIMATUL by nasuhalias
-**Domain:** walimatul.my
-**Support:** +60148412018 | https://wa.me/60148412018
+## Brand
+
+**WALIMATUL by nasuhalias**
+
+- Domain: `walimatul.my`
+- Support WhatsApp: `+60148412018`
+- Support URL: `https://wa.me/60148412018`
 
 ---
 
-## Overview
+## Product: Blush Garden
 
-WALIMATUL is a digital wedding invitation SaaS for Malaysian couples. Clients create beautiful, responsive digital invitations, publish them at a unique URL, and share them with guests. Guests do not require accounts. RSVPs are tracked privately through the client dashboard.
-
----
-
-## Core Philosophy
-
-> **Wedding data belongs to the invitation. Design belongs to the template.**
-
-- Elegant, romantic, modern, premium
-- Mobile-first
-- Malaysian-friendly
-- Simple and accessible
+| Property | Value |
+|----------|-------|
+| Template | Blush Garden |
+| Price | RM49.00 |
+| Validity | 6 months |
+| Payment model | One payment. No recurring fees. |
+| Payment method | Touch 'n Go eWallet QR |
 
 ---
 
-## User Types
-
-| Type | Auth | Can |
-|------|------|-----|
-| Admin | Required | Manage platform, templates, users, orders |
-| Client | Required | Create, edit, publish, share invitations; track RSVPs |
-| Guest | None | View published invitation; submit RSVP |
-
-Guests must never be required to create an account to RSVP.
-
----
-
-## Client Journey
+## Payment Flow
 
 ```
-Landing → Browse Templates → Preview → Use This Template
-→ Register/Login → Enter Wedding Details → Live Preview
-→ Choose Slug → Review → Pay → Publish → Share
-→ Guests RSVP → Client Tracks RSVPs
+Client completes invitation
+↓
+Reviews order (template, amount, validity)
+↓
+Sees WALIMATUL Touch 'n Go payment QR
+↓
+Pays using Touch 'n Go eWallet
+↓
+Uploads payment proof (screenshot) and/or transaction reference
+↓
+Order → pending_verification
+↓
+Admin reviews payment proof
+↓
+Admin approves or rejects
+```
+
+### On Approval
+```
+order.payment_status = 'paid'
+order.paid_at        = now()
+order.reviewed_by    = admin user
+order.receipt_number = 'WAL-{YYYY}-{seq}'
+↓
+invitation.status      = 'published'
+invitation.published_at = now()
+invitation.expires_at   = paid_at + validity_months
+↓
+Receipt generated
+Invitation QR generated (https://walimatul.my/{slug})
+Approval email sent to client
+```
+
+### On Rejection
+```
+order.payment_status   = 'payment_rejected'
+order.rejection_reason = reason text
 ```
 
 ---
 
-## MVP Acceptance Test
+## Payment QR vs Invitation QR
 
-### Client
+| | Payment QR | Invitation QR |
+|-|------------|--------------|
+| Purpose | Client pays WALIMATUL | Guests open the invitation |
+| Content | WALIMATUL Touch 'n Go account | https://walimatul.my/{slug} |
+| Shown when | Checkout / payment step | After admin approval |
+| Controlled by | Admin / platform settings | Generated per invitation |
 
-1. Register/Login
-2. Choose Blush Garden template
-3. Create Abu & Hana invitation
-4. Add event information
-5. Choose slug `abu-hana`
-6. Publish
+These are two distinct QR codes. Never conflate them in code or UI.
 
-Result: `walimatul.my/abu-hana` is live.
-
-### Guest
-
-1. Open `walimatul.my/abu-hana`
-2. Press Open Invitation
-3. Read wedding information
-4. RSVP Attending — 2 Pax
-5. Submit → receive confirmation
-
-### Client
-
-1. Login → Dashboard → Abu & Hana → RSVP
-2. See guest name, Attending, 2 Pax
+Use explicit naming: `paymentQr`, `invitationQr`.
 
 ---
 
-## Security Requirements
+## Invitation Lifecycle
 
-- Guest cannot access dashboard
-- Guest cannot browse RSVP records
-- Client cannot access admin
-- Client A cannot edit Client B's invitation
-- Client cannot promote themselves to admin
-- Draft invitations cannot load publicly
-- Service-role credentials are never shipped to browser
-- Reserved slugs cannot become invitation URLs
+```
+draft
+  ↓ (editor)
+published   ← requires admin payment approval
+  ↓
+archived   ← client archives
+expired    ← now() > expires_at
+```
 
----
+## Order Payment Lifecycle
 
-## Out of Scope for V1
-
-- Drag/drop visual builder
-- Guest accounts
-- Personalized guest links
-- Seating plans
-- QR event check-in
-- Vendor marketplace
-- Custom domains
-- Arbitrary font/music uploads
-- Advanced analytics
-- AI invitation generator
+```
+pending_payment
+  ↓ (client submits proof)
+pending_verification
+  ↓ (admin approves)       ↓ (admin rejects)
+paid                  payment_rejected
+```
 
 ---
 
-## Development Phases
+## Invitation Validity
 
-| Phase | Focus |
-|-------|-------|
-| 1 | Foundation, design system, landing page |
-| 2 | Authentication (Supabase Auth, Google OAuth) |
-| 3 | Database schema, migrations, RLS |
-| 4 | Blush Garden template |
-| 5 | Invitation editor |
-| 6 | Public invitation route |
-| 7 | Guest RSVP |
-| 8 | RSVP dashboard |
-| 9 | Marketing page polish |
-| 10 | Gallery + music |
-| 11 | Payment integration |
-| 12 | Admin dashboard |
+| Template | Validity |
+|----------|---------|
+| Blush Garden (initial) | 6 months |
+| Future premium plans | 12 months |
+
+Validity must NOT be:
+- "Forever"
+- "Lifetime"
+
+Expiry must be calculated from payment approval date.
+
+---
+
+## Authentication
+
+| User | Auth required | Role |
+|------|--------------|------|
+| Client (invitation owner) | Yes | client |
+| Admin | Yes | admin |
+| Wedding guest | No (anonymous) | — |
+
+---
+
+## Receipt Format
+
+```
+WALIMATUL by nasuhalias
+
+Receipt Number: WAL-2026-000001
+Client: [full name]
+Invitation: [groom] & [bride]
+Template: Blush Garden
+Amount: RM49.00
+Payment Method: Touch 'n Go eWallet
+Paid Date: [paid_at]
+Validity: 6 months
+Expiry Date: [expires_at]
+```
+
+---
+
+## Future Plans
+
+- 12-month validity tier
+- Additional templates (Royal Gold, Minimal White, Malay Heritage)
+- PDF receipt download
+- Approval email automation
+- Admin bulk review interface

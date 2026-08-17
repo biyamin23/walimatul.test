@@ -6,146 +6,214 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getActiveTemplates } from "@/lib/data/templates";
+import { isTemplateComponentAvailable } from "@/templates/registry";
+import type { Template } from "@/types/database";
 
 export const metadata: Metadata = {
-  title: "Wedding Invitation Templates",
+  title: "Wedding Invitation Templates — WALIMATUL",
   description:
-    "Browse beautiful digital wedding invitation templates. Choose your design and create your invitation in minutes.",
+    "Browse beautiful digital wedding invitation templates. Choose your design and create your invitation in minutes. One payment, no recurring fees.",
 };
 
-const TEMPLATES = [
-  {
-    id: "blush-garden",
-    name: "Blush Garden",
-    category: "Floral",
-    price: "RM49",
-    palette: ["#FCF8F3", "#F5DDD6", "#174F3A", "#B8955A"],
-    description:
-      "A romantic floral design with ivory backgrounds, blush tones, and muted gold accents. Perfect for an elegant garden wedding.",
-    available: true,
-  },
-  {
-    id: "royal-gold",
-    name: "Royal Gold",
-    category: "Elegant",
-    price: "RM49",
-    palette: ["#1A1A1A", "#B8955A", "#D4B07A", "#F0E6D0"],
-    description: "A timeless black and gold design for a classic, sophisticated celebration.",
-    available: false,
-  },
-  {
-    id: "minimal-white",
-    name: "Minimal White",
-    category: "Modern",
-    price: "RM49",
-    palette: ["#FFFFFF", "#F0F0F0", "#222222", "#888888"],
-    description: "Clean lines, elegant typography, and purposeful whitespace for the modern couple.",
-    available: false,
-  },
-  {
-    id: "malay-heritage",
-    name: "Malay Heritage",
-    category: "Traditional",
-    price: "RM49",
-    palette: ["#F5F0E8", "#8B0000", "#D4AF37", "#2E4A2E"],
-    description: "A traditional Malay-inspired design with songket motifs and rich heritage colours.",
-    available: false,
-  },
-];
+/** Brand palette for each template — fallback when no thumbnail exists */
+const TEMPLATE_PALETTES: Record<string, string[]> = {
+  "blush-garden": ["#FCF8F3", "#F5DDD6", "#174F3A", "#B8955A"],
+  "royal-gold": ["#1A1A1A", "#B8955A", "#D4B07A", "#F0E6D0"],
+  "minimal-white": ["#FFFFFF", "#F0F0F0", "#222222", "#888888"],
+  "malay-heritage": ["#F5F0E8", "#8B0000", "#D4AF37", "#2E4A2E"],
+};
 
-export default function TemplatesPage() {
+const FALLBACK_PALETTE = ["#FCF8F3", "#E8E0D8", "#3A3A3A", "#888888"];
+
+function TemplateCard({ template }: { template: Template }) {
+  const palette = TEMPLATE_PALETTES[template.slug] ?? FALLBACK_PALETTE;
+  // A template is actionable only if it has a code component registered
+  const isAvailable = isTemplateComponentAvailable(template.component_key);
+  const priceDisplay = `RM${Number(template.price).toFixed(0)}`;
+
+  return (
+    <article aria-labelledby={`tpl-${template.slug}-name`} className="h-full">
+      <Card
+        variant="default"
+        padding="none"
+        className="overflow-hidden h-full flex flex-col group hover:shadow-[var(--shadow-elevated)] transition-all hover:-translate-y-1"
+      >
+        {/* Visual preview */}
+        <div
+          className="h-52 relative flex items-center justify-center"
+          style={{ background: palette[0] }}
+          aria-hidden="true"
+        >
+          {/* Palette dots */}
+          <div className="absolute top-3 right-3 flex gap-1">
+            {palette.map((color, i) => (
+              <div
+                key={i}
+                className="w-3.5 h-3.5 rounded-full border border-white/40"
+                style={{ background: color }}
+              />
+            ))}
+          </div>
+
+          {/* Mini invitation preview card */}
+          <div
+            className="w-24 rounded-xl shadow-md flex flex-col items-center py-4 px-3 text-center gap-1.5 border"
+            style={{
+              background: `${palette[0]}dd`,
+              borderColor: `${palette[2]}20`,
+            }}
+          >
+            <div
+              className="font-display text-sm leading-tight"
+              style={{ color: palette[2] }}
+            >
+              Abu &amp; Hana
+            </div>
+            <div
+              className="w-6 h-px"
+              style={{ background: palette[3] }}
+            />
+            <div
+              className="text-[8px] tracking-wider uppercase font-ui"
+              style={{ color: palette[3] }}
+            >
+              24 Nov 2026
+            </div>
+          </div>
+
+          {/* Unavailable overlay */}
+          {!isAvailable && (
+            <div
+              className="absolute inset-0 flex items-end justify-center pb-3"
+              style={{ background: "rgba(0,0,0,0.08)" }}
+            >
+              <span
+                className="text-xs font-medium px-3 py-1 rounded-full"
+                style={{
+                  background: "var(--surface)",
+                  color: "var(--text-muted)",
+                }}
+              >
+                Coming Soon
+              </span>
+            </div>
+          )}
+
+          {/* Featured badge */}
+          {template.is_featured && isAvailable && (
+            <div className="absolute top-3 left-3">
+              <span
+                className="text-[10px] font-semibold px-2 py-0.5 rounded-full font-ui tracking-wide"
+                style={{
+                  background: "var(--gold)",
+                  color: "#fff",
+                }}
+              >
+                Featured
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="p-5 flex flex-col flex-1">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <h2
+              id={`tpl-${template.slug}-name`}
+              className="font-semibold text-[var(--text)] font-ui"
+            >
+              {template.name}
+            </h2>
+            <Badge variant={isAvailable ? "gold" : "default"}>
+              {template.category ?? "Template"}
+            </Badge>
+          </div>
+
+          <p className="text-xs text-[var(--text-muted)] mb-3 font-ui leading-relaxed flex-1">
+            {template.description}
+          </p>
+
+          {/* Validity note */}
+          <p className="text-[10px] text-[var(--text-subtle)] font-ui mb-3">
+            {template.validity_months} months access · One payment
+          </p>
+
+          <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--border-soft)]">
+            <span className="font-display text-lg text-[var(--primary)]">
+              {priceDisplay}
+            </span>
+            {isAvailable ? (
+              <Link
+                href={`/templates/${template.slug}`}
+                className="text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
+                aria-label={`Use the ${template.name} template`}
+              >
+                Use This Template →
+              </Link>
+            ) : (
+              <span className="text-xs text-[var(--text-subtle)] font-ui">
+                Coming soon
+              </span>
+            )}
+          </div>
+        </div>
+      </Card>
+    </article>
+  );
+}
+
+export default async function TemplatesPage() {
+  const templates = await getActiveTemplates();
+
   return (
     <>
       <Navbar />
       <main id="main-content">
         <section
           className="py-16 sm:py-20"
-          style={{ background: "linear-gradient(160deg, var(--background) 60%, var(--blush-soft) 100%)" }}
+          style={{
+            background:
+              "linear-gradient(160deg, var(--background) 60%, var(--blush-soft) 100%)",
+          }}
           aria-labelledby="templates-page-heading"
         >
           <Container>
             <SectionHeading
               eyebrow="Our Templates"
               title="Choose your invitation design"
-              subtitle="Each template is a fully responsive digital wedding invitation. Select one to preview and create."
+              subtitle="Each template is a fully responsive digital wedding invitation. One payment. No recurring fees. Valid for 6 months."
               id="templates-page-heading"
               className="mb-16"
             />
 
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 list-none" role="list">
-              {TEMPLATES.map((template) => (
-                <li key={template.id}>
-                  <article
-                    aria-labelledby={`tpl-${template.id}-name`}
-                    className="h-full"
+            {templates.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-[var(--text-muted)] font-ui">
+                  Templates are loading. If this persists, please{" "}
+                  <a
+                    href="https://wa.me/60148412018"
+                    className="text-[var(--primary)] font-semibold hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    <Card
-                      variant="default"
-                      padding="none"
-                      className="overflow-hidden h-full flex flex-col group hover:shadow-[var(--shadow-elevated)] transition-all hover:-translate-y-1"
-                    >
-                      {/* Preview */}
-                      <div
-                        className="h-52 relative flex items-center justify-center"
-                        style={{ background: template.palette[0] }}
-                        aria-hidden="true"
-                      >
-                        <div className="absolute top-3 right-3 flex gap-1">
-                          {template.palette.map((color, i) => (
-                            <div key={i} className="w-3.5 h-3.5 rounded-full border border-white/40" style={{ background: color }} />
-                          ))}
-                        </div>
-                        <div
-                          className="w-24 rounded-xl shadow-md flex flex-col items-center py-4 px-3 text-center gap-1.5 border"
-                          style={{ background: `${template.palette[0]}dd`, borderColor: `${template.palette[2]}20` }}
-                        >
-                          <div className="font-display text-sm leading-tight" style={{ color: template.palette[2] }}>Abu &amp; Hana</div>
-                          <div className="w-6 h-px" style={{ background: template.palette[3] }} />
-                          <div className="text-[8px] tracking-wider uppercase font-ui" style={{ color: template.palette[3] }}>24 Nov 2026</div>
-                        </div>
-
-                        {!template.available && (
-                          <div className="absolute inset-0 flex items-end justify-center pb-3" style={{ background: "rgba(0,0,0,0.08)" }}>
-                            <span className="text-xs font-medium px-3 py-1 rounded-full" style={{ background: "var(--surface)", color: "var(--text-muted)" }}>
-                              Coming Soon
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Info */}
-                      <div className="p-5 flex flex-col flex-1">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h2 id={`tpl-${template.id}-name`} className="font-semibold text-[var(--text)] font-ui">
-                            {template.name}
-                          </h2>
-                          <Badge variant={template.available ? "gold" : "default"}>
-                            {template.category}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-[var(--text-muted)] mb-3 font-ui leading-relaxed flex-1">
-                          {template.description}
-                        </p>
-                        <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--border-soft)]">
-                          <span className="font-display text-lg text-[var(--primary)]">{template.price}</span>
-                          {template.available ? (
-                            <Link
-                              href={`/templates/${template.id}`}
-                              className="text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
-                              aria-label={`Use the ${template.name} template`}
-                            >
-                              Use This Template →
-                            </Link>
-                          ) : (
-                            <span className="text-xs text-[var(--text-subtle)] font-ui">Coming soon</span>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  </article>
-                </li>
-              ))}
-            </ul>
+                    contact us on WhatsApp
+                  </a>
+                  .
+                </p>
+              </div>
+            ) : (
+              <ul
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 list-none"
+                role="list"
+              >
+                {templates.map((template) => (
+                  <li key={template.id}>
+                    <TemplateCard template={template} />
+                  </li>
+                ))}
+              </ul>
+            )}
           </Container>
         </section>
       </main>

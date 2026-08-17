@@ -1,155 +1,176 @@
-# WALIMATUL — Database Schema
+# WALIMATUL — Database Architecture
 
-**Version:** 1.0 (Phase 3 target)
+## Entity Relationship
 
-All migrations are in `supabase/migrations/`.
+```
+auth.users
+    │
+    ├── profiles              (1:1 — auto-created via trigger)
+    │
+    └── invitations           (1:N — user owns many invitations)
+           │
+           ├── templates      (N:1 — each invitation uses one template)
+           │
+           ├── invitation_gallery  (1:N — photos for the invitation)
+           │
+           ├── rsvps              (1:N — guest responses)
+           │
+           └── orders             (1:N — payment records)
+                  │
+                  └── payment_proofs  (1:N — proof of Touch 'n Go payment)
+```
+
+---
+
+## Separation of Concerns
+
+| Concern | Table | Notes |
+|---------|-------|-------|
+| Invitation lifecycle | `invitations.status` | draft → published → archived → expired |
+| Payment lifecycle | `orders.payment_status` | pending_payment → pending_verification → paid |
+| Financial snapshot | `orders.amount`, `orders.validity_months`, `orders.template_id` | Immutable after creation |
+| Template design | `templates/registry.ts` (code) | DB stores metadata only |
+| Template metadata | `templates` table | Pricing, validity, active status |
+
+> **Principle:** Wedding data belongs to the invitation. Design belongs to the template.
 
 ---
 
 ## Tables
 
-### `profiles`
-
-Extends `auth.users`. Created automatically on registration.
-
+### `public.profiles`
 | Column | Type | Notes |
 |--------|------|-------|
-| `id` | UUID PK | References `auth.users.id` |
-| `full_name` | TEXT | |
-| `phone` | TEXT | |
-| `avatar_url` | TEXT | |
-| `role` | TEXT | `'client'` (default), `'admin'` |
-| `created_at` | TIMESTAMPTZ | |
-| `updated_at` | TIMESTAMPTZ | |
+| id | UUID PK | = auth.users.id |
+| full_name | TEXT | |
+| phone | TEXT | |
+| avatar_url | TEXT | |
+| role | TEXT | 'client' (default) or 'admin' |
+| created_at | TIMESTAMPTZ | |
+| updated_at | TIMESTAMPTZ | |
 
-**RLS:** Clients can read/write own row. Clients cannot update `role`.
+### `public.templates`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | UUID PK | |
+| name | TEXT | |
+| slug | TEXT UNIQUE | URL-friendly identifier |
+| component_key | TEXT UNIQUE | Registry key in templates/registry.ts |
+| price | NUMERIC(10,2) | Display price; orders snapshot at purchase |
+| validity_months | INTEGER | 6 for Blush Garden |
+| is_active | BOOLEAN | False = hidden from catalogue |
+| is_featured | BOOLEAN | |
+| sort_order | INTEGER | |
+
+### `public.invitations`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | UUID PK | |
+| user_id | UUID FK | auth.users — ownership |
+| template_id | UUID FK | templates — RESTRICT delete |
+| slug | TEXT UNIQUE | Null for drafts; used in public URL |
+| status | TEXT | draft \| published \| archived \| expired |
+| published_at | TIMESTAMPTZ | Set on admin approval |
+| expires_at | TIMESTAMPTZ | paid_at + validity_months |
+| ... | | See migration for full schema |
+
+### `public.invitation_gallery`
+| Column | Type | Notes |
+|--------|------|-------|
+| invitation_id | UUID FK | CASCADE delete |
+| storage_path | TEXT | Supabase Storage path |
+| sort_order | INTEGER | |
+
+### `public.rsvps`
+| Column | Type | Notes |
+|--------|------|-------|
+| invitation_id | UUID FK | CASCADE delete |
+| guest_name | TEXT | |
+| attendance | TEXT | 'attending' or 'not_attending' |
+| pax | INTEGER | 0 if not_attending; ≥1 if attending |
+
+### `public.orders`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | UUID PK | |
+| receipt_number | TEXT UNIQUE | Null until paid; format WAL-2026-000001 |
+| user_id | UUID FK | RESTRICT delete |
+| invitation_id | UUID FK | RESTRICT delete |
+| template_id | UUID FK | Snapshot |
+| amount | NUMERIC(10,2) | Snapshot |
+| currency | TEXT | 'MYR' |
+| payment_method | TEXT | 'tng_ewallet_qr' |
+| payment_status | TEXT | pending_payment → pending_verification → paid |
+| validity_months | INTEGER | Snapshot |
+| reviewed_by | UUID FK | Admin who approved/rejected |
+| paid_at | TIMESTAMPTZ | Set on approval |
+| rejection_reason | TEXT | Set on rejection |
+
+### `public.payment_proofs`
+| Column | Type | Notes |
+|--------|------|-------|
+| order_id | UUID FK | CASCADE delete |
+| storage_path | TEXT | Supabase Storage (private bucket) |
+| transaction_reference | TEXT | TNG transaction ID |
+| submitted_by | UUID FK | RESTRICT |
+
+**Constraint:** At least one of `storage_path` or `transaction_reference` must be non-null.
 
 ---
 
-### `templates`
+## RLS Summary
 
-Template metadata. Layout is in code (`component_key`).
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID PK | |
-| `name` | TEXT | |
-| `slug` | TEXT UNIQUE | |
-| `description` | TEXT | |
-| `category` | TEXT | |
-| `component_key` | TEXT UNIQUE | Maps to `templates/registry.ts` |
-| `thumbnail_url` | TEXT | |
-| `preview_url` | TEXT | |
-| `price` | NUMERIC | Default `0` |
-| `is_active` | BOOLEAN | Default `true` |
-| `is_featured` | BOOLEAN | Default `false` |
-| `created_at` | TIMESTAMPTZ | |
-| `updated_at` | TIMESTAMPTZ | |
-
-**RLS:** Public read (active only). Admin full access.
+| Table | anon SELECT | auth SELECT | auth INSERT | auth UPDATE | Admin |
+|-------|------------|------------|------------|------------|-------|
+| profiles | ✗ | own only | via trigger | own (role protected) | postgres |
+| templates | active only | active only | ✗ | ✗ | postgres |
+| invitations | ✗ (Phase 6+) | own only | own | own (lifecycle protected) | postgres |
+| invitation_gallery | ✗ (Phase 6+) | own (via invite) | own | own | postgres |
+| rsvps | ✗ (Phase 7+) | own (via invite) | ✗ (Phase 7+) | ✗ | postgres |
+| orders | ✗ | own only | own (pending_payment initial) | limited (no admin fields) | postgres |
+| payment_proofs | ✗ | own (via order) | own (own pending orders) | ✗ | postgres |
 
 ---
 
-### `invitations`
+## Financial Security Layers
 
-Client wedding data. Template-independent.
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID PK | |
-| `user_id` | UUID | FK → `profiles.id` |
-| `template_id` | UUID | FK → `templates.id` |
-| `slug` | TEXT UNIQUE | Public URL segment |
-| `groom_name` | TEXT | |
-| `groom_short_name` | TEXT | |
-| `bride_name` | TEXT | |
-| `bride_short_name` | TEXT | |
-| `wedding_date` | DATE | |
-| `start_time` | TIME | |
-| `end_time` | TIME | |
-| `venue_name` | TEXT | |
-| `venue_address` | TEXT | |
-| `google_maps_url` | TEXT | |
-| `waze_url` | TEXT | |
-| `opening_message` | TEXT | |
-| `invitation_message` | TEXT | |
-| `closing_message` | TEXT | |
-| `rsvp_enabled` | BOOLEAN | Default `true` |
-| `rsvp_deadline` | DATE | |
-| `max_pax` | INTEGER | Default `5` |
-| `allow_guest_message` | BOOLEAN | Default `true` |
-| `music_enabled` | BOOLEAN | Default `false` |
-| `music_key` | TEXT | |
-| `status` | TEXT | `draft` → `published` |
-| `published_at` | TIMESTAMPTZ | |
-| `created_at` | TIMESTAMPTZ | |
-| `updated_at` | TIMESTAMPTZ | |
-
-**Status flow (pre-payment):** `draft → published`
-**Status flow (post-payment):** `draft → unpaid → paid → published`
-
-**RLS:** Clients access own invitations only. Public read for `status = 'published'` only.
+Client cannot set `payment_status = 'paid'` because:
+1. **Column-level REVOKE:** `REVOKE UPDATE (payment_status, ...) ON orders FROM authenticated`
+2. **BEFORE UPDATE trigger:** `protect_order_admin_fields()` raises exception
+3. **RLS WITH CHECK:** INSERT policy forces `payment_status = 'pending_payment'`
+4. **Application layer:** Server Actions validate all mutations
 
 ---
 
-### `invitation_gallery`
+## Migrations Applied Order
 
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID PK | |
-| `invitation_id` | UUID | FK → `invitations.id` |
-| `storage_path` | TEXT | Supabase Storage path |
-| `sort_order` | INTEGER | Default `0` |
-| `created_at` | TIMESTAMPTZ | |
-
-**Storage bucket:** `invitation-images`
-**Path pattern:** `{user_id}/{invitation_id}/{filename}`
-**Max images:** 10 (configurable)
-
----
-
-### `rsvps`
-
-Guest RSVP submissions. No auth required to insert.
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID PK | |
-| `invitation_id` | UUID | FK → `invitations.id` |
-| `guest_name` | TEXT NOT NULL | |
-| `attendance` | TEXT NOT NULL | `attending` or `not_attending` |
-| `pax` | INTEGER | `0` if not attending; `1–max_pax` if attending |
-| `message` | TEXT | |
-| `created_at` | TIMESTAMPTZ | |
-| `updated_at` | TIMESTAMPTZ | |
-
-**RLS:** Anyone can insert for a published invitation. Only the invitation owner can select.
+```
+20260816000001_profiles.sql          Phase 2 — profiles, RLS, auto-create trigger
+20260816000002_role_escalation.sql   Phase 2 — role escalation protection
+20260817000001_templates.sql         Phase 3 — templates table
+20260817000002_invitations.sql       Phase 3 — invitations table
+20260817000003_gallery.sql           Phase 3 — invitation_gallery table
+20260817000004_rsvps.sql             Phase 3 — rsvps table
+20260817000005_orders.sql            Phase 3 — orders table
+20260817000006_payment_proofs.sql    Phase 3 — payment_proofs table
+20260817000007_seed_templates.sql    Phase 3 — Blush Garden seed
+```
 
 ---
 
-### `orders`
+## Storage Buckets
 
-Payment records. One per invitation payment attempt.
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID PK | |
-| `user_id` | UUID | FK → `profiles.id` |
-| `invitation_id` | UUID | FK → `invitations.id` |
-| `amount` | NUMERIC NOT NULL | |
-| `currency` | TEXT | Default `'MYR'` |
-| `payment_provider` | TEXT | TBD |
-| `payment_reference` | TEXT | Provider transaction ID |
-| `payment_status` | TEXT | `pending`, `paid`, `failed`, `refunded` |
-| `created_at` | TIMESTAMPTZ | |
-| `paid_at` | TIMESTAMPTZ | |
+| Bucket | Access | Path Pattern | Usage |
+|--------|--------|-------------|-------|
+| `invitation-gallery` | Private (signed URLs) | `{user_id}/{invitation_id}/{filename}` | Invitation photos |
+| `payment-proofs` | Private (never public) | `{user_id}/{order_id}/{filename}` | TNG payment evidence |
 
 ---
 
-## Reserved Slugs
+## Admin Promotion (SQL Editor)
 
-The following slugs may never be used as invitation URLs:
-
-`admin`, `api`, `auth`, `billing`, `dashboard`, `forgot-password`, `login`, `logout`, `pricing`, `profile`, `register`, `reset-password`, `settings`, `signin`, `signup`, `support`, `templates`
-
-Validated both client-side and server-side before saving.
+```sql
+UPDATE public.profiles
+SET role = 'admin', updated_at = now()
+WHERE id = '<auth-user-uuid>';
+```
