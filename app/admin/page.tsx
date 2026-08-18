@@ -107,7 +107,26 @@ export default async function AdminPage() {
       </div>
 
       {/* ── Quick Links Grid ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div
+          className="rounded-[var(--radius-lg)] p-6 bg-[var(--surface)] border border-[var(--border)] shadow-xs flex flex-col justify-between space-y-4"
+        >
+          <div>
+            <h2 className="font-display text-lg font-bold text-[var(--text)] mb-1">
+              Pengurusan Templat &amp; Rekaan
+            </h2>
+            <p className="text-xs text-[var(--text-muted)] font-ui leading-relaxed">
+              Cipta templat Hybrid baharu, muat naik latar belakang tersuai, tetapkan harga, dan konfigurasikan animasi overlay.
+            </p>
+          </div>
+          <Link
+            href="/admin/templates"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors"
+          >
+            Urus Templat &amp; Rekaan →
+          </Link>
+        </div>
+
         <div
           className="rounded-[var(--radius-lg)] p-6 bg-[var(--surface)] border border-[var(--border)] shadow-xs flex flex-col justify-between space-y-4"
         >
@@ -121,7 +140,7 @@ export default async function AdminPage() {
           </div>
           <Link
             href="/admin/payments"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--surface-warm)] border border-[var(--border)] text-[var(--text)] text-xs font-semibold font-ui hover:border-[var(--primary)] transition-colors"
           >
             Buka Senarai Pembayaran →
           </Link>

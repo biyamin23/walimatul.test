@@ -21,6 +21,7 @@
 
 import type { TemplateComponent, TemplateRegistryEntry } from "./types";
 import { BlushGardenTemplate } from "./blush-garden/Template";
+import { HybridEditorialTemplate } from "./hybrid-editorial/Template";
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
@@ -34,10 +35,11 @@ const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     name: "Blush Garden",
     component: BlushGardenTemplate,
   },
-  // Future templates:
-  // "royal-gold": { componentKey: "royal-gold", name: "Royal Gold", component: RoyalGoldTemplate },
-  // "minimal-white": { ... },
-  // "malay-heritage": { ... },
+  "hybrid-editorial": {
+    componentKey: "hybrid-editorial",
+    name: "Hybrid Editorial",
+    component: HybridEditorialTemplate,
+  },
 };
 
 // ─── Registry Helpers ─────────────────────────────────────────────────────────

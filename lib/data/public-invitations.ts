@@ -10,7 +10,9 @@ import type { Invitation, Template } from "@/types/database";
 export interface PublishedInvitationResult {
   invitation: Invitation;
   templateData: InvitationTemplateData;
-  template: Pick<Template, "id" | "name" | "slug" | "component_key">;
+  template: Pick<Template, "id" | "name" | "slug" | "component_key"> & {
+    design_config?: Record<string, unknown>;
+  };
 }
 
 /**
@@ -49,7 +51,8 @@ export const getPublishedInvitationBySlug = cache(
           name,
           slug,
           component_key,
-          is_active
+          is_active,
+          design_config
         ),
         gallery:invitation_gallery (
           id,
@@ -91,6 +94,7 @@ export const getPublishedInvitationBySlug = cache(
         name: templateRaw.name,
         slug: templateRaw.slug,
         component_key: templateRaw.component_key,
+        design_config: templateRaw.design_config,
       },
     };
   }

@@ -1,27 +1,37 @@
-# WALIMATUL — Template System
+# WALIMATUL — Template System & Hybrid Architecture
 
 ## Architecture
 
 ```
 templates/
-  types.ts                      — InvitationTemplateData contract, TemplateComponent type
+  types.ts                      — InvitationTemplateData contract, TemplateComponentProps
   registry.ts                   — Map component_key → React component
-  blush-garden/
-    Template.tsx                — Blush Garden production invitation component
-    config.ts                   — Design metadata + theme tokens
-    fonts.ts                    — Scoped Google Fonts (Great Vibes, Cormorant Garamond, Inter)
-    preview-data.ts             — Sample & edge-case datasets for preview & visual testing
+  blush-garden/                 — Coded React template component
+    Template.tsx
+    config.ts
+    fonts.ts
+    preview-data.ts
     components/
-      BotanicalOrnaments.tsx    — SVG corner accents, botanical dividers & flourishes
-      CoverSection.tsx          — Responsive cover / hero section (Great Vibes script names)
-      OpeningSection.tsx        — Bismillah motif, opening quotation & blessing
-      CoupleSection.tsx         — Formal couple presentation
-      EventDetailsSection.tsx   — Ceremonial date/time, venue & Maps/Waze actions
-      GallerySection.tsx        — Responsive photo gallery layout
-      RsvpPreviewSection.tsx    — RSVP presentation details & guest settings
-      ClosingSection.tsx        — Doa, blessing & subtle WALIMATUL attribution
-  shared/                       — Shared utilities, ornaments, layout primitives
+  hybrid-editorial/             — Reusable Hybrid template engine (Phase 10A)
+    Template.tsx                — Configurable renderer (consumes dynamic design_config)
+    OverlayAnimation.tsx        — Lightweight CSS overlay animation presets
+    fonts.ts                    — Font loaders for approved Google font registry
 ```
+
+---
+
+## Coded vs Hybrid Templates
+
+WALIMATUL supports two categories of templates:
+
+1. **Coded Templates (`blush-garden`)**:
+   - Implemented as dedicated, handcrafted React components with custom JSX layout and bespoke ornament assets.
+   - Ideal for unique signature styles.
+
+2. **Hybrid Configurable Templates (`hybrid-editorial`)**:
+   - Reusable, production-grade presentation renderer that consumes dynamic `design_config` (JSONB) and uploaded graphical assets (PNG/JPG/WebP).
+   - Allows Admin to launch new commercial visual variations without deploying new React code.
+   - **Guaranteed Purity**: No raw executable JavaScript/HTML is ever uploaded or executed. Dynamic wedding data remains live HTML/text.
 
 ---
 
@@ -30,110 +40,120 @@ templates/
 Every template component accepts exactly this shape (from `templates/types.ts`):
 
 ```ts
-interface InvitationTemplateData {
-  id: string;
-  groomName: string;
-  groomShortName: string;
-  brideName: string;
-  brideShortName: string;
-  weddingDate: string | null;
-  startTime: string | null;
-  endTime: string | null;
-  venueName: string | null;
-  venueAddress: string | null;
-  googleMapsUrl: string | null;
-  wazeUrl: string | null;
-  openingMessage: string | null;
-  invitationMessage: string | null;
-  closingMessage: string | null;
-  gallery: GalleryItem[];
-  rsvpEnabled: boolean;
-  rsvpDeadline: string | null;
-  maxPax: number;
-  allowGuestMessage: boolean;
-  musicEnabled: boolean;
-  musicKey: string | null;
+export interface TemplateComponentProps {
+  data: InvitationTemplateData;
+  mode?: "preview" | "live" | "editor";
+  designConfig?: TemplateDesignConfig | Record<string, unknown>;
 }
 ```
 
-Templates must NOT define their own incompatible data interfaces.
+**Rule:** Template components must never query the database directly or contain server dependencies.
 
 ---
 
-## Database Mapper Layer
+## Template Status Lifecycle
 
-The mapper in `lib/templates/map-invitation.ts` converts Supabase snake_case rows to `InvitationTemplateData`:
+Templates progress through a 3-stage lifecycle:
 
-```ts
-import { mapInvitationToTemplateData } from "@/lib/templates/map-invitation";
-
-const templateData = mapInvitationToTemplateData(invitationRow, galleryRows);
+```
+[ draft ] ──(Admin Activate)──> [ active ] ──(Admin Archive)──> [ archived ]
+   │
+ (Delete allowed ONLY if unreferenced)
 ```
 
-**Rule:** Template components must never access database fields directly or contain data-fetching logic.
+| Status | Customer Catalogue | New Purchases | Existing Invitations |
+|---|---|---|---|
+| **Draft** | Hidden | Not selectable | Renders in Admin Preview |
+| **Active** | Visible (`/templates`) | Selectable | Renders on Public & Editor |
+| **Archived** | Hidden | Not selectable | Renders on Historical/Active Invitations |
+
+### Safe Delete Protection
+- **Hard Delete**: Permitted ONLY when `status = 'draft'` AND 0 invitations reference it AND 0 orders reference it.
+- **In-Use Protection**: If any invitation or order references the template, hard delete is blocked and "Archive" is offered instead, ensuring zero broken historical invitations.
 
 ---
 
-## Template Availability Rule
+## Hybrid Design Configuration (`design_config`)
 
-A template is actionable only when BOTH are true:
+Stored as JSONB in `public.templates.design_config`:
 
-| Condition | Source |
-|-----------|--------|
-| `templates.is_active = true` | Supabase DB |
-| `component_key in registry` | `templates/registry.ts` |
-
-If `is_active` in DB but no component: show "unavailable" state — never crash.
-If component exists but `is_active = false`: do not show in catalogue.
-
----
-
-## Registry API
-
-```ts
-// Check availability
-isTemplateComponentAvailable('blush-garden') // → true | false
-
-// Get component (null-safe)
-const Template = getTemplateComponent('blush-garden')
-if (!Template) return <UnavailableState />
-return <Template data={data} mode="live" />
+```json
+{
+  "colors": {
+    "background": "#FDFBF7",
+    "surface": "#FFFFFF",
+    "surfaceCard": "rgba(255, 255, 255, 0.88)",
+    "primaryText": "#2C2523",
+    "secondaryText": "#736862",
+    "accent": "#9C7A4A",
+    "border": "#EFE8DF",
+    "buttonBg": "#9C7A4A",
+    "buttonText": "#FFFFFF"
+  },
+  "typography": {
+    "headingFont": "cormorant",
+    "scriptFont": "great-vibes",
+    "bodyFont": "inter"
+  },
+  "background": {
+    "color": "#FDFBF7",
+    "imageUrl": "https://.../background.webp",
+    "size": "cover",
+    "repeat": "no-repeat",
+    "overlayOpacity": 0.1
+  },
+  "ornaments": {
+    "topOrnamentUrl": "https://.../top-ornament.png",
+    "bottomOrnamentUrl": "https://.../bottom-ornament.png",
+    "dividerStyle": "floral"
+  },
+  "overlay": {
+    "enabled": true,
+    "animationPreset": "soft-float",
+    "customAssetUrl": null,
+    "opacity": 0.6,
+    "speed": "normal"
+  }
+}
 ```
 
 ---
 
-## Template Render Modes
+## Approved Font Registry
 
-| Mode | Usage |
-|------|-------|
-| `"live"` | Public invitation page (full features) |
-| `"preview"` | Preview route / template card preview (shows preview badge, presentation buttons) |
-| `"editor"` | Editor live preview pane (real-time, placeholder data allowed) |
+1. `cormorant`: Cormorant Garamond (Serif Elegan)
+2. `playfair`: Playfair Display (Serif Klasik)
+3. `great-vibes`: Great Vibes (Kaligrafi Romantik)
+4. `inter`: Inter (Moden & Jelas)
+5. `outfit`: Outfit (Sans Kontemporari)
 
 ---
 
-## Blush Garden Design Specifications
+## Overlay Animation Presets
 
-### Palette Tokens
-```
-Background:  #FCF8F3 (Warm Ivory)
-Soft Blush:  #F5DDD6
-Light Blush: #FCF1EE
-Primary:     #174F3A (Deep Green)
-Gold:        #B8955A (Muted Gold)
-Warm Text:   #746F6B (Warm Charcoal)
-Warm Border: #E8DDD5
-```
+1. `none`: Static presentation.
+2. `soft-float`: Subtle floating elements.
+3. `sparkle`: Micro-particle glowing sparkles.
+4. `bokeh`: Soft blurred light circles drifting slowly.
+5. `petals`: Drifting soft floral petals.
+6. `gentle-glow`: Ambient pulsing radial glow.
 
-### Typography
-- **Couple Names**: Great Vibes (fluid `clamp(2.75rem, 11vw, 5.25rem)` with graceful wrapping)
-- **Ceremonial Headings & Dates**: Cormorant Garamond
-- **Body & Functional Text**: Inter
+### Safety & Accessibility
+- `pointer-events: none` on all animations (never blocks RSVP, Maps, or links).
+- `@media (prefers-reduced-motion: reduce)` automatically disables all animations.
 
-### Responsive Viewports Tested
-- **Mobile (360px – 430px)**: Primary target, full touch-friendly targets, no horizontal overflow.
-- **Tablet (768px – 1024px)**: Centered editorial container (~640-720px max-width) with soft backdrop.
-- **Desktop (1440px+)**: Intimate invitation container with warm ambient border and shadows.
+---
 
-### Preview Route
-Accessible at `/templates/blush-garden/preview` with interactive dataset switcher (Standard, Long Names, Minimal).
+## Template Asset Storage (`template-assets`)
+
+- Bucket: `template-assets` (Public Read, Admin Write/Update/Delete).
+- Directory structure:
+  ```
+  template-assets/
+    {template_slug}/
+      thumbnail/
+      background/
+      ornaments/
+      overlays/
+  ```
+- Allowed formats: JPG, PNG, WebP (Max 5 MB).

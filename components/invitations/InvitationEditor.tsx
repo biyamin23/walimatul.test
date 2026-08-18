@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { InvitationForm } from "./InvitationForm";
 import { SaveStatusIndicator, type SaveStatus } from "./SaveStatusIndicator";
-import { BlushGardenTemplate } from "@/templates/blush-garden/Template";
+import { getTemplateComponent } from "@/templates/registry";
+import { HybridEditorialTemplate } from "@/templates/hybrid-editorial/Template";
 import { updateOwnInvitationAction } from "@/app/actions/invitations";
 import type { InvitationWithTemplate } from "@/types/database";
 import type { UpdateInvitationInput } from "@/lib/validation/invitation";
@@ -256,14 +257,14 @@ export function InvitationEditor({
                   Pengaktifan &amp; Pembayaran Jemputan
                 </h3>
                 <p className="text-xs font-ui text-[var(--text-muted)] mt-0.5">
-                  Selesai mengisi butiran? Teruskan ke pembayaran Touch ’n Go eWallet (RM49) untuk mengaktifkan jemputan rasmi anda.
+                  Selesai mengisi butiran? Teruskan ke pembayaran Touch ’n Go eWallet (RM{invitation.template?.price ?? 49}) untuk mengaktifkan jemputan rasmi anda.
                 </p>
               </div>
               <Link
                 href={`/dashboard/invitations/${invitation.id}/payment`}
                 className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-full bg-[var(--primary)] text-white font-ui text-xs font-semibold hover:bg-[var(--primary-hover)] transition-all shadow-sm"
               >
-                <span>Teruskan ke Pembayaran (RM49)</span>
+                <span>Teruskan ke Pembayaran (RM{invitation.template?.price ?? 49})</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
@@ -280,7 +281,14 @@ export function InvitationEditor({
               </span>
             </div>
             <div className="w-full rounded-2xl overflow-hidden shadow-2xl">
-              <BlushGardenTemplate data={liveTemplateData} mode="editor" />
+              {React.createElement(
+                getTemplateComponent(invitation.template?.component_key) || HybridEditorialTemplate,
+                {
+                  data: liveTemplateData,
+                  mode: "editor",
+                  designConfig: invitation.template?.design_config,
+                }
+              )}
             </div>
           </div>
         </div>
@@ -307,14 +315,14 @@ export function InvitationEditor({
                     Pengaktifan &amp; Pembayaran Jemputan
                   </h3>
                   <p className="text-xs font-ui text-[var(--text-muted)] mt-0.5">
-                    Selesai mengisi butiran? Teruskan ke pembayaran Touch ’n Go eWallet (RM49) untuk mengaktifkan jemputan rasmi anda.
+                    Selesai mengisi butiran? Teruskan ke pembayaran Touch ’n Go eWallet (RM{invitation.template?.price ?? 49}) untuk mengaktifkan jemputan rasmi anda.
                   </p>
                 </div>
                 <Link
                   href={`/dashboard/invitations/${invitation.id}/payment`}
                   className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-full bg-[var(--primary)] text-white font-ui text-xs font-semibold hover:bg-[var(--primary-hover)] transition-all shadow-sm"
                 >
-                  <span>Teruskan ke Pembayaran (RM49)</span>
+                  <span>Teruskan ke Pembayaran (RM{invitation.template?.price ?? 49})</span>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
@@ -323,7 +331,14 @@ export function InvitationEditor({
             </div>
           ) : (
             <div className="rounded-2xl overflow-hidden shadow-2xl pb-16 w-full max-w-full min-w-0">
-              <BlushGardenTemplate data={liveTemplateData} mode="editor" />
+              {React.createElement(
+                getTemplateComponent(invitation.template?.component_key) || HybridEditorialTemplate,
+                {
+                  data: liveTemplateData,
+                  mode: "editor",
+                  designConfig: invitation.template?.design_config,
+                }
+              )}
             </div>
           )}
         </div>

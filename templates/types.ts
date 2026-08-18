@@ -65,6 +65,8 @@ export interface GalleryItem {
 
 // ─── Template Component Contract ──────────────────────────────────────────────
 
+import type { TemplateDesignConfig } from "@/lib/templates/template-design";
+
 /**
  * All WALIMATUL template React components must accept this props shape.
  * mode: 'preview' = lightweight preview (no music, reduced animations)
@@ -74,6 +76,7 @@ export interface GalleryItem {
 export interface TemplateComponentProps {
   data: InvitationTemplateData;
   mode?: "preview" | "live" | "editor";
+  designConfig?: TemplateDesignConfig | Record<string, unknown>;
 }
 
 /** The type of a WALIMATUL template React component */

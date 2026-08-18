@@ -43,11 +43,13 @@ export interface Profile {
   updated_at: string; // ISO 8601
 }
 
+export type TemplateStatus = "draft" | "active" | "archived";
+
 /**
  * public.templates
- * Product metadata for wedding invitation designs.
- * Actual design is a coded React component (templates/registry.ts).
- * Clients: SELECT active only. Admin manages via Supabase Dashboard.
+ * Product metadata and design configuration for wedding invitation designs.
+ * Actual design is rendered via coded React component or Hybrid Editorial renderer.
+ * Clients: SELECT active only. Admin manages via Admin panel.
  */
 export interface Template {
   id: string; // UUID
@@ -55,14 +57,17 @@ export interface Template {
   slug: string; // unique — used in URLs and registry lookup
   description: string | null;
   category: string | null;
-  component_key: string; // unique — maps to templates/registry.ts key
+  component_key: string; // maps to templates/registry.ts key
   thumbnail_url: string | null;
   preview_url: string | null;
   price: number; // NUMERIC(10,2) — display price in MYR
-  validity_months: number; // default 6 for Blush Garden
+  validity_months: number; // e.g. 6 or 12
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
+  status: TemplateStatus;
+  design_config?: Record<string, unknown>;
+  updated_by?: string | null;
   created_at: string;
   updated_at: string;
 }

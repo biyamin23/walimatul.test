@@ -27,6 +27,8 @@ const TEMPLATE_PALETTES: Record<string, string[]> = {
 
 const FALLBACK_PALETTE = ["#FCF8F3", "#E8E0D8", "#3A3A3A", "#888888"];
 
+import Image from "next/image";
+
 function TemplateCard({ template }: { template: Template }) {
   const palette = TEMPLATE_PALETTES[template.slug] ?? FALLBACK_PALETTE;
   // A template is actionable only if it has a code component registered
@@ -42,46 +44,58 @@ function TemplateCard({ template }: { template: Template }) {
       >
         {/* Visual preview */}
         <div
-          className="h-52 relative flex items-center justify-center"
+          className="h-52 relative flex items-center justify-center overflow-hidden"
           style={{ background: palette[0] }}
           aria-hidden="true"
         >
-          {/* Palette dots */}
-          <div className="absolute top-3 right-3 flex gap-1">
-            {palette.map((color, i) => (
-              <div
-                key={i}
-                className="w-3.5 h-3.5 rounded-full border border-white/40"
-                style={{ background: color }}
-              />
-            ))}
-          </div>
-
-          {/* Mini invitation preview card */}
-          <div
-            className="w-24 rounded-xl shadow-md flex flex-col items-center py-4 px-3 text-center gap-1.5 border"
-            style={{
-              background: `${palette[0]}dd`,
-              borderColor: `${palette[2]}20`,
-            }}
-          >
-            <div
-              className="font-display text-sm leading-tight"
-              style={{ color: palette[2] }}
-            >
-              Abu &amp; Hana
-            </div>
-            <div
-              className="w-6 h-px"
-              style={{ background: palette[3] }}
+          {template.thumbnail_url ? (
+            <Image
+              src={template.thumbnail_url}
+              alt={template.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              unoptimized
             />
-            <div
-              className="text-[8px] tracking-wider uppercase font-ui"
-              style={{ color: palette[3] }}
-            >
-              24 Nov 2026
-            </div>
-          </div>
+          ) : (
+            <>
+              {/* Palette dots */}
+              <div className="absolute top-3 right-3 flex gap-1 z-10">
+                {palette.map((color, i) => (
+                  <div
+                    key={i}
+                    className="w-3.5 h-3.5 rounded-full border border-white/40"
+                    style={{ background: color }}
+                  />
+                ))}
+              </div>
+
+              {/* Mini invitation preview card */}
+              <div
+                className="w-24 rounded-xl shadow-md flex flex-col items-center py-4 px-3 text-center gap-1.5 border"
+                style={{
+                  background: `${palette[0]}dd`,
+                  borderColor: `${palette[2]}20`,
+                }}
+              >
+                <div
+                  className="font-display text-sm leading-tight"
+                  style={{ color: palette[2] }}
+                >
+                  Abu &amp; Hana
+                </div>
+                <div
+                  className="w-6 h-px"
+                  style={{ background: palette[3] }}
+                />
+                <div
+                  className="text-[8px] tracking-wider uppercase font-ui"
+                  style={{ color: palette[3] }}
+                >
+                  24 Nov 2026
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Unavailable overlay */}
           {!isAvailable && (

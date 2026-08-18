@@ -37,8 +37,14 @@ export default async function AdminLayout({
             Admin
           </span>
           <Link
-            href="/admin/payments"
+            href="/admin/templates"
             className="text-xs font-ui font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors ml-2"
+          >
+            Templates
+          </Link>
+          <Link
+            href="/admin/payments"
+            className="text-xs font-ui font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
             Payments
           </Link>

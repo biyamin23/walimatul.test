@@ -13,18 +13,22 @@ Next.js 16.3.1 (App Router)
 │   │   │   └── [id]/edit/      — Invitation editor with live preview
 │   │   └── profile/            — User profile management
 │   └── admin/                  — Protected admin area
+│       ├── templates/          — Template management (CRUD, design config, preview)
+│       └── payments/           — Payment verification & approval queue
 ├── components/                 — Reusable UI components
+│   ├── admin/                  — Admin payment queue, template forms, asset uploaders
 │   └── invitations/            — InvitationEditor, Form, Cards, SlugField, SaveStatus
 ├── lib/
 │   ├── supabase/               — Browser + server Supabase clients
 │   ├── auth/                   — Auth guards, getClaims(), permissions
-│   ├── data/                   — Server-side data access layer
-│   ├── templates/              — Template mappers & deterministic formatters
-│   └── validation/             — Zod schemas
+│   ├── data/                   — Server-side data access layer (admin-templates, rsvps, payments)
+│   ├── templates/              — Template mappers, design normalizers & sample datasets
+│   └── validation/             — Zod schemas (templates, payments, rsvps)
 ├── templates/                  — Invitation template system
-│   ├── types.ts                — Shared InvitationTemplateData contract
+│   ├── types.ts                — Shared InvitationTemplateData & TemplateComponentProps contract
 │   ├── registry.ts             — component_key → React component map
-│   └── blush-garden/           — Blush Garden template component
+│   ├── blush-garden/           — Coded Blush Garden template component
+│   └── hybrid-editorial/       — Configurable Hybrid Editorial renderer with overlay animation
 ├── types/
 │   ├── database.ts             — All DB row types, enums, Database namespace
 │   └── index.ts                — Re-export convenience

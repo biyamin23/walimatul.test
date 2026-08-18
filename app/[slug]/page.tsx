@@ -98,6 +98,7 @@ export default async function PublicInvitationPage({
       {React.createElement(TemplateComponent, {
         data: result.templateData,
         mode: "live",
+        designConfig: result.template.design_config,
       })}
     </main>
   );

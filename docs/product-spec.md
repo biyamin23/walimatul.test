@@ -10,15 +10,17 @@
 
 ---
 
-## Product: Blush Garden
+## Product Model & Templates
 
 | Property | Value |
-|----------|-------|
-| Template | Blush Garden |
-| Price | RM49.00 |
-| Validity | 6 months |
-| Payment model | One payment. No recurring fees. |
-| Payment method | Touch 'n Go eWallet QR |
+|---|---|
+| Coded Template | Blush Garden (RM49.00 / 6 months) |
+| Hybrid Templates | Configurable (e.g. Royal Gold, RM69 / 12 months) |
+| Payment model | One-time payment per invitation. No recurring subscriptions. |
+| Payment method | Touch 'n Go eWallet QR transfer + screenshot proof verification |
+| Template Engine | Coded React renderer OR Hybrid Editorial configurable renderer |
+| Asset Storage | Supabase Storage `template-assets` bucket |
+| Deletion Policy | Safe archive; referenced templates cannot be hard-deleted |
 
 ---
 
