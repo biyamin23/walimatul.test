@@ -97,7 +97,8 @@ Stored as JSONB in `public.templates.design_config`:
   },
   "background": {
     "color": "#FDFBF7",
-    "imageUrl": "https://.../background.webp",
+    "mobileImageUrl": "https://.../mobile-1080x1920.webp",
+    "desktopImageUrl": "https://.../desktop-1920x1080.webp",
     "size": "cover",
     "repeat": "no-repeat",
     "overlayOpacity": 0.1
@@ -109,7 +110,7 @@ Stored as JSONB in `public.templates.design_config`:
   },
   "overlay": {
     "enabled": true,
-    "animationPreset": "soft-float",
+    "preset": "soft-float",
     "customAssetUrl": null,
     "opacity": 0.6,
     "speed": "normal"

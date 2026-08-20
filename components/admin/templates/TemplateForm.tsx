@@ -316,20 +316,44 @@ export function TemplateForm({ initialTemplate }: TemplateFormProps) {
                 assetFolder="thumbnail"
               />
 
-              <TemplateAssetUploader
-                label="Gambar Latar Belakang (Background)"
-                description="Imej latar belakang utama jemputan (pilihan)."
-                recommendedSize="Cadangan saiz: 1080 × 1920 px (Portrait)"
-                value={designConfig.background.imageUrl}
-                onChange={(url) =>
-                  setDesignConfig((prev) => ({
-                    ...prev,
-                    background: { ...prev.background, imageUrl: url },
-                  }))
-                }
-                templateSlug={slug || "new"}
-                assetFolder="background"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <TemplateAssetUploader
+                  label="Gambar Latar Mobile (Portrait)"
+                  description="Imej latar belakang untuk paparan telefon pintar."
+                  recommendedSize="Cadangan saiz: 1080 × 1920 px (Portrait)"
+                  value={designConfig.background.mobileImageUrl}
+                  onChange={(url) =>
+                    setDesignConfig((prev) => ({
+                      ...prev,
+                      background: {
+                        ...prev.background,
+                        mobileImageUrl: url,
+                        imageUrl: url || prev.background.imageUrl,
+                      },
+                    }))
+                  }
+                  templateSlug={slug || "new"}
+                  assetFolder="background"
+                />
+
+                <TemplateAssetUploader
+                  label="Gambar Latar Desktop (Landscape)"
+                  description="Imej latar belakang untuk paparan komputer & tablet."
+                  recommendedSize="Cadangan saiz: 1920 × 1080 px (Landscape)"
+                  value={designConfig.background.desktopImageUrl}
+                  onChange={(url) =>
+                    setDesignConfig((prev) => ({
+                      ...prev,
+                      background: {
+                        ...prev.background,
+                        desktopImageUrl: url,
+                      },
+                    }))
+                  }
+                  templateSlug={slug || "new"}
+                  assetFolder="background"
+                />
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <TemplateAssetUploader
@@ -546,34 +570,46 @@ export function TemplateForm({ initialTemplate }: TemplateFormProps) {
                       Pilihan Preset Animasi
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                      {ANIMATION_PRESETS.map((p) => (
-                        <button
-                          key={p.key}
-                          type="button"
-                          onClick={() =>
-                            setDesignConfig((prev) => ({
-                              ...prev,
-                              overlay: { ...prev.overlay, animationPreset: p.key },
-                            }))
-                          }
-                          className={`p-3 rounded-xl border text-left transition-all ${
-                            designConfig.overlay.animationPreset === p.key
-                              ? "bg-[var(--primary)] text-white border-[var(--primary)] shadow-xs"
-                              : "bg-[var(--surface-warm)] border-[var(--border-soft)] text-[var(--text)] hover:border-[var(--primary)]"
-                          }`}
-                        >
-                          <p className="text-xs font-bold">{p.label}</p>
-                          <p
-                            className={`text-[10px] mt-0.5 ${
-                              designConfig.overlay.animationPreset === p.key
-                                ? "text-white/80"
-                                : "text-[var(--text-muted)]"
+                      {ANIMATION_PRESETS.map((p) => {
+                        const currentPreset =
+                          designConfig.overlay.preset ||
+                          designConfig.overlay.animationPreset ||
+                          "none";
+                        const isSelected = currentPreset === p.key;
+
+                        return (
+                          <button
+                            key={p.key}
+                            type="button"
+                            onClick={() =>
+                              setDesignConfig((prev) => ({
+                                ...prev,
+                                overlay: {
+                                  ...prev.overlay,
+                                  preset: p.key,
+                                  animationPreset: p.key,
+                                },
+                              }))
+                            }
+                            className={`p-3 rounded-xl border text-left transition-all ${
+                              isSelected
+                                ? "bg-[var(--primary)] text-white border-[var(--primary)] shadow-xs"
+                                : "bg-[var(--surface-warm)] border-[var(--border-soft)] text-[var(--text)] hover:border-[var(--primary)]"
                             }`}
                           >
-                            {p.description}
-                          </p>
-                        </button>
-                      ))}
+                            <p className="text-xs font-bold">{p.label}</p>
+                            <p
+                              className={`text-[10px] mt-0.5 ${
+                                isSelected
+                                  ? "text-white/80"
+                                  : "text-[var(--text-muted)]"
+                              }`}
+                            >
+                              {p.description}
+                            </p>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 

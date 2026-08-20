@@ -4,7 +4,8 @@ import { z } from "zod";
  * WALIMATUL — Hybrid Template Design Configuration & Schema
  *
  * Central source of truth for configurable visual styling,
- * typography presets, color palettes, decorative assets, and overlay animations.
+ * responsive backgrounds, typography presets, color palettes,
+ * decorative assets, and overlay animations.
  */
 
 export type AnimationPreset =
@@ -71,8 +72,8 @@ export const ANIMATION_PRESETS: {
 }[] = [
   { key: "none", label: "Tiada Animasi", description: "Lapisan statik tanpa pergerakan" },
   { key: "soft-float", label: "Soft Float", description: "Pergerakan terapung yang lembut dan tenang" },
-  { key: "sparkle", label: "Sparkle", description: "Kilauan cahaya mikro berkilau secara rawak" },
-  { key: "bokeh", label: "Bokeh Light", description: "Bulatan cahaya lembut kabur terapung perlahan" },
+  { key: "sparkle", label: "Sparkle", description: "Kilauan mikro berkilau secara rawak" },
+  { key: "bokeh", label: "Bokeh Light", description: "Bulatan cahaya lembut terapung perlahan" },
   { key: "petals", label: "Falling Petals", description: "Kelopak bunga halus melayang perlahan" },
   { key: "gentle-glow", label: "Gentle Glow", description: "Nadi kilauan cahaya ambien di sekeliling rekaan" },
 ];
@@ -97,10 +98,13 @@ export interface TemplateDesignTypography {
 
 export interface TemplateDesignBackground {
   color: string;
-  imageUrl: string | null;
+  mobileImageUrl: string | null;
+  desktopImageUrl: string | null;
   size: BackgroundSize;
   repeat: BackgroundRepeat;
   overlayOpacity: number;
+  /** Legacy single background image for backward compatibility */
+  imageUrl?: string | null;
 }
 
 export interface TemplateDesignOrnaments {
@@ -111,10 +115,12 @@ export interface TemplateDesignOrnaments {
 
 export interface TemplateDesignOverlay {
   enabled: boolean;
-  animationPreset: AnimationPreset;
+  preset: AnimationPreset;
   customAssetUrl: string | null;
   opacity: number;
   speed: "slow" | "normal" | "fast";
+  /** Backward compatibility alias */
+  animationPreset?: AnimationPreset;
 }
 
 export interface TemplateDesignConfig {
@@ -144,10 +150,12 @@ export const DEFAULT_HYBRID_DESIGN_CONFIG: TemplateDesignConfig = {
   },
   background: {
     color: "#FDFBF7",
-    imageUrl: null,
+    mobileImageUrl: null,
+    desktopImageUrl: null,
     size: "cover",
     repeat: "no-repeat",
     overlayOpacity: 0,
+    imageUrl: null,
   },
   ornaments: {
     topOrnamentUrl: null,
@@ -156,7 +164,7 @@ export const DEFAULT_HYBRID_DESIGN_CONFIG: TemplateDesignConfig = {
   },
   overlay: {
     enabled: true,
-    animationPreset: "soft-float",
+    preset: "soft-float",
     customAssetUrl: null,
     opacity: 0.6,
     speed: "normal",
@@ -189,7 +197,9 @@ export const templateDesignConfigSchema = z.object({
   }),
   background: z.object({
     color: hexColorSchema.default(DEFAULT_HYBRID_DESIGN_CONFIG.background.color),
-    imageUrl: z.string().nullable().default(null),
+    mobileImageUrl: z.string().nullable().optional(),
+    desktopImageUrl: z.string().nullable().optional(),
+    imageUrl: z.string().nullable().optional(),
     size: z.enum(["cover", "contain", "auto"]).default("cover"),
     repeat: z.enum(["no-repeat", "repeat", "repeat-y"]).default("no-repeat"),
     overlayOpacity: z.number().min(0).max(1).default(0),
@@ -201,7 +211,8 @@ export const templateDesignConfigSchema = z.object({
   }),
   overlay: z.object({
     enabled: z.boolean().default(true),
-    animationPreset: z.enum(["none", "soft-float", "sparkle", "bokeh", "petals", "gentle-glow"]).default("soft-float"),
+    preset: z.enum(["none", "soft-float", "sparkle", "bokeh", "petals", "gentle-glow"]).optional(),
+    animationPreset: z.enum(["none", "soft-float", "sparkle", "bokeh", "petals", "gentle-glow"]).optional(),
     customAssetUrl: z.string().nullable().default(null),
     opacity: z.number().min(0).max(1).default(0.6),
     speed: z.enum(["slow", "normal", "fast"]).default("normal"),
@@ -210,7 +221,7 @@ export const templateDesignConfigSchema = z.object({
 
 /**
  * Safely parse and normalize raw design_config jsonb into a guaranteed TemplateDesignConfig.
- * Never throws — always falls back to valid defaults.
+ * Handles backward compatibility seamlessly between single legacy background and new responsive assets.
  */
 export function normalizeTemplateDesignConfig(
   raw: unknown
@@ -219,10 +230,84 @@ export function normalizeTemplateDesignConfig(
     return DEFAULT_HYBRID_DESIGN_CONFIG;
   }
 
-  const parsed = templateDesignConfigSchema.safeParse(raw);
+  const rawObj = raw as Record<string, unknown>;
+  const rawBg = (rawObj.background && typeof rawObj.background === "object"
+    ? rawObj.background
+    : {}) as Record<string, unknown>;
+  const rawOverlay = (rawObj.overlay && typeof rawObj.overlay === "object"
+    ? rawObj.overlay
+    : {}) as Record<string, unknown>;
+
+  // Backward compatibility normalization for background
+  const legacyBgUrl = typeof rawBg.imageUrl === "string" ? rawBg.imageUrl : null;
+  const mobileBgUrl =
+    typeof rawBg.mobileImageUrl === "string"
+      ? rawBg.mobileImageUrl
+      : legacyBgUrl ?? (typeof rawBg.desktopImageUrl === "string" ? rawBg.desktopImageUrl : null);
+  const desktopBgUrl =
+    typeof rawBg.desktopImageUrl === "string"
+      ? rawBg.desktopImageUrl
+      : legacyBgUrl ?? (typeof rawBg.mobileImageUrl === "string" ? rawBg.mobileImageUrl : null);
+
+  // Backward compatibility normalization for animation preset
+  const rawPreset =
+    typeof rawOverlay.preset === "string"
+      ? rawOverlay.preset
+      : typeof rawOverlay.animationPreset === "string"
+      ? rawOverlay.animationPreset
+      : "soft-float";
+  const canonicalPreset: AnimationPreset = (
+    ["none", "soft-float", "sparkle", "bokeh", "petals", "gentle-glow"].includes(rawPreset)
+      ? rawPreset
+      : "soft-float"
+  ) as AnimationPreset;
+
+  const normalized = {
+    ...rawObj,
+    background: {
+      color: typeof rawBg.color === "string" ? rawBg.color : DEFAULT_HYBRID_DESIGN_CONFIG.background.color,
+      mobileImageUrl: mobileBgUrl,
+      desktopImageUrl: desktopBgUrl,
+      imageUrl: legacyBgUrl,
+      size: typeof rawBg.size === "string" ? rawBg.size : "cover",
+      repeat: typeof rawBg.repeat === "string" ? rawBg.repeat : "no-repeat",
+      overlayOpacity: typeof rawBg.overlayOpacity === "number" ? rawBg.overlayOpacity : 0,
+    },
+    overlay: {
+      enabled: typeof rawOverlay.enabled === "boolean" ? rawOverlay.enabled : true,
+      preset: canonicalPreset,
+      animationPreset: canonicalPreset,
+      customAssetUrl: typeof rawOverlay.customAssetUrl === "string" ? rawOverlay.customAssetUrl : null,
+      opacity: typeof rawOverlay.opacity === "number" ? rawOverlay.opacity : 0.6,
+      speed: typeof rawOverlay.speed === "string" ? rawOverlay.speed : "normal",
+    },
+  };
+
+  const parsed = templateDesignConfigSchema.safeParse(normalized);
   if (!parsed.success) {
     return DEFAULT_HYBRID_DESIGN_CONFIG;
   }
 
-  return parsed.data as TemplateDesignConfig;
+  const data = parsed.data;
+
+  return {
+    ...data,
+    background: {
+      color: data.background.color,
+      mobileImageUrl: mobileBgUrl,
+      desktopImageUrl: desktopBgUrl,
+      imageUrl: legacyBgUrl,
+      size: data.background.size,
+      repeat: data.background.repeat,
+      overlayOpacity: data.background.overlayOpacity,
+    },
+    overlay: {
+      enabled: data.overlay.enabled,
+      preset: canonicalPreset,
+      animationPreset: canonicalPreset,
+      customAssetUrl: data.overlay.customAssetUrl,
+      opacity: data.overlay.opacity,
+      speed: data.overlay.speed,
+    },
+  };
 }

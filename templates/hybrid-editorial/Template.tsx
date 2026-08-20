@@ -77,13 +77,38 @@ export function HybridEditorialTemplate({
           borderColor: config.colors.border,
         }}
       >
-        {/* Background Image Layer (if provided) */}
-        {config.background.imageUrl && (
+        {/* Responsive Background Image Layers */}
+        {/* Mobile Background (Portrait: < 640px) */}
+        {config.background.mobileImageUrl && (
           <div
             aria-hidden="true"
-            className="absolute inset-0 pointer-events-none z-0"
+            className="absolute inset-0 pointer-events-none z-0 sm:hidden"
             style={{
-              backgroundImage: `url(${config.background.imageUrl})`,
+              backgroundImage: `url(${config.background.mobileImageUrl})`,
+              backgroundSize: config.background.size,
+              backgroundRepeat: config.background.repeat,
+              backgroundPosition: "center top",
+            }}
+          >
+            {config.background.overlayOpacity > 0 && (
+              <div
+                className="w-full h-full"
+                style={{
+                  backgroundColor: config.colors.background,
+                  opacity: config.background.overlayOpacity,
+                }}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Desktop / Tablet Background (Landscape: >= 640px) */}
+        {config.background.desktopImageUrl && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none z-0 hidden sm:block"
+            style={{
+              backgroundImage: `url(${config.background.desktopImageUrl})`,
               backgroundSize: config.background.size,
               backgroundRepeat: config.background.repeat,
               backgroundPosition: "center top",

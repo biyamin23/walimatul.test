@@ -21,12 +21,28 @@ export function TemplatePreviewContainer({
 
   const designConfig = normalizeTemplateDesignConfig(template.design_config);
 
+  // Adapt background specifically for active preview mode
+  const effectiveDesignConfig = {
+    ...designConfig,
+    background: {
+      ...designConfig.background,
+      mobileImageUrl:
+        viewport === "desktop"
+          ? designConfig.background.desktopImageUrl || designConfig.background.mobileImageUrl
+          : designConfig.background.mobileImageUrl,
+      desktopImageUrl:
+        viewport === "desktop"
+          ? designConfig.background.desktopImageUrl
+          : designConfig.background.mobileImageUrl || designConfig.background.desktopImageUrl,
+    },
+  };
+
   const viewportWidth =
     viewport === "mobile-standard"
       ? "max-w-[390px]"
       : viewport === "mobile-large"
       ? "max-w-[430px]"
-      : "max-w-full";
+      : "max-w-4xl";
 
   return (
     <div className="min-h-screen bg-[var(--surface-warm)] flex flex-col font-ui">
@@ -100,7 +116,7 @@ export function TemplatePreviewContainer({
             {
               data: SAMPLE_PREVIEW_INVITATION_DATA,
               mode: "preview",
-              designConfig,
+              designConfig: effectiveDesignConfig,
             }
           )}
         </div>
