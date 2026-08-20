@@ -615,6 +615,7 @@ function FeaturesSection() {
 const PRICING_PLANS = [
   {
     name: "Blush Garden",
+    templateSlug: "blush-garden",
     price: "RM49",
     period: "one-time",
     description: "Perfect for couples who want a beautiful, timeless invitation.",
@@ -628,8 +629,7 @@ const PRICING_PLANS = [
       "Background music",
       "Shareable QR code",
     ],
-    cta: "Use This Template",
-    href: `${SITE_NAV.templates}/blush-garden`,
+    cta: "Use This Template →",
     highlighted: true,
   },
 ];
@@ -695,14 +695,12 @@ function PricingSection() {
                   ))}
                 </ul>
 
-                <Link
-                  href={plan.href}
-                  className="block w-full text-center py-4 px-6 text-base font-semibold text-white rounded-[var(--radius-lg)] transition-all hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2"
-                  style={{ background: "var(--primary)" }}
-                  aria-label={`Get started with ${plan.name} for ${plan.price}`}
-                >
-                  {plan.cta}
-                </Link>
+                <CreateDraftButton
+                  templateSlug={plan.templateSlug}
+                  label={plan.cta}
+                  loadingLabel="Creating Draft..."
+                  className="w-full py-4 px-6 text-base font-semibold text-white rounded-[var(--radius-lg)] transition-all hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 bg-[var(--primary)] shadow-sm text-center"
+                />
               </Card>
             </div>
           ))}
