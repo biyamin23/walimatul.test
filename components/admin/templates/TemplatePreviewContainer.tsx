@@ -18,6 +18,7 @@ export function TemplatePreviewContainer({
   const [viewport, setViewport] = useState<"mobile-standard" | "mobile-large" | "desktop">(
     "mobile-standard"
   );
+  const [replayKey, setReplayKey] = useState(0);
 
   const designConfig = normalizeTemplateDesignConfig(template.design_config);
 
@@ -61,54 +62,67 @@ export function TemplatePreviewContainer({
               {template.name}
             </span>
             <span className="text-[10px] text-[var(--text-muted)] font-mono">
-              {template.component_key} · RM{template.price}
+              {template.component_key} · RM{template.price} · {designConfig.animation.cardPreset}
             </span>
           </div>
         </div>
 
-        {/* Viewport Width Toggles */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[var(--surface-warm)] border border-[var(--border-soft)]">
+        {/* Viewport Width Toggles & Replay Button */}
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setViewport("mobile-standard")}
-            className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
-              viewport === "mobile-standard"
-                ? "bg-[var(--primary)] text-white shadow-xs"
-                : "text-[var(--text-muted)] hover:text-[var(--text)]"
-            }`}
+            onClick={() => setReplayKey((k) => k + 1)}
+            className="px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-warm)] hover:bg-[var(--surface)] text-xs font-semibold text-[var(--text)] hover:border-[var(--primary)] transition-all flex items-center gap-1.5 cursor-pointer"
+            title="Main semula animasi kemunculan kad"
           >
-            📱 Mobile 390px
+            <span aria-hidden="true">🔄</span>
+            <span>Main Semula</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setViewport("mobile-large")}
-            className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
-              viewport === "mobile-large"
-                ? "bg-[var(--primary)] text-white shadow-xs"
-                : "text-[var(--text-muted)] hover:text-[var(--text)]"
-            }`}
-          >
-            📱 Mobile 430px
-          </button>
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[var(--surface-warm)] border border-[var(--border-soft)]">
+            <button
+              type="button"
+              onClick={() => setViewport("mobile-standard")}
+              className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                viewport === "mobile-standard"
+                  ? "bg-[var(--primary)] text-white shadow-xs"
+                  : "text-[var(--text-muted)] hover:text-[var(--text)]"
+              }`}
+            >
+              📱 390px
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setViewport("desktop")}
-            className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
-              viewport === "desktop"
-                ? "bg-[var(--primary)] text-white shadow-xs"
-                : "text-[var(--text-muted)] hover:text-[var(--text)]"
-            }`}
-          >
-            💻 Desktop
-          </button>
+            <button
+              type="button"
+              onClick={() => setViewport("mobile-large")}
+              className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                viewport === "mobile-large"
+                  ? "bg-[var(--primary)] text-white shadow-xs"
+                  : "text-[var(--text-muted)] hover:text-[var(--text)]"
+              }`}
+            >
+              📱 430px
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewport("desktop")}
+              className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                viewport === "desktop"
+                  ? "bg-[var(--primary)] text-white shadow-xs"
+                  : "text-[var(--text-muted)] hover:text-[var(--text)]"
+              }`}
+            >
+              💻 Desktop
+            </button>
+          </div>
         </div>
       </header>
 
       {/* ── Viewport Stage ── */}
       <main className="flex-1 flex justify-center p-0 sm:p-6 overflow-y-auto">
         <div
+          key={replayKey}
           className={`w-full ${viewportWidth} transition-all duration-300 shadow-2xl rounded-none sm:rounded-3xl overflow-hidden border border-[var(--border)]`}
         >
           {React.createElement(

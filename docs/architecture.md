@@ -28,8 +28,8 @@ Next.js 16.3.1 (App Router)
 │   ├── types.ts                — Shared InvitationTemplateData & TemplateComponentProps contract
 │   ├── registry.ts             — component_key → React component map
 │   ├── blush-garden/           — Coded Blush Garden template component
-│   └── hybrid-editorial/       — Configurable Hybrid Editorial renderer with overlay animation
-├── types/
+│   └── hybrid-editorial/       — Configurable Hybrid Editorial renderer with overlay animation & Motion for React card animations
+│       └── motion/             — Reusable MotionReveal, MotionStagger, and MotionHero primitives
 │   ├── database.ts             — All DB row types, enums, Database namespace
 │   └── index.ts                — Re-export convenience
 └── supabase/migrations/        — All tracked DB migrations

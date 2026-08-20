@@ -7,9 +7,14 @@ import { createTemplateAction, updateTemplateAction } from "@/app/actions/admin-
 import {
   APPROVED_FONTS,
   ANIMATION_PRESETS,
+  CARD_ANIMATION_PRESETS,
+  ORNAMENT_SIZE_OPTIONS,
   normalizeTemplateDesignConfig,
   type TemplateDesignConfig,
   type FontFamilyKey,
+  type CardAnimationPreset,
+  type CardAnimationDuration,
+  type OrnamentSize,
 } from "@/lib/templates/template-design";
 import { TemplateAssetUploader } from "./TemplateAssetUploader";
 import type { AdminTemplateDetail } from "@/lib/data/admin-templates";
@@ -533,15 +538,137 @@ export function TemplateForm({ initialTemplate }: TemplateFormProps) {
             </div>
           </div>
 
-          {/* ── 6. Animasi & Hiasan Overlay ── */}
+          {/* ── 6. Animasi Kandungan Kad (Motion for React) ── */}
           <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
             <div>
               <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--gold)] font-ui block mb-1">
                 Bahagian 6
               </span>
               <h2 className="text-xl font-bold font-display text-[var(--text)]">
-                Animasi &amp; Hiasan Terapung
+                Animasi Kandungan Kad
               </h2>
+              <p className="text-xs text-[var(--text-muted)] font-ui mt-1">
+                Animasi ini mengawal bagaimana bahagian kandungan muncul semasa tetamu menatal jemputan.
+              </p>
+            </div>
+
+            <div className="space-y-4 font-ui">
+              <div>
+                <label className="block text-xs font-bold text-[var(--text)] mb-1.5">
+                  Pilihan Preset Animasi Kad
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  {CARD_ANIMATION_PRESETS.map((p) => {
+                    const currentPreset = designConfig.animation?.cardPreset || "fade-up";
+                    const isSelected = currentPreset === p.key;
+
+                    return (
+                      <button
+                        key={p.key}
+                        type="button"
+                        onClick={() =>
+                          setDesignConfig((prev) => ({
+                            ...prev,
+                            animation: {
+                              ...prev.animation,
+                              cardPreset: p.key as CardAnimationPreset,
+                            },
+                          }))
+                        }
+                        className={`p-3 rounded-xl border text-left transition-all relative ${
+                          isSelected
+                            ? "bg-[var(--primary)] text-white border-[var(--primary)] shadow-xs"
+                            : "bg-[var(--surface-warm)] border-[var(--border-soft)] text-[var(--text)] hover:border-[var(--primary)]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <p className="text-xs font-bold">{p.label}</p>
+                          {p.badge && (
+                            <span
+                              className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold ${
+                                isSelected
+                                  ? "bg-white/20 text-white"
+                                  : "bg-[var(--primary-soft)] text-[var(--primary)]"
+                              }`}
+                            >
+                              {p.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p
+                          className={`text-[10px] mt-0.5 ${
+                            isSelected
+                              ? "text-white/80"
+                              : "text-[var(--text-muted)]"
+                          }`}
+                        >
+                          {p.description}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div>
+                  <label className="block text-xs font-bold text-[var(--text)] mb-1">
+                    Kelajuan Animasi Kad
+                  </label>
+                  <select
+                    value={designConfig.animation?.duration || "normal"}
+                    onChange={(e) =>
+                      setDesignConfig((prev) => ({
+                        ...prev,
+                        animation: {
+                          ...prev.animation,
+                          duration: e.target.value as CardAnimationDuration,
+                        },
+                      }))
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-xs text-[var(--text)]"
+                  >
+                    <option value="normal">Sederhana (Normal ~0.6s)</option>
+                    <option value="slow">Perlahan (Slow ~0.9s)</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2 pt-6">
+                  <input
+                    type="checkbox"
+                    id="animation-trigger-once"
+                    checked={designConfig.animation?.triggerOnce !== false}
+                    onChange={(e) =>
+                      setDesignConfig((prev) => ({
+                        ...prev,
+                        animation: {
+                          ...prev.animation,
+                          triggerOnce: e.target.checked,
+                        },
+                      }))
+                    }
+                    className="w-4 h-4 rounded text-[var(--primary)]"
+                  />
+                  <label htmlFor="animation-trigger-once" className="text-xs font-bold text-[var(--text)]">
+                    Animasikan sekali sahaja semasa ditatal masuk (Disyorkan)
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 7. Animasi & Hiasan Overlay ── */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
+            <div>
+              <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--gold)] font-ui block mb-1">
+                Bahagian 7
+              </span>
+              <h2 className="text-xl font-bold font-display text-[var(--text)]">
+                Animasi &amp; Hiasan Terapung (Overlay)
+              </h2>
+              <p className="text-xs text-[var(--text-muted)] font-ui mt-1">
+                Lapisan zarah mikro hiasan yang melayang berterusan di atas latar belakang.
+              </p>
             </div>
 
             <div className="space-y-4 font-ui">
@@ -567,7 +694,7 @@ export function TemplateForm({ initialTemplate }: TemplateFormProps) {
                 <div className="space-y-4 pt-2">
                   <div>
                     <label className="block text-xs font-bold text-[var(--text)] mb-1.5">
-                      Pilihan Preset Animasi
+                      Pilihan Preset Animasi Overlay
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                       {ANIMATION_PRESETS.map((p) => {
@@ -616,7 +743,7 @@ export function TemplateForm({ initialTemplate }: TemplateFormProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-[var(--text)] mb-1">
-                        Kelajuan Animasi
+                        Kelajuan Animasi Overlay
                       </label>
                       <select
                         value={designConfig.overlay.speed}
@@ -658,20 +785,64 @@ export function TemplateForm({ initialTemplate }: TemplateFormProps) {
                     </div>
                   </div>
 
-                  <TemplateAssetUploader
-                    label="Imej Partikel Khas (Pilihan)"
-                    description="Muat naik imej kecil PNG (cth. kelopak bunga / bintang) untuk digunakan dalam animasi."
-                    recommendedSize="Saiz disyorkan: 64 × 64 px PNG telus"
-                    value={designConfig.overlay.customAssetUrl}
-                    onChange={(url) =>
-                      setDesignConfig((prev) => ({
-                        ...prev,
-                        overlay: { ...prev.overlay, customAssetUrl: url },
-                      }))
-                    }
-                    templateSlug={slug || "new"}
-                    assetFolder="overlays"
-                  />
+                  {/* Floating Ornament Size Selector */}
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--text)] mb-1.5">
+                      Saiz Paparan Hiasan Terapung (Floating Ornament)
+                    </label>
+                    <div className="grid grid-cols-3 gap-2.5">
+                      {ORNAMENT_SIZE_OPTIONS.map((opt) => {
+                        const isSelected = (designConfig.overlay.ornamentSize || "medium") === opt.key;
+                        return (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            onClick={() =>
+                              setDesignConfig((prev) => ({
+                                ...prev,
+                                overlay: {
+                                  ...prev.overlay,
+                                  ornamentSize: opt.key as OrnamentSize,
+                                },
+                              }))
+                            }
+                            className={`p-2.5 rounded-xl border text-left transition-all ${
+                              isSelected
+                                ? "bg-[var(--primary)] text-white border-[var(--primary)] shadow-xs"
+                                : "bg-[var(--surface-warm)] border-[var(--border-soft)] text-[var(--text)] hover:border-[var(--primary)]"
+                            }`}
+                          >
+                            <p className="text-xs font-bold">{opt.label}</p>
+                            <p
+                              className={`text-[10px] mt-0.5 ${
+                                isSelected ? "text-white/80" : "text-[var(--text-muted)]"
+                              }`}
+                            >
+                              {opt.dimensionLabel}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Custom Floating Ornament Uploader with strict guidance */}
+                  <div className="space-y-2">
+                    <TemplateAssetUploader
+                      label="Floating Ornament / Imej Hiasan Terapung Khas (Pilihan)"
+                      description="Muat naik motif grafik kecil PNG / WebP berlatar belakang telus."
+                      recommendedSize="Disyorkan: 512 × 512 px atau 1024 × 1024 px PNG telus. Pastikan karya seni dipotong rapat (crop tightly) merangkumi 70–90% kanvas tanpa ruang kosong berlebihan di sekeliling."
+                      value={designConfig.overlay.customAssetUrl}
+                      onChange={(url) =>
+                        setDesignConfig((prev) => ({
+                          ...prev,
+                          overlay: { ...prev.overlay, customAssetUrl: url },
+                        }))
+                      }
+                      templateSlug={slug || "new"}
+                      assetFolder="overlays"
+                    />
+                  </div>
                 </div>
               )}
             </div>

@@ -10,6 +10,7 @@ import {
 import { fontVariablesClass } from "./fonts";
 import { OverlayAnimation } from "./OverlayAnimation";
 import { GuestRsvpModal } from "@/components/rsvp/GuestRsvpModal";
+import { MotionReveal, MotionStagger, MotionHero } from "./motion";
 
 export function HybridEditorialTemplate({
   data,
@@ -161,56 +162,62 @@ export function HybridEditorialTemplate({
           )}
 
           {/* 1. Cover / Hero Section */}
-          <section className="px-6 py-12 text-center space-y-6">
-            <span
-              className="text-[11px] uppercase tracking-[0.25em] font-semibold block"
-              style={{ color: config.colors.accent }}
+          <section className="px-6 py-12 text-center">
+            <MotionHero
+              preset={config.animation.cardPreset}
+              duration={config.animation.duration}
+              className="space-y-6 flex flex-col items-center justify-center"
             >
-              Walimatulurus
-            </span>
-
-            <div className="space-y-3">
-              <h1
-                className="text-4xl sm:text-5xl md:text-6xl leading-tight font-normal"
-                style={{
-                  fontFamily: "var(--template-font-script)",
-                  color: config.colors.primaryText,
-                }}
-              >
-                {groomName}
-              </h1>
-
               <span
-                className="text-xl sm:text-2xl font-light italic block"
-                style={{
-                  fontFamily: "var(--template-font-heading)",
-                  color: config.colors.accent,
-                }}
+                className="text-[11px] uppercase tracking-[0.25em] font-semibold block"
+                style={{ color: config.colors.accent }}
               >
-                &amp;
+                Walimatulurus
               </span>
 
-              <h1
-                className="text-4xl sm:text-5xl md:text-6xl leading-tight font-normal"
+              <div className="space-y-3">
+                <h1
+                  className="text-4xl sm:text-5xl md:text-6xl leading-tight font-normal"
+                  style={{
+                    fontFamily: "var(--template-font-script)",
+                    color: config.colors.primaryText,
+                  }}
+                >
+                  {groomName}
+                </h1>
+
+                <span
+                  className="text-xl sm:text-2xl font-light italic block"
+                  style={{
+                    fontFamily: "var(--template-font-heading)",
+                    color: config.colors.accent,
+                  }}
+                >
+                  &amp;
+                </span>
+
+                <h1
+                  className="text-4xl sm:text-5xl md:text-6xl leading-tight font-normal"
+                  style={{
+                    fontFamily: "var(--template-font-script)",
+                    color: config.colors.primaryText,
+                  }}
+                >
+                  {brideName}
+                </h1>
+              </div>
+
+              <div
+                className="inline-block py-2 px-6 rounded-full border text-xs sm:text-sm font-medium tracking-wide shadow-2xs"
                 style={{
-                  fontFamily: "var(--template-font-script)",
-                  color: config.colors.primaryText,
+                  backgroundColor: config.colors.surfaceCard,
+                  borderColor: config.colors.border,
+                  color: config.colors.secondaryText,
                 }}
               >
-                {brideName}
-              </h1>
-            </div>
-
-            <div
-              className="inline-block py-2 px-6 rounded-full border text-xs sm:text-sm font-medium tracking-wide shadow-2xs"
-              style={{
-                backgroundColor: config.colors.surfaceCard,
-                borderColor: config.colors.border,
-                color: config.colors.secondaryText,
-              }}
-            >
-              {formattedDate}
-            </div>
+                {formattedDate}
+              </div>
+            </MotionHero>
           </section>
 
           {/* Divider */}
@@ -221,90 +228,108 @@ export function HybridEditorialTemplate({
           </div>
 
           {/* 2. Opening & Greeting Section */}
-          <section className="px-6 sm:px-10 py-8 text-center space-y-4">
-            <h2
-              className="text-2xl sm:text-3xl font-normal"
-              style={{
-                fontFamily: "var(--template-font-heading)",
-                color: config.colors.primaryText,
-              }}
+          <section className="px-6 sm:px-10 py-8 text-center">
+            <MotionReveal
+              preset={config.animation.cardPreset}
+              duration={config.animation.duration}
+              triggerOnce={config.animation.triggerOnce}
+              className="space-y-4"
             >
-              Undangan Majlis
-            </h2>
+              <h2
+                className="text-2xl sm:text-3xl font-normal"
+                style={{
+                  fontFamily: "var(--template-font-heading)",
+                  color: config.colors.primaryText,
+                }}
+              >
+                Undangan Majlis
+              </h2>
 
-            {data.openingMessage ? (
-              <p
-                className="text-xs sm:text-sm leading-relaxed max-w-md mx-auto whitespace-pre-line"
-                style={{ color: config.colors.secondaryText }}
-              >
-                {data.openingMessage}
-              </p>
-            ) : (
-              <p
-                className="text-xs sm:text-sm leading-relaxed max-w-md mx-auto italic"
-                style={{ color: config.colors.secondaryText }}
-              >
-                &ldquo;Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.&rdquo;
-                <br />
-                <span className="text-[11px] font-semibold not-italic block mt-1">
-                  (Surah Ar-Rum: 21)
-                </span>
-              </p>
-            )}
+              {data.openingMessage ? (
+                <p
+                  className="text-xs sm:text-sm leading-relaxed max-w-md mx-auto whitespace-pre-line"
+                  style={{ color: config.colors.secondaryText }}
+                >
+                  {data.openingMessage}
+                </p>
+              ) : (
+                <p
+                  className="text-xs sm:text-sm leading-relaxed max-w-md mx-auto italic"
+                  style={{ color: config.colors.secondaryText }}
+                >
+                  &ldquo;Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.&rdquo;
+                  <br />
+                  <span className="text-[11px] font-semibold not-italic block mt-1">
+                    (Surah Ar-Rum: 21)
+                  </span>
+                </p>
+              )}
+            </MotionReveal>
           </section>
 
           {/* 3. Formal Couple Presentation */}
           <section className="px-6 sm:px-10 py-6">
-            <div
-              className="p-6 sm:p-8 rounded-3xl border shadow-sm text-center space-y-6"
-              style={{
-                backgroundColor: config.colors.surfaceCard,
-                borderColor: config.colors.border,
-              }}
+            <MotionReveal
+              preset={config.animation.cardPreset}
+              duration={config.animation.duration}
+              triggerOnce={config.animation.triggerOnce}
             >
-              {/* Groom */}
-              <div className="space-y-1">
-                <h3
-                  className="text-xl sm:text-2xl font-bold"
-                  style={{
-                    fontFamily: "var(--template-font-heading)",
-                    color: config.colors.primaryText,
-                  }}
-                >
-                  {data.groomName || "Nama Penuh Pengantin Lelaki"}
-                </h3>
-                {data.invitationMessage && (
-                  <p
-                    className="text-xs leading-relaxed max-w-sm mx-auto"
-                    style={{ color: config.colors.secondaryText }}
+              <div
+                className="p-6 sm:p-8 rounded-3xl border shadow-sm text-center space-y-6"
+                style={{
+                  backgroundColor: config.colors.surfaceCard,
+                  borderColor: config.colors.border,
+                }}
+              >
+                {/* Groom */}
+                <div className="space-y-1">
+                  <h3
+                    className="text-xl sm:text-2xl font-bold"
+                    style={{
+                      fontFamily: "var(--template-font-heading)",
+                      color: config.colors.primaryText,
+                    }}
                   >
-                    {data.invitationMessage}
-                  </p>
-                )}
-              </div>
+                    {data.groomName || "Nama Penuh Pengantin Lelaki"}
+                  </h3>
+                  {data.invitationMessage && (
+                    <p
+                      className="text-xs leading-relaxed max-w-sm mx-auto"
+                      style={{ color: config.colors.secondaryText }}
+                    >
+                      {data.invitationMessage}
+                    </p>
+                  )}
+                </div>
 
-              <span className="text-sm font-semibold" style={{ color: config.colors.accent }}>
-                DENGAN
-              </span>
+                <span className="text-sm font-semibold" style={{ color: config.colors.accent }}>
+                  DENGAN
+                </span>
 
-              {/* Bride */}
-              <div className="space-y-1">
-                <h3
-                  className="text-xl sm:text-2xl font-bold"
-                  style={{
-                    fontFamily: "var(--template-font-heading)",
-                    color: config.colors.primaryText,
-                  }}
-                >
-                  {data.brideName || "Nama Penuh Pengantin Perempuan"}
-                </h3>
+                {/* Bride */}
+                <div className="space-y-1">
+                  <h3
+                    className="text-xl sm:text-2xl font-bold"
+                    style={{
+                      fontFamily: "var(--template-font-heading)",
+                      color: config.colors.primaryText,
+                    }}
+                  >
+                    {data.brideName || "Nama Penuh Pengantin Perempuan"}
+                  </h3>
+                </div>
               </div>
-            </div>
+            </MotionReveal>
           </section>
 
           {/* 4. Event Schedule & Venue */}
           <section className="px-6 sm:px-10 py-8 space-y-6">
-            <div className="text-center space-y-1">
+            <MotionReveal
+              preset={config.animation.cardPreset}
+              duration={config.animation.duration}
+              triggerOnce={config.animation.triggerOnce}
+              className="text-center space-y-1"
+            >
               <span
                 className="text-[10px] uppercase tracking-widest font-bold block"
                 style={{ color: config.colors.accent }}
@@ -320,9 +345,12 @@ export function HybridEditorialTemplate({
               >
                 Butiran Majlis
               </h2>
-            </div>
+            </MotionReveal>
 
-            <div
+            <MotionStagger
+              preset={config.animation.cardPreset}
+              duration={config.animation.duration}
+              triggerOnce={config.animation.triggerOnce}
               className="p-6 sm:p-8 rounded-3xl border shadow-sm text-center space-y-5"
               style={{
                 backgroundColor: config.colors.surfaceCard,
@@ -372,7 +400,7 @@ export function HybridEditorialTemplate({
                     href={data.googleMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all shadow-xs cursor-pointer hover:opacity-90"
                     style={{
                       backgroundColor: config.colors.buttonBg,
                       color: config.colors.buttonText,
@@ -387,7 +415,7 @@ export function HybridEditorialTemplate({
                     href={data.wazeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide border transition-all"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide border transition-all cursor-pointer hover:bg-[var(--surface-warm)]"
                     style={{
                       backgroundColor: config.colors.surface,
                       borderColor: config.colors.border,
@@ -403,7 +431,7 @@ export function HybridEditorialTemplate({
                     href={getGoogleCalendarUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide border transition-all"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide border transition-all cursor-pointer hover:bg-[var(--surface-warm)]"
                     style={{
                       backgroundColor: config.colors.surface,
                       borderColor: config.colors.border,
@@ -414,13 +442,18 @@ export function HybridEditorialTemplate({
                   </a>
                 )}
               </div>
-            </div>
+            </MotionStagger>
           </section>
 
           {/* 5. Photo Gallery (if items present) */}
           {data.gallery && data.gallery.length > 0 && (
             <section className="px-6 sm:px-10 py-8 space-y-4">
-              <div className="text-center space-y-1">
+              <MotionReveal
+                preset={config.animation.cardPreset}
+                duration={config.animation.duration}
+                triggerOnce={config.animation.triggerOnce}
+                className="text-center space-y-1"
+              >
                 <span
                   className="text-[10px] uppercase tracking-widest font-bold block"
                   style={{ color: config.colors.accent }}
@@ -436,9 +469,14 @@ export function HybridEditorialTemplate({
                 >
                   Kenangan Manis
                 </h2>
-              </div>
+              </MotionReveal>
 
-              <div className="grid grid-cols-2 gap-3 pt-2">
+              <MotionReveal
+                preset={config.animation.cardPreset}
+                duration={config.animation.duration}
+                triggerOnce={config.animation.triggerOnce}
+                className="grid grid-cols-2 gap-3 pt-2"
+              >
                 {data.gallery.map((item) => (
                   <div
                     key={item.id}
@@ -454,69 +492,75 @@ export function HybridEditorialTemplate({
                     />
                   </div>
                 ))}
-              </div>
+              </MotionReveal>
             </section>
           )}
 
           {/* 6. RSVP Section */}
           {data.rsvpEnabled && (
             <section className="px-6 sm:px-10 py-8">
-              <div
-                className="p-6 sm:p-8 rounded-3xl border shadow-sm text-center space-y-4"
-                style={{
-                  backgroundColor: config.colors.surfaceCard,
-                  borderColor: config.colors.border,
-                }}
+              <MotionReveal
+                preset={config.animation.cardPreset}
+                duration={config.animation.duration}
+                triggerOnce={config.animation.triggerOnce}
               >
-                <span
-                  className="text-[10px] uppercase tracking-widest font-bold block"
-                  style={{ color: config.colors.accent }}
-                >
-                  Kehadiran
-                </span>
-                <h2
-                  className="text-2xl sm:text-3xl font-normal"
+                <div
+                  className="p-6 sm:p-8 rounded-3xl border shadow-sm text-center space-y-4"
                   style={{
-                    fontFamily: "var(--template-font-heading)",
-                    color: config.colors.primaryText,
+                    backgroundColor: config.colors.surfaceCard,
+                    borderColor: config.colors.border,
                   }}
                 >
-                  Sahkan Kehadiran Anda
-                </h2>
-
-                <p
-                  className="text-xs leading-relaxed max-w-sm mx-auto"
-                  style={{ color: config.colors.secondaryText }}
-                >
-                  {data.rsvpDeadline
-                    ? `Sila sahkan kehadiran anda sebelum ${new Date(
-                        data.rsvpDeadline
-                      ).toLocaleDateString("ms-MY", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}.`
-                    : "Sila buat pengesahan kehadiran awal bagi memudahkan penyusunan majlis."}
-                </p>
-
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (mode === "live") {
-                        setIsRsvpModalOpen(true);
-                      }
-                    }}
-                    className="w-full sm:w-auto px-8 py-3.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all shadow-md active:scale-95"
+                  <span
+                    className="text-[10px] uppercase tracking-widest font-bold block"
+                    style={{ color: config.colors.accent }}
+                  >
+                    Kehadiran
+                  </span>
+                  <h2
+                    className="text-2xl sm:text-3xl font-normal"
                     style={{
-                      backgroundColor: config.colors.buttonBg,
-                      color: config.colors.buttonText,
+                      fontFamily: "var(--template-font-heading)",
+                      color: config.colors.primaryText,
                     }}
                   >
-                    Hantar Maklum Balas RSVP
-                  </button>
+                    Sahkan Kehadiran Anda
+                  </h2>
+
+                  <p
+                    className="text-xs leading-relaxed max-w-sm mx-auto"
+                    style={{ color: config.colors.secondaryText }}
+                  >
+                    {data.rsvpDeadline
+                      ? `Sila sahkan kehadiran anda sebelum ${new Date(
+                          data.rsvpDeadline
+                        ).toLocaleDateString("ms-MY", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}.`
+                      : "Sila buat pengesahan kehadiran awal bagi memudahkan penyusunan majlis."}
+                  </p>
+
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (mode === "live") {
+                          setIsRsvpModalOpen(true);
+                        }
+                      }}
+                      className="w-full sm:w-auto px-8 py-3.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all shadow-md active:scale-95 cursor-pointer"
+                      style={{
+                        backgroundColor: config.colors.buttonBg,
+                        color: config.colors.buttonText,
+                      }}
+                    >
+                      Hantar Maklum Balas RSVP
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </MotionReveal>
             </section>
           )}
 
@@ -536,25 +580,32 @@ export function HybridEditorialTemplate({
 
           {/* 7. Closing Blessing & Attribution */}
           <section className="px-6 py-8 text-center space-y-4 mt-auto">
-            {data.closingMessage ? (
-              <p
-                className="text-xs leading-relaxed max-w-md mx-auto whitespace-pre-line"
-                style={{ color: config.colors.secondaryText }}
-              >
-                {data.closingMessage}
-              </p>
-            ) : (
-              <p
-                className="text-xs leading-relaxed max-w-md mx-auto"
-                style={{ color: config.colors.secondaryText }}
-              >
-                Semoga kehadiran dan doa restu para hadirin sekalian memeriahkan lagi majlis kami serta diberkati Allah SWT.
-              </p>
-            )}
+            <MotionReveal
+              preset={config.animation.cardPreset}
+              duration={config.animation.duration}
+              triggerOnce={config.animation.triggerOnce}
+              className="space-y-4"
+            >
+              {data.closingMessage ? (
+                <p
+                  className="text-xs leading-relaxed max-w-md mx-auto whitespace-pre-line"
+                  style={{ color: config.colors.secondaryText }}
+                >
+                  {data.closingMessage}
+                </p>
+              ) : (
+                <p
+                  className="text-xs leading-relaxed max-w-md mx-auto"
+                  style={{ color: config.colors.secondaryText }}
+                >
+                  Semoga kehadiran dan doa restu para hadirin sekalian memeriahkan lagi majlis kami serta diberkati Allah SWT.
+                </p>
+              )}
 
-            <div className="pt-4 text-[10px] uppercase tracking-widest font-semibold opacity-60">
-              WALIMATUL by nasuhalias
-            </div>
+              <div className="pt-4 text-[10px] uppercase tracking-widest font-semibold opacity-60">
+                WALIMATUL by nasuhalias
+              </div>
+            </MotionReveal>
           </section>
         </main>
       </div>

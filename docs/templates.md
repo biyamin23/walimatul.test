@@ -14,8 +14,12 @@ templates/
     components/
   hybrid-editorial/             — Reusable Hybrid template engine (Phase 10A)
     Template.tsx                — Configurable renderer (consumes dynamic design_config)
-    OverlayAnimation.tsx        — Lightweight CSS overlay animation presets
+    OverlayAnimation.tsx        — Lightweight CSS overlay particle animation engine
     fonts.ts                    — Font loaders for approved Google font registry
+    motion/                     — Motion for React card & section animation primitives
+      MotionReveal.tsx          — Scroll-triggered section & card reveal
+      MotionStagger.tsx         — Sequential children reveal container
+      MotionHero.tsx            — Dedicated initial page entrance animation
 ```
 
 ---
@@ -32,6 +36,23 @@ WALIMATUL supports two categories of templates:
    - Reusable, production-grade presentation renderer that consumes dynamic `design_config` (JSONB) and uploaded graphical assets (PNG/JPG/WebP).
    - Allows Admin to launch new commercial visual variations without deploying new React code.
    - **Guaranteed Purity**: No raw executable JavaScript/HTML is ever uploaded or executed. Dynamic wedding data remains live HTML/text.
+
+---
+
+## Animation Systems: Overlay vs Card Animation
+
+WALIMATUL maintains **two separate, decoupled animation systems** in Hybrid templates:
+
+| Feature | Overlay Animation (`overlay`) | Card Animation (`animation`) |
+|---|---|---|
+| **Engine** | Lightweight Pure CSS Keyframes | **Motion for React** (`motion/react`) |
+| **Purpose** | Continuous ambient atmospheric particles drifting across screen | Scroll-triggered entrance reveals for content sections & cards |
+| **Targets** | Petals, sparkles, bokeh, soft-float, gentle-glow | Hero title, couple presentation, event details, RSVP, gallery, footer |
+| **Trigger** | Continuous loop on page | Viewport scroll (`whileInView`, `viewport: { once: true, amount: 0.15 }`) |
+| **Z-Index** | `z-20` (pointer-events: none) | `z-10` (interactive content cards) |
+| **Presets** | `none`, `soft-float`, `sparkle`, `bokeh`, `petals`, `gentle-glow` | `none`, `soft-fade`, `fade-up` (Disyorkan), `gentle-scale`, `staggered-reveal` |
+| **Speeds** | `slow` (14s), `normal` (9s), `fast` (6s) | `normal` (0.62s), `slow` (0.92s) |
+| **Accessibility** | `@media (prefers-reduced-motion: reduce)` disables keyframes | `useReducedMotion()` renders static markup without transform/hidden state |
 
 ---
 
@@ -110,10 +131,16 @@ Stored as JSONB in `public.templates.design_config`:
   },
   "overlay": {
     "enabled": true,
-    "preset": "soft-float",
-    "customAssetUrl": null,
+    "preset": "petals",
+    "customAssetUrl": "https://.../custom-petal.png",
     "opacity": 0.6,
-    "speed": "normal"
+    "speed": "normal",
+    "ornamentSize": "medium"
+  },
+  "animation": {
+    "cardPreset": "fade-up",
+    "duration": "normal",
+    "triggerOnce": true
   }
 }
 ```
@@ -130,18 +157,25 @@ Stored as JSONB in `public.templates.design_config`:
 
 ---
 
-## Overlay Animation Presets
+## Card Animation Presets (Motion for React)
 
-1. `none`: Static presentation.
-2. `soft-float`: Subtle floating elements.
-3. `sparkle`: Micro-particle glowing sparkles.
-4. `bokeh`: Soft blurred light circles drifting slowly.
-5. `petals`: Drifting soft floral petals.
-6. `gentle-glow`: Ambient pulsing radial glow.
+1. `none`: Static presentation, no hidden initial state.
+2. `soft-fade`: `initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}`
+3. `fade-up` (Disyorkan): `initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}`
+4. `gentle-scale`: `initial={{ opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }}`
+5. `staggered-reveal`: Staggered sequential children entrance (`staggerChildren: 0.1s`).
 
-### Safety & Accessibility
-- `pointer-events: none` on all animations (never blocks RSVP, Maps, or links).
-- `@media (prefers-reduced-motion: reduce)` automatically disables all animations.
+---
+
+## Floating Ornament Asset Guidelines
+
+- **Dimensions**: 512 × 512 px or 1024 × 1024 px.
+- **Format**: PNG or WebP with transparent background.
+- **Canvas Coverage**: Crop artwork tightly so the ornament occupies 70–90% of the canvas.
+- **Size Scaling**:
+  - `small`: ~48px rendered size.
+  - `medium`: ~80px rendered size (default).
+  - `large`: ~120px rendered size.
 
 ---
 

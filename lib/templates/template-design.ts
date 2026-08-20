@@ -16,6 +16,16 @@ export type AnimationPreset =
   | "petals"
   | "gentle-glow";
 
+export type CardAnimationPreset =
+  | "none"
+  | "soft-fade"
+  | "fade-up"
+  | "gentle-scale"
+  | "staggered-reveal";
+
+export type CardAnimationDuration = "normal" | "slow";
+export type OrnamentSize = "small" | "medium" | "large";
+
 export type BackgroundSize = "cover" | "contain" | "auto";
 export type BackgroundRepeat = "no-repeat" | "repeat" | "repeat-y";
 export type FontFamilyKey =
@@ -78,6 +88,30 @@ export const ANIMATION_PRESETS: {
   { key: "gentle-glow", label: "Gentle Glow", description: "Nadi kilauan cahaya ambien di sekeliling rekaan" },
 ];
 
+export const CARD_ANIMATION_PRESETS: {
+  key: CardAnimationPreset;
+  label: string;
+  badge?: string;
+  description: string;
+}[] = [
+  { key: "none", label: "Tiada", description: "Paparan statik tanpa animasi kemunculan" },
+  { key: "soft-fade", label: "Soft Fade", description: "Kemunculan beransur-ansur dengan kejelasan lembut" },
+  { key: "fade-up", label: "Fade Up", badge: "Disyorkan", description: "Meluncur naik secara anggun sambil muncul jelas" },
+  { key: "gentle-scale", label: "Gentle Scale", description: "Mengembang lembut dari saiz mikro ke saiz penuh" },
+  { key: "staggered-reveal", label: "Staggered Reveal", description: "Elemen kandungan muncul bersiri satu persatu" },
+];
+
+export const ORNAMENT_SIZE_OPTIONS: {
+  key: OrnamentSize;
+  label: string;
+  description: string;
+  dimensionLabel: string;
+}[] = [
+  { key: "small", label: "Kecil (Small ~48px)", description: "Motif halus untuk latar belakang minimalis", dimensionLabel: "48px" },
+  { key: "medium", label: "Sederhana (Medium ~80px)", description: "Saiz standard seimbang untuk kebanyakan corak", dimensionLabel: "80px" },
+  { key: "large", label: "Besar (Large ~120px)", description: "Hiasan ketara untuk motif utama", dimensionLabel: "120px" },
+];
+
 export interface TemplateDesignColors {
   background: string;
   surface: string;
@@ -119,8 +153,15 @@ export interface TemplateDesignOverlay {
   customAssetUrl: string | null;
   opacity: number;
   speed: "slow" | "normal" | "fast";
+  ornamentSize: OrnamentSize;
   /** Backward compatibility alias */
   animationPreset?: AnimationPreset;
+}
+
+export interface TemplateDesignAnimation {
+  cardPreset: CardAnimationPreset;
+  duration: CardAnimationDuration;
+  triggerOnce: boolean;
 }
 
 export interface TemplateDesignConfig {
@@ -129,6 +170,7 @@ export interface TemplateDesignConfig {
   background: TemplateDesignBackground;
   ornaments: TemplateDesignOrnaments;
   overlay: TemplateDesignOverlay;
+  animation: TemplateDesignAnimation;
 }
 
 export const DEFAULT_HYBRID_DESIGN_CONFIG: TemplateDesignConfig = {
@@ -168,6 +210,12 @@ export const DEFAULT_HYBRID_DESIGN_CONFIG: TemplateDesignConfig = {
     customAssetUrl: null,
     opacity: 0.6,
     speed: "normal",
+    ornamentSize: "medium",
+  },
+  animation: {
+    cardPreset: "fade-up",
+    duration: "normal",
+    triggerOnce: true,
   },
 };
 
@@ -216,6 +264,16 @@ export const templateDesignConfigSchema = z.object({
     customAssetUrl: z.string().nullable().default(null),
     opacity: z.number().min(0).max(1).default(0.6),
     speed: z.enum(["slow", "normal", "fast"]).default("normal"),
+    ornamentSize: z.enum(["small", "medium", "large"]).default("medium"),
+  }),
+  animation: z.object({
+    cardPreset: z.enum(["none", "soft-fade", "fade-up", "gentle-scale", "staggered-reveal"]).default("fade-up"),
+    duration: z.enum(["normal", "slow"]).default("normal"),
+    triggerOnce: z.boolean().default(true),
+  }).default({
+    cardPreset: "fade-up",
+    duration: "normal",
+    triggerOnce: true,
   }),
 });
 
@@ -262,6 +320,34 @@ export function normalizeTemplateDesignConfig(
       : "soft-float"
   ) as AnimationPreset;
 
+  const rawOrnamentSize: OrnamentSize =
+    typeof rawOverlay.ornamentSize === "string" && ["small", "medium", "large"].includes(rawOverlay.ornamentSize)
+      ? (rawOverlay.ornamentSize as OrnamentSize)
+      : "medium";
+
+  // Card Content Animation normalization
+  const rawAnim = (rawObj.animation && typeof rawObj.animation === "object"
+    ? rawObj.animation
+    : {}) as Record<string, unknown>;
+
+  const rawCardPreset =
+    typeof rawAnim.cardPreset === "string"
+      ? rawAnim.cardPreset
+      : "fade-up";
+  const canonicalCardPreset: CardAnimationPreset = (
+    ["none", "soft-fade", "fade-up", "gentle-scale", "staggered-reveal"].includes(rawCardPreset)
+      ? rawCardPreset
+      : "fade-up"
+  ) as CardAnimationPreset;
+
+  const rawDuration: CardAnimationDuration =
+    typeof rawAnim.duration === "string" && ["normal", "slow"].includes(rawAnim.duration)
+      ? (rawAnim.duration as CardAnimationDuration)
+      : "normal";
+
+  const rawTriggerOnce =
+    typeof rawAnim.triggerOnce === "boolean" ? rawAnim.triggerOnce : true;
+
   const normalized = {
     ...rawObj,
     background: {
@@ -280,6 +366,12 @@ export function normalizeTemplateDesignConfig(
       customAssetUrl: typeof rawOverlay.customAssetUrl === "string" ? rawOverlay.customAssetUrl : null,
       opacity: typeof rawOverlay.opacity === "number" ? rawOverlay.opacity : 0.6,
       speed: typeof rawOverlay.speed === "string" ? rawOverlay.speed : "normal",
+      ornamentSize: rawOrnamentSize,
+    },
+    animation: {
+      cardPreset: canonicalCardPreset,
+      duration: rawDuration,
+      triggerOnce: rawTriggerOnce,
     },
   };
 
@@ -308,6 +400,12 @@ export function normalizeTemplateDesignConfig(
       customAssetUrl: data.overlay.customAssetUrl,
       opacity: data.overlay.opacity,
       speed: data.overlay.speed,
+      ornamentSize: data.overlay.ornamentSize,
+    },
+    animation: {
+      cardPreset: data.animation.cardPreset,
+      duration: data.animation.duration,
+      triggerOnce: data.animation.triggerOnce,
     },
   };
 }

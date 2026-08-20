@@ -97,46 +97,58 @@ export function OverlayAnimation({ config }: OverlayAnimationProps) {
       `}</style>
 
       {/* ── Preset A: Custom Uploaded Asset ── */}
-      {config.customAssetUrl && (
-        <div className="absolute inset-0 pointer-events-none">
-          {[
-            { top: "6%", left: "12%", size: 36, delay: "0s" },
-            { top: "22%", right: "10%", size: 30, delay: "1.8s" },
-            { top: "42%", left: "8%", size: 34, delay: "3.4s" },
-            { top: "60%", right: "14%", size: 40, delay: "1.2s" },
-            { top: "78%", left: "15%", size: 28, delay: "2.6s" },
-            { top: "90%", right: "8%", size: 32, delay: "4.2s" },
-          ].map((pos, idx) => (
-            <div
-              key={idx}
-              className={`absolute pointer-events-none ${
-                preset === "petals"
-                  ? "anim-walimatul-petal"
-                  : preset === "sparkle"
-                  ? "anim-walimatul-sparkle"
-                  : "anim-walimatul-float"
-              }`}
-              style={{
-                top: pos.top,
-                left: pos.left,
-                right: pos.right,
-                animationDelay: pos.delay,
-                width: pos.size,
-                height: pos.size,
-              }}
-            >
-              <Image
-                src={config.customAssetUrl!}
-                alt=""
-                width={pos.size}
-                height={pos.size}
-                className="w-full h-full object-contain pointer-events-none"
-                unoptimized
-              />
-            </div>
-          ))}
-        </div>
-      )}
+      {config.customAssetUrl && (() => {
+        const sizeScale =
+          config.ornamentSize === "small"
+            ? 1.0
+            : config.ornamentSize === "large"
+            ? 2.3
+            : 1.6; // default medium (~72-88px)
+
+        return (
+          <div className="absolute inset-0 pointer-events-none">
+            {[
+              { top: "6%", left: "10%", baseSize: 48, delay: "0s" },
+              { top: "22%", right: "8%", baseSize: 42, delay: "1.8s" },
+              { top: "42%", left: "6%", baseSize: 46, delay: "3.4s" },
+              { top: "60%", right: "10%", baseSize: 52, delay: "1.2s" },
+              { top: "78%", left: "12%", baseSize: 40, delay: "2.6s" },
+              { top: "90%", right: "6%", baseSize: 44, delay: "4.2s" },
+            ].map((pos, idx) => {
+              const actualSize = Math.round(pos.baseSize * sizeScale);
+              return (
+                <div
+                  key={idx}
+                  className={`absolute pointer-events-none ${
+                    preset === "petals"
+                      ? "anim-walimatul-petal"
+                      : preset === "sparkle"
+                      ? "anim-walimatul-sparkle"
+                      : "anim-walimatul-float"
+                  }`}
+                  style={{
+                    top: pos.top,
+                    left: pos.left,
+                    right: pos.right,
+                    animationDelay: pos.delay,
+                    width: actualSize,
+                    height: actualSize,
+                  }}
+                >
+                  <Image
+                    src={config.customAssetUrl!}
+                    alt=""
+                    width={actualSize}
+                    height={actualSize}
+                    className="w-full h-full object-contain pointer-events-none"
+                    unoptimized
+                  />
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
 
       {/* ── Preset B: Soft Float (Built-in Motifs if no custom asset) ── */}
       {!config.customAssetUrl && preset === "soft-float" && (
