@@ -9,9 +9,14 @@ import { SAMPLE_PREVIEW_INVITATION_DATA } from "@/lib/templates/sample-data";
 import { normalizeTemplateDesignConfig } from "@/lib/templates/template-design";
 import { CreateDraftButton } from "@/components/invitations/CreateDraftButton";
 
+import { createDraftAndRedirect } from "@/app/actions/invitations";
+
 interface DynamicTemplatePreviewPageProps {
   params: Promise<{
     slug: string;
+  }>;
+  searchParams?: Promise<{
+    create?: string;
   }>;
 }
 
@@ -37,8 +42,15 @@ export async function generateMetadata({
 
 export default async function DynamicTemplatePreviewPage({
   params,
+  searchParams,
 }: DynamicTemplatePreviewPageProps) {
   const { slug } = await params;
+  const query = searchParams ? await searchParams : {};
+
+  if (query.create === "1") {
+    await createDraftAndRedirect(slug);
+  }
+
   const template = await getTemplateBySlug(slug);
 
   if (!template) {

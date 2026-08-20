@@ -39,12 +39,15 @@ export async function signUpWithEmail(
   const { fullName, email, password } = result.data;
   const supabase = await createClient();
 
+  const nextParam = formData.get("next") as string | null;
+  const safeNext = getSafeRedirectUrl(nextParam, "/dashboard");
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: { full_name: fullName },
-      emailRedirectTo: `${SITE_URL}/auth/callback`,
+      emailRedirectTo: `${SITE_URL}/auth/callback?next=${encodeURIComponent(safeNext)}`,
     },
   });
 
@@ -64,7 +67,7 @@ export async function signUpWithEmail(
   }
 
   // Email confirmation disabled — session created immediately.
-  redirect("/dashboard");
+  redirect(safeNext);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

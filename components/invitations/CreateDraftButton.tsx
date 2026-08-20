@@ -28,8 +28,9 @@ export function CreateDraftButton({
       if (res.success && res.data?.invitationId) {
         router.push(`/dashboard/invitations/${res.data.invitationId}/edit`);
       } else if (res.error && res.error.toLowerCase().includes("signed in")) {
-        // Redirect unauthenticated visitors safely to login with next path
-        router.push(`/login?next=/templates/${templateSlug}/preview`);
+        // Redirect unauthenticated visitors safely to login with next path that auto-creates draft on arrival
+        const nextUrl = `/templates/${templateSlug}/preview?create=1`;
+        router.push(`/login?next=${encodeURIComponent(nextUrl)}`);
       } else {
         alert(res.error || "Could not create draft. Please try again.");
       }

@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     "Create your WALIMATUL account and start building your beautiful digital wedding invitation.",
 };
 
+import { Suspense } from "react";
+
 export default function RegisterPage() {
   return (
     <>
@@ -21,7 +23,9 @@ export default function RegisterPage() {
       >
         <div className="w-full max-w-md">
           <Card variant="default" padding="lg">
-            <RegisterForm />
+            <Suspense fallback={<div className="h-64 animate-pulse" />}>
+              <RegisterForm />
+            </Suspense>
           </Card>
         </div>
       </main>

@@ -29,7 +29,12 @@ function GoogleIcon() {
   );
 }
 
+import { useSearchParams } from "next/navigation";
+
 export default function RegisterForm() {
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "";
+
   const [state, formAction, isPending] = useActionState<AuthFormState, FormData>(
     signUpWithEmail,
     undefined,
@@ -38,7 +43,7 @@ export default function RegisterForm() {
 
   function handleGoogleSignIn() {
     startGoogleTransition(async () => {
-      await signInWithGoogle("/dashboard");
+      await signInWithGoogle(next || "/dashboard");
     });
   }
 
@@ -108,6 +113,8 @@ export default function RegisterForm() {
 
       {/* Registration form */}
       <form action={formAction} noValidate>
+        <input type="hidden" name="next" value={next} />
+
         <div className="space-y-4">
           {/* Full Name */}
           <div>
@@ -269,7 +276,7 @@ export default function RegisterForm() {
       <p className="text-center text-sm text-[var(--text-muted)] mt-6 font-ui">
         Already have an account?{" "}
         <Link
-          href="/login"
+          href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
           className="text-[var(--primary)] font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
         >
           Sign in

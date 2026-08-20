@@ -225,7 +225,7 @@ export default function LoginForm() {
       <p className="text-center text-sm text-[var(--text-muted)] mt-6 font-ui">
         Don&apos;t have an account?{" "}
         <Link
-          href="/register"
+          href={next ? `/register?next=${encodeURIComponent(next)}` : "/register"}
           className="text-[var(--primary)] font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
         >
           Create one

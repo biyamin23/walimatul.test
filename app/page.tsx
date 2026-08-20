@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
 import { BRAND, SITE_NAV } from "@/lib/constants/brand";
+import { CreateDraftButton } from "@/components/invitations/CreateDraftButton";
 
 export default function HomePage() {
   return (
@@ -475,15 +476,23 @@ function TemplatesSection() {
                   </p>
 
                   {template.available ? (
-                    <Link
-                      href={`${SITE_NAV.templates}/${template.id}`}
-                      className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
-                      aria-label={`Use the ${template.name} template`}
-                    >
-                      Use This Template <ArrowRightIcon />
-                    </Link>
+                    <div className="flex items-center justify-between gap-3 mt-auto pt-2 border-t border-[var(--border-soft)]">
+                      <Link
+                        href={`/templates/${template.id}/preview`}
+                        className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
+                        aria-label={`Preview the ${template.name} template`}
+                      >
+                        Preview
+                      </Link>
+                      <CreateDraftButton
+                        templateSlug={template.id}
+                        label="Use This Template →"
+                        loadingLabel="Creating..."
+                        className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2"
+                      />
+                    </div>
                   ) : (
-                    <p className="text-sm text-[var(--text-subtle)] font-ui">
+                    <p className="text-xs text-[var(--text-subtle)] font-ui">
                       Available in a future update
                     </p>
                   )}
