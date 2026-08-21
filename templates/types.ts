@@ -52,6 +52,9 @@ export interface InvitationTemplateData {
   maxPax: number;
   allowGuestMessage: boolean;
 
+  // ── Opening Cover ─────────────────────────────────────────────────────────
+  openingCoverEnabled: boolean;
+
   // ── Countdown ─────────────────────────────────────────────────────────────
   countdownEnabled: boolean;
 

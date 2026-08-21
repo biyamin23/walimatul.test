@@ -6,6 +6,7 @@ import { InvitationForm } from "./InvitationForm";
 import { SaveStatusIndicator, type SaveStatus } from "./SaveStatusIndicator";
 import { getTemplateComponent } from "@/templates/registry";
 import { HybridEditorialTemplate } from "@/templates/hybrid-editorial/Template";
+import { InvitationExperience } from "./InvitationExperience";
 import { updateOwnInvitationAction } from "@/app/actions/invitations";
 import { extractYouTubeVideoId } from "@/lib/youtube";
 import type { InvitationWithTemplate } from "@/types/database";
@@ -42,6 +43,7 @@ export function InvitationEditor({
     rsvpDeadline: invitation.rsvp_deadline || "",
     maxPax: invitation.max_pax ?? 5,
     allowGuestMessage: invitation.allow_guest_message ?? true,
+    openingCoverEnabled: invitation.opening_cover_enabled ?? true,
     countdownEnabled: invitation.countdown_enabled ?? false,
     guestWishesEnabled: invitation.guest_wishes_enabled ?? false,
     musicEnabled: invitation.music_enabled ?? false,
@@ -93,6 +95,7 @@ export function InvitationEditor({
     rsvpDeadline: formValues.rsvpDeadline || null,
     maxPax: formValues.maxPax,
     allowGuestMessage: formValues.allowGuestMessage,
+    openingCoverEnabled: formValues.openingCoverEnabled ?? true,
     countdownEnabled: formValues.countdownEnabled ?? false,
     guestWishesEnabled: formValues.guestWishesEnabled ?? false,
     guestWishes: [
@@ -322,14 +325,20 @@ export function InvitationEditor({
               </span>
             </div>
             <div className="w-full rounded-2xl overflow-hidden shadow-2xl">
-              {React.createElement(
-                getTemplateComponent(invitation.template?.component_key) || HybridEditorialTemplate,
-                {
-                  data: liveTemplateData,
-                  mode: "editor",
-                  designConfig: invitation.template?.design_config,
-                }
-              )}
+              <InvitationExperience
+                data={liveTemplateData}
+                mode="editor"
+                designConfig={invitation.template?.design_config}
+              >
+                {React.createElement(
+                  getTemplateComponent(invitation.template?.component_key) || HybridEditorialTemplate,
+                  {
+                    data: liveTemplateData,
+                    mode: "editor",
+                    designConfig: invitation.template?.design_config,
+                  }
+                )}
+              </InvitationExperience>
             </div>
           </div>
         </div>
@@ -374,14 +383,20 @@ export function InvitationEditor({
             </div>
           ) : (
             <div className="rounded-2xl overflow-hidden shadow-2xl pb-16 w-full max-w-full min-w-0">
-              {React.createElement(
-                getTemplateComponent(invitation.template?.component_key) || HybridEditorialTemplate,
-                {
-                  data: liveTemplateData,
-                  mode: "editor",
-                  designConfig: invitation.template?.design_config,
-                }
-              )}
+              <InvitationExperience
+                data={liveTemplateData}
+                mode="editor"
+                designConfig={invitation.template?.design_config}
+              >
+                {React.createElement(
+                  getTemplateComponent(invitation.template?.component_key) || HybridEditorialTemplate,
+                  {
+                    data: liveTemplateData,
+                    mode: "editor",
+                    designConfig: invitation.template?.design_config,
+                  }
+                )}
+              </InvitationExperience>
             </div>
           )}
         </div>

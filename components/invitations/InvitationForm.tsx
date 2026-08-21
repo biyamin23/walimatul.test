@@ -587,6 +587,42 @@ export function InvitationForm({
           )}
         </div>
       </fieldset>
+
+      {/* ── Section 11: Opening Cover (Buka Jemputan) ── */}
+      <fieldset className={fieldsetClass}>
+        <legend className="text-sm sm:text-base font-semibold font-display text-[var(--primary)] px-2 max-w-full break-words">
+          11. Paparan Pembukaan (Opening Cover)
+        </legend>
+
+        <div className="space-y-4 font-ui">
+          <label
+            htmlFor="opening-cover-enabled-checkbox"
+            className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-[var(--surface-warm)] border border-[var(--border-soft)] gap-3 min-w-0 w-full cursor-pointer hover:border-[var(--border)] transition-colors select-none"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-[var(--text)] break-words">
+                Aktifkan skrin Buka Jemputan
+              </p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5 break-words">
+                Tetamu akan mengetik Buka Jemputan sebelum melihat kandungan penuh.
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              id="opening-cover-enabled-checkbox"
+              checked={values.openingCoverEnabled ?? true}
+              onChange={(e) => onChange("openingCoverEnabled", e.target.checked)}
+              className="shrink-0 w-5 h-5 accent-[var(--primary)] rounded cursor-pointer"
+            />
+          </label>
+
+          {values.openingCoverEnabled && values.musicEnabled && (
+            <p className="text-xs text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
+              🎵 Muzik akan cuba dimainkan secara automatik selepas tetamu mengetik <strong>Buka Jemputan</strong>.
+            </p>
+          )}
+        </div>
+      </fieldset>
     </form>
   );
 }

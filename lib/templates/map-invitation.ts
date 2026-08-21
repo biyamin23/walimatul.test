@@ -46,6 +46,7 @@ export function mapInvitationToTemplateData(
     rsvpDeadline: invitation.rsvp_deadline || null,
     maxPax: invitation.max_pax ?? 5,
     allowGuestMessage: invitation.allow_guest_message ?? true,
+    openingCoverEnabled: invitation.opening_cover_enabled ?? true,
     countdownEnabled: invitation.countdown_enabled ?? false,
     guestWishesEnabled: invitation.guest_wishes_enabled ?? false,
     guestWishes: guestWishes,

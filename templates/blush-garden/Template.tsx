@@ -10,7 +10,6 @@ import { RsvpPreviewSection } from "./components/RsvpPreviewSection";
 import { ClosingSection } from "./components/ClosingSection";
 import { LiveCountdown } from "@/components/countdown/LiveCountdown";
 import { GuestWishesSection } from "@/components/wishes/GuestWishesSection";
-import { FloatingMusicPlayer } from "@/components/music/FloatingMusicPlayer";
 
 /**
  * WALIMATUL — Blush Garden Invitation Template
@@ -103,14 +102,6 @@ export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentPr
           {/* 8. Closing Blessing & Attribution */}
           <ClosingSection data={data} />
         </main>
-
-        {/* Background Music Player via YouTube (Floating widget) */}
-        {data.musicEnabled && data.musicYoutubeVideoId && (
-          <FloatingMusicPlayer
-            youtubeVideoId={data.musicYoutubeVideoId}
-            loop={data.musicLoop}
-          />
-        )}
       </div>
     </div>
   );

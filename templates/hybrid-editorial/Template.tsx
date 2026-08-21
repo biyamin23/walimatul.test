@@ -13,7 +13,6 @@ import { GuestRsvpModal } from "@/components/rsvp/GuestRsvpModal";
 import { MotionReveal, MotionStagger, MotionHero } from "./motion";
 import { LiveCountdown } from "@/components/countdown/LiveCountdown";
 import { GuestWishesSection } from "@/components/wishes/GuestWishesSection";
-import { FloatingMusicPlayer } from "@/components/music/FloatingMusicPlayer";
 import { GalleryLightbox } from "@/components/gallery/GalleryLightbox";
 
 export function HybridEditorialTemplate({
@@ -667,13 +666,7 @@ export function HybridEditorialTemplate({
         onClose={() => setSelectedGalleryImage(null)}
       />
 
-      {/* Background Music Player via YouTube (Floating widget) */}
-      {data.musicEnabled && data.musicYoutubeVideoId && (
-        <FloatingMusicPlayer
-          youtubeVideoId={data.musicYoutubeVideoId}
-          loop={data.musicLoop}
-        />
-      )}
+
 
       {/* Guest RSVP Modal in live mode */}
       {mode === "live" && (

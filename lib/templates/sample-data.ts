@@ -25,6 +25,7 @@ export const SAMPLE_PREVIEW_INVITATION_DATA: InvitationTemplateData = {
   rsvpDeadline: "2026-11-14",
   maxPax: 5,
   allowGuestMessage: true,
+  openingCoverEnabled: true,
   countdownEnabled: true,
   guestWishesEnabled: true,
   guestWishes: [

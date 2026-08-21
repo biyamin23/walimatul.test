@@ -49,6 +49,7 @@ export const BLUSH_GARDEN_PREVIEW_DATA: InvitationTemplateData = {
   rsvpDeadline: "2026-11-10",
   maxPax: 5,
   allowGuestMessage: true,
+  openingCoverEnabled: true,
   countdownEnabled: true,
   guestWishesEnabled: true,
   guestWishes: [
@@ -106,6 +107,7 @@ export const LONG_CONTENT_PREVIEW_DATA: InvitationTemplateData = {
   rsvpDeadline: "2026-12-01",
   maxPax: 6,
   allowGuestMessage: true,
+  openingCoverEnabled: true,
   countdownEnabled: true,
   guestWishesEnabled: false,
   guestWishes: [],
@@ -140,6 +142,7 @@ export const MINIMAL_PREVIEW_DATA: InvitationTemplateData = {
   rsvpDeadline: null,
   maxPax: 2,
   allowGuestMessage: false,
+  openingCoverEnabled: false,
   countdownEnabled: false,
   guestWishesEnabled: false,
   guestWishes: [],

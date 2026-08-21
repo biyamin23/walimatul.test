@@ -13,6 +13,14 @@
 
 DO $$
 BEGIN
+  -- Opening Cover toggle (defaults to true for premium experience)
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'invitations' AND column_name = 'opening_cover_enabled'
+  ) THEN
+    ALTER TABLE public.invitations ADD COLUMN opening_cover_enabled BOOLEAN NOT NULL DEFAULT true;
+  END IF;
+
   -- Countdown toggle
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns

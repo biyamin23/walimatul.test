@@ -109,6 +109,7 @@ export interface Invitation {
   allow_guest_message: boolean;
   music_enabled: boolean;
   music_key: string | null;
+  opening_cover_enabled?: boolean;
   countdown_enabled?: boolean;
   guest_wishes_enabled?: boolean;
   music_youtube_video_id?: string | null;

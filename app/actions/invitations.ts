@@ -206,6 +206,7 @@ export async function updateOwnInvitationAction(
     rsvp_deadline: values.rsvpDeadline || null,
     max_pax: values.maxPax,
     allow_guest_message: values.allowGuestMessage,
+    opening_cover_enabled: values.openingCoverEnabled ?? true,
     countdown_enabled: values.countdownEnabled ?? false,
     guest_wishes_enabled: values.guestWishesEnabled ?? false,
     music_enabled: values.musicEnabled ?? false,

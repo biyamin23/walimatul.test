@@ -74,6 +74,8 @@ export async function generateMetadata({
  * - Reuses coded template from registry in mode="live".
  * - Standalone presentation with no dashboard or editor chrome.
  */
+import { InvitationExperience } from "@/components/invitations/InvitationExperience";
+
 export default async function PublicInvitationPage({
   params,
 }: PublicInvitationPageProps) {
@@ -95,11 +97,17 @@ export default async function PublicInvitationPage({
 
   return (
     <main className="min-h-screen bg-[var(--background)]">
-      {React.createElement(TemplateComponent, {
-        data: result.templateData,
-        mode: "live",
-        designConfig: result.template.design_config,
-      })}
+      <InvitationExperience
+        data={result.templateData}
+        mode="live"
+        designConfig={result.template.design_config}
+      >
+        {React.createElement(TemplateComponent, {
+          data: result.templateData,
+          mode: "live",
+          designConfig: result.template.design_config,
+        })}
+      </InvitationExperience>
     </main>
   );
 }

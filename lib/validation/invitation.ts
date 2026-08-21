@@ -106,6 +106,7 @@ export const updateInvitationSchema = z
       ),
     maxPax: z.coerce.number().int().min(1, "Max pax must be at least 1").max(20, "Max pax cannot exceed 20").default(5),
     allowGuestMessage: z.boolean().default(true),
+    openingCoverEnabled: z.boolean().default(true),
     countdownEnabled: z.boolean().default(false),
     guestWishesEnabled: z.boolean().default(false),
     musicEnabled: z.boolean().default(false),
