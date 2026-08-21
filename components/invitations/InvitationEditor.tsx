@@ -328,6 +328,7 @@ export function InvitationEditor({
               <InvitationExperience
                 data={liveTemplateData}
                 mode="editor"
+                templateKey={invitation.template?.component_key}
                 designConfig={invitation.template?.design_config}
               >
                 {React.createElement(
@@ -386,6 +387,7 @@ export function InvitationEditor({
               <InvitationExperience
                 data={liveTemplateData}
                 mode="editor"
+                templateKey={invitation.template?.component_key}
                 designConfig={invitation.template?.design_config}
               >
                 {React.createElement(

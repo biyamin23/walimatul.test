@@ -100,6 +100,7 @@ export default async function PublicInvitationPage({
       <InvitationExperience
         data={result.templateData}
         mode="live"
+        templateKey={result.template.component_key}
         designConfig={result.template.design_config}
       >
         {React.createElement(TemplateComponent, {
