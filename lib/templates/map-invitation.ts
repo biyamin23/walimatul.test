@@ -1,5 +1,5 @@
 import type { Invitation, InvitationGalleryItem } from "@/types/database";
-import type { InvitationTemplateData } from "@/templates/types";
+import type { InvitationTemplateData, GuestWish } from "@/templates/types";
 
 /**
  * WALIMATUL — Database to Template Data Mapper
@@ -14,7 +14,8 @@ import type { InvitationTemplateData } from "@/templates/types";
  */
 export function mapInvitationToTemplateData(
   invitation: Invitation,
-  galleryItems: InvitationGalleryItem[] = []
+  galleryItems: InvitationGalleryItem[] = [],
+  guestWishes: GuestWish[] = []
 ): InvitationTemplateData {
   const sortedGallery = [...galleryItems]
     .sort((a, b) => a.sort_order - b.sort_order)
@@ -45,7 +46,12 @@ export function mapInvitationToTemplateData(
     rsvpDeadline: invitation.rsvp_deadline || null,
     maxPax: invitation.max_pax ?? 5,
     allowGuestMessage: invitation.allow_guest_message ?? true,
+    countdownEnabled: invitation.countdown_enabled ?? false,
+    guestWishesEnabled: invitation.guest_wishes_enabled ?? false,
+    guestWishes: guestWishes,
     musicEnabled: invitation.music_enabled ?? false,
     musicKey: invitation.music_key || null,
+    musicYoutubeVideoId: invitation.music_youtube_video_id || null,
+    musicLoop: invitation.music_loop ?? false,
   };
 }

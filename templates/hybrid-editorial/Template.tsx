@@ -11,6 +11,10 @@ import { fontVariablesClass } from "./fonts";
 import { OverlayAnimation } from "./OverlayAnimation";
 import { GuestRsvpModal } from "@/components/rsvp/GuestRsvpModal";
 import { MotionReveal, MotionStagger, MotionHero } from "./motion";
+import { LiveCountdown } from "@/components/countdown/LiveCountdown";
+import { GuestWishesSection } from "@/components/wishes/GuestWishesSection";
+import { FloatingMusicPlayer } from "@/components/music/FloatingMusicPlayer";
+import { GalleryLightbox } from "@/components/gallery/GalleryLightbox";
 
 export function HybridEditorialTemplate({
   data,
@@ -19,6 +23,7 @@ export function HybridEditorialTemplate({
 }: TemplateComponentProps) {
   const config = normalizeTemplateDesignConfig(designConfig);
   const [isRsvpModalOpen, setIsRsvpModalOpen] = useState(false);
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | null>(null);
 
   // Formatted date
   const formattedDate = data.weddingDate
@@ -217,6 +222,23 @@ export function HybridEditorialTemplate({
               >
                 {formattedDate}
               </div>
+
+              {/* Live Countdown if enabled */}
+              {data.countdownEnabled && data.weddingDate && (
+                <div className="pt-2 w-full">
+                  <LiveCountdown
+                    weddingDate={data.weddingDate}
+                    startTime={data.startTime}
+                    theme={{
+                      accentColor: config.colors.accent,
+                      surfaceColor: config.colors.surfaceCard,
+                      textColor: config.colors.primaryText,
+                      secondaryTextColor: config.colors.secondaryText,
+                      borderColor: config.colors.border,
+                    }}
+                  />
+                </div>
+              )}
             </MotionHero>
           </section>
 
@@ -480,23 +502,51 @@ export function HybridEditorialTemplate({
                 {data.gallery.map((item) => (
                   <div
                     key={item.id}
-                    className="relative aspect-4/5 rounded-2xl overflow-hidden border shadow-xs"
+                    onClick={() => setSelectedGalleryImage(item.storagePath)}
+                    className="relative aspect-4/5 rounded-2xl overflow-hidden border shadow-xs cursor-pointer group"
                     style={{ borderColor: config.colors.border }}
                   >
                     <Image
                       src={item.storagePath}
                       alt="Galeri perkahwinan"
                       fill
-                      className="object-cover hover:scale-105 transition-transform duration-500"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                       unoptimized
                     />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 text-white text-xs font-semibold bg-black/50 px-2 py-1 rounded-full backdrop-blur-xs transition-opacity">
+                        🔍 Lihat
+                      </span>
+                    </div>
                   </div>
                 ))}
               </MotionReveal>
             </section>
           )}
 
-          {/* 6. RSVP Section */}
+          {/* 6. Guest Wishes Section (Phase 10B) */}
+          {data.guestWishesEnabled && data.guestWishes && data.guestWishes.length > 0 && (
+            <section className="px-6 sm:px-10 py-8">
+              <MotionReveal
+                preset={config.animation.cardPreset}
+                duration={config.animation.duration}
+                triggerOnce={config.animation.triggerOnce}
+              >
+                <GuestWishesSection
+                  wishes={data.guestWishes}
+                  theme={{
+                    accentColor: config.colors.accent,
+                    surfaceColor: config.colors.surfaceCard,
+                    textColor: config.colors.primaryText,
+                    secondaryTextColor: config.colors.secondaryText,
+                    borderColor: config.colors.border,
+                  }}
+                />
+              </MotionReveal>
+            </section>
+          )}
+
+          {/* 7. RSVP Section */}
           {data.rsvpEnabled && (
             <section className="px-6 sm:px-10 py-8">
               <MotionReveal
@@ -578,7 +628,7 @@ export function HybridEditorialTemplate({
             </div>
           )}
 
-          {/* 7. Closing Blessing & Attribution */}
+          {/* 8. Closing Blessing & Attribution */}
           <section className="px-6 py-8 text-center space-y-4 mt-auto">
             <MotionReveal
               preset={config.animation.cardPreset}
@@ -609,6 +659,21 @@ export function HybridEditorialTemplate({
           </section>
         </main>
       </div>
+
+      {/* Gallery Lightbox Modal */}
+      <GalleryLightbox
+        isOpen={Boolean(selectedGalleryImage)}
+        imageUrl={selectedGalleryImage || ""}
+        onClose={() => setSelectedGalleryImage(null)}
+      />
+
+      {/* Background Music Player via YouTube (Floating widget) */}
+      {data.musicEnabled && data.musicYoutubeVideoId && (
+        <FloatingMusicPlayer
+          youtubeVideoId={data.musicYoutubeVideoId}
+          loop={data.musicLoop}
+        />
+      )}
 
       {/* Guest RSVP Modal in live mode */}
       {mode === "live" && (

@@ -52,15 +52,31 @@ export interface InvitationTemplateData {
   maxPax: number;
   allowGuestMessage: boolean;
 
+  // ── Countdown ─────────────────────────────────────────────────────────────
+  countdownEnabled: boolean;
+
+  // ── Guest Wishes ──────────────────────────────────────────────────────────
+  guestWishesEnabled: boolean;
+  guestWishes: GuestWish[];
+
   // ── Music ─────────────────────────────────────────────────────────────────
   musicEnabled: boolean;
-  musicKey: string | null; // Supabase Storage key for background music
+  musicKey: string | null; // Supabase Storage key for legacy music
+  musicYoutubeVideoId: string | null; // YouTube 11-char video ID for background music
+  musicLoop: boolean;
 }
 
 export interface GalleryItem {
   id: string;
   storagePath: string; // Supabase Storage path
   sortOrder: number;
+}
+
+export interface GuestWish {
+  id: string;
+  guestName: string;
+  message: string;
+  createdAt: string;
 }
 
 // ─── Template Component Contract ──────────────────────────────────────────────

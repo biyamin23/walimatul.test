@@ -1,12 +1,19 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import { toggleRsvpWishPublicAction } from "@/app/actions/rsvps";
 import type { RSVP } from "@/types/database";
 
 export interface RsvpResponseListProps {
   rsvps: RSVP[];
+  invitationId?: string;
 }
 
-export function RsvpResponseList({ rsvps }: RsvpResponseListProps) {
-  if (rsvps.length === 0) {
+export function RsvpResponseList({ rsvps, invitationId }: RsvpResponseListProps) {
+  const [items, setItems] = useState<RSVP[]>(rsvps);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  if (items.length === 0) {
     return (
       <div className="p-8 sm:p-12 rounded-3xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-3">
         <div className="w-12 h-12 rounded-full bg-[var(--surface-warm)] text-[var(--primary)] flex items-center justify-center mx-auto">
@@ -42,22 +49,57 @@ export function RsvpResponseList({ rsvps }: RsvpResponseListProps) {
     }
   }
 
+  async function handleTogglePublic(rsvpId: string, currentState: boolean) {
+    const parentInvId = invitationId || items.find((i) => i.id === rsvpId)?.invitation_id;
+    if (!parentInvId) return;
+
+    const nextState = !currentState;
+    setUpdatingId(rsvpId);
+
+    // Optimistic UI update
+    setItems((prev) =>
+      prev.map((r) => (r.id === rsvpId ? { ...r, show_on_invitation: nextState } : r))
+    );
+
+    try {
+      const result = await toggleRsvpWishPublicAction(parentInvId, rsvpId, nextState);
+      if (!result.success) {
+        // Revert on failure
+        setItems((prev) =>
+          prev.map((r) => (r.id === rsvpId ? { ...r, show_on_invitation: currentState } : r))
+        );
+      }
+    } catch {
+      setItems((prev) =>
+        prev.map((r) => (r.id === rsvpId ? { ...r, show_on_invitation: currentState } : r))
+      );
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   return (
     <div className="space-y-4 w-full">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-lg font-bold text-[var(--text)]">
-          Senarai Respon ({rsvps.length})
+          Senarai Respon ({items.length})
         </h3>
+        <span className="text-xs text-[var(--text-muted)] font-ui">
+          💡 Ucapan tetamu kekal peribadi melainkan anda memilih untuk memaparkannya.
+        </span>
       </div>
 
       {/* ── Mobile Card View (Hidden on Desktop) ── */}
       <div className="space-y-3 sm:hidden">
-        {rsvps.map((rsvp) => {
+        {items.map((rsvp) => {
           const isAttending = rsvp.attendance === "attending";
+          const isPublic = Boolean(rsvp.show_on_invitation);
+          const isUpdating = updatingId === rsvp.id;
+
           return (
             <div
               key={rsvp.id}
-              className="p-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-2.5"
+              className="p-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-3"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
@@ -80,8 +122,29 @@ export function RsvpResponseList({ rsvps }: RsvpResponseListProps) {
               </div>
 
               {rsvp.message ? (
-                <div className="p-3 rounded-xl bg-[var(--surface-warm)] border border-[var(--border-soft)] text-xs font-ui text-[var(--text)] italic leading-relaxed break-words">
-                  “{rsvp.message}”
+                <div className="space-y-2">
+                  <div className="p-3 rounded-xl bg-[var(--surface-warm)] border border-[var(--border-soft)] text-xs font-ui text-[var(--text)] italic leading-relaxed break-words">
+                    “{rsvp.message}”
+                  </div>
+
+                  {/* Public Moderation Control */}
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[11px] font-ui text-[var(--text-muted)]">
+                      Paparan Jemputan:
+                    </span>
+                    <button
+                      type="button"
+                      disabled={isUpdating}
+                      onClick={() => handleTogglePublic(rsvp.id, isPublic)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold font-ui transition-all cursor-pointer ${
+                        isPublic
+                          ? "bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200"
+                          : "bg-[var(--surface-warm)] text-[var(--text)] border border-[var(--border)] hover:border-[var(--primary)]"
+                      } ${isUpdating ? "opacity-50" : ""}`}
+                    >
+                      {isPublic ? "✓ Dipaparkan" : "+ Paparkan di Jemputan"}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <p className="text-[11px] font-ui text-[var(--text-subtle)] italic">
@@ -102,12 +165,16 @@ export function RsvpResponseList({ rsvps }: RsvpResponseListProps) {
               <th className="py-3.5 px-4">Status</th>
               <th className="py-3.5 px-4 text-center">Jumlah Pax</th>
               <th className="py-3.5 px-4">Ucapan / Doa</th>
+              <th className="py-3.5 px-4 text-center">Paparan Awam</th>
               <th className="py-3.5 px-4 text-right">Tarikh &amp; Masa</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-soft)]">
-            {rsvps.map((rsvp) => {
+            {items.map((rsvp) => {
               const isAttending = rsvp.attendance === "attending";
+              const isPublic = Boolean(rsvp.show_on_invitation);
+              const isUpdating = updatingId === rsvp.id;
+
               return (
                 <tr key={rsvp.id} className="hover:bg-[var(--surface-warm)]/50 transition-colors">
                   <td className="py-3.5 px-4 font-medium text-[var(--text)]">
@@ -129,6 +196,24 @@ export function RsvpResponseList({ rsvps }: RsvpResponseListProps) {
                   </td>
                   <td className="py-3.5 px-4 text-xs text-[var(--text-muted)] max-w-xs break-words">
                     {rsvp.message ? `“${rsvp.message}”` : "—"}
+                  </td>
+                  <td className="py-3.5 px-4 text-center">
+                    {rsvp.message ? (
+                      <button
+                        type="button"
+                        disabled={isUpdating}
+                        onClick={() => handleTogglePublic(rsvp.id, isPublic)}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                          isPublic
+                            ? "bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200"
+                            : "bg-[var(--surface-warm)] text-[var(--text)] border border-[var(--border)] hover:border-[var(--primary)]"
+                        } ${isUpdating ? "opacity-50" : ""}`}
+                      >
+                        {isPublic ? "✓ Dipaparkan" : "+ Paparkan"}
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-[var(--text-subtle)]">—</span>
+                    )}
                   </td>
                   <td className="py-3.5 px-4 text-right text-xs text-[var(--text-subtle)] whitespace-nowrap">
                     {formatDateTime(rsvp.created_at)}

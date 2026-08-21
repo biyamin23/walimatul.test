@@ -12,6 +12,8 @@ import {
   DEFAULT_CLOSING_MESSAGE,
 } from "@/lib/constants/default-invitation-text";
 
+import { extractYouTubeVideoId } from "@/lib/youtube";
+
 export interface ActionResponse<T = unknown> {
   success: boolean;
   data?: T;
@@ -179,6 +181,10 @@ export async function updateOwnInvitationAction(
     }
   }
 
+  const resolvedYoutubeId = values.musicYoutubeUrl
+    ? extractYouTubeVideoId(values.musicYoutubeUrl)
+    : values.musicYoutubeVideoId || null;
+
   // 3. Prepare strictly whitelisted DB update payload
   const updatePayload = {
     slug: values.slug || null,
@@ -200,6 +206,11 @@ export async function updateOwnInvitationAction(
     rsvp_deadline: values.rsvpDeadline || null,
     max_pax: values.maxPax,
     allow_guest_message: values.allowGuestMessage,
+    countdown_enabled: values.countdownEnabled ?? false,
+    guest_wishes_enabled: values.guestWishesEnabled ?? false,
+    music_enabled: values.musicEnabled ?? false,
+    music_youtube_video_id: resolvedYoutubeId,
+    music_loop: values.musicLoop ?? false,
   };
 
   // 4. Update row where ID matches and user is the owner

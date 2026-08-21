@@ -7,9 +7,10 @@ import { SaveStatusIndicator, type SaveStatus } from "./SaveStatusIndicator";
 import { getTemplateComponent } from "@/templates/registry";
 import { HybridEditorialTemplate } from "@/templates/hybrid-editorial/Template";
 import { updateOwnInvitationAction } from "@/app/actions/invitations";
+import { extractYouTubeVideoId } from "@/lib/youtube";
 import type { InvitationWithTemplate } from "@/types/database";
 import type { UpdateInvitationInput } from "@/lib/validation/invitation";
-import type { InvitationTemplateData } from "@/templates/types";
+import type { InvitationTemplateData, GalleryItem } from "@/templates/types";
 
 interface InvitationEditorProps {
   invitation: InvitationWithTemplate;
@@ -41,7 +42,23 @@ export function InvitationEditor({
     rsvpDeadline: invitation.rsvp_deadline || "",
     maxPax: invitation.max_pax ?? 5,
     allowGuestMessage: invitation.allow_guest_message ?? true,
+    countdownEnabled: invitation.countdown_enabled ?? false,
+    guestWishesEnabled: invitation.guest_wishes_enabled ?? false,
+    musicEnabled: invitation.music_enabled ?? false,
+    musicYoutubeUrl: invitation.music_youtube_video_id
+      ? `https://www.youtube.com/watch?v=${invitation.music_youtube_video_id}`
+      : "",
+    musicYoutubeVideoId: invitation.music_youtube_video_id || "",
+    musicLoop: invitation.music_loop ?? false,
   });
+
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() =>
+    (invitation.gallery || []).map((g) => ({
+      id: g.id,
+      storagePath: g.storage_path,
+      sortOrder: g.sort_order,
+    }))
+  );
 
   const [activeTab, setActiveTab] = useState<"edit" | "preview">(initialMode);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
@@ -49,6 +66,10 @@ export function InvitationEditor({
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const resolvedYoutubeId = formValues.musicYoutubeUrl
+    ? extractYouTubeVideoId(formValues.musicYoutubeUrl)
+    : formValues.musicYoutubeVideoId || null;
 
   // ── Live Normalized Template Data for Preview ──
   const liveTemplateData: InvitationTemplateData = {
@@ -67,13 +88,31 @@ export function InvitationEditor({
     openingMessage: formValues.openingMessage || null,
     invitationMessage: formValues.invitationMessage || null,
     closingMessage: formValues.closingMessage || null,
-    gallery: [],
+    gallery: galleryItems,
     rsvpEnabled: formValues.rsvpEnabled,
     rsvpDeadline: formValues.rsvpDeadline || null,
     maxPax: formValues.maxPax,
     allowGuestMessage: formValues.allowGuestMessage,
-    musicEnabled: false,
+    countdownEnabled: formValues.countdownEnabled ?? false,
+    guestWishesEnabled: formValues.guestWishesEnabled ?? false,
+    guestWishes: [
+      {
+        id: "preview-wish-1",
+        guestName: "Haji Ismail & Keluarga",
+        message: "Selamat pengantin baru! Semoga mahligai yang dibina sentiasa dilimpahi sakinah, mawaddah dan rahmah.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "preview-wish-2",
+        guestName: "Zulkifli & Sarah",
+        message: "Barakallahu lakuma wa baraka alaikuma wa jama'a bainakuma fi khair.",
+        createdAt: new Date().toISOString(),
+      },
+    ],
+    musicEnabled: formValues.musicEnabled ?? false,
     musicKey: null,
+    musicYoutubeVideoId: resolvedYoutubeId,
+    musicLoop: formValues.musicLoop ?? false,
   };
 
   // ── Save Function ──
@@ -244,6 +283,8 @@ export function InvitationEditor({
               invitationId={invitation.id}
               values={formValues}
               onChange={handleFieldChange}
+              initialGallery={galleryItems}
+              onGalleryChange={setGalleryItems}
               errors={errors}
             />
 
@@ -302,6 +343,8 @@ export function InvitationEditor({
                 invitationId={invitation.id}
                 values={formValues}
                 onChange={handleFieldChange}
+                initialGallery={galleryItems}
+                onGalleryChange={setGalleryItems}
                 errors={errors}
               />
 

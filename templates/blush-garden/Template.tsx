@@ -8,6 +8,9 @@ import { EventDetailsSection } from "./components/EventDetailsSection";
 import { GallerySection } from "./components/GallerySection";
 import { RsvpPreviewSection } from "./components/RsvpPreviewSection";
 import { ClosingSection } from "./components/ClosingSection";
+import { LiveCountdown } from "@/components/countdown/LiveCountdown";
+import { GuestWishesSection } from "@/components/wishes/GuestWishesSection";
+import { FloatingMusicPlayer } from "@/components/music/FloatingMusicPlayer";
 
 /**
  * WALIMATUL — Blush Garden Invitation Template
@@ -49,6 +52,23 @@ export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentPr
           {/* 1. Cover / Hero Section */}
           <CoverSection data={data} />
 
+          {/* Live Countdown (if enabled) */}
+          {data.countdownEnabled && data.weddingDate && (
+            <div className="px-6 py-4 max-w-sm mx-auto w-full">
+              <LiveCountdown
+                weddingDate={data.weddingDate}
+                startTime={data.startTime}
+                theme={{
+                  accentColor: "#B8955A",
+                  surfaceColor: "#FCF1EE",
+                  textColor: "#174F3A",
+                  secondaryTextColor: "#6B5E59",
+                  borderColor: "#E8DDD5",
+                }}
+              />
+            </div>
+          )}
+
           {/* 2. Opening Greetings & Quotation */}
           <OpeningSection data={data} />
 
@@ -61,12 +81,36 @@ export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentPr
           {/* 5. Photo Gallery */}
           <GallerySection data={data} />
 
-          {/* 6. RSVP Preview Section */}
+          {/* 6. Public Guest Wishes Section (if enabled & approved wishes exist) */}
+          {data.guestWishesEnabled && data.guestWishes && data.guestWishes.length > 0 && (
+            <div className="px-4 sm:px-6 py-8">
+              <GuestWishesSection
+                wishes={data.guestWishes}
+                theme={{
+                  accentColor: "#B8955A",
+                  surfaceColor: "#FCF1EE",
+                  textColor: "#174F3A",
+                  secondaryTextColor: "#6B5E59",
+                  borderColor: "#E8DDD5",
+                }}
+              />
+            </div>
+          )}
+
+          {/* 7. RSVP Preview Section */}
           <RsvpPreviewSection data={data} mode={mode} />
 
-          {/* 7. Closing Blessing & Attribution */}
+          {/* 8. Closing Blessing & Attribution */}
           <ClosingSection data={data} />
         </main>
+
+        {/* Background Music Player via YouTube (Floating widget) */}
+        {data.musicEnabled && data.musicYoutubeVideoId && (
+          <FloatingMusicPlayer
+            youtubeVideoId={data.musicYoutubeVideoId}
+            loop={data.musicLoop}
+          />
+        )}
       </div>
     </div>
   );

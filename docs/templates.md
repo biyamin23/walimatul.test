@@ -192,3 +192,36 @@ Stored as JSONB in `public.templates.design_config`:
       overlays/
   ```
 - Allowed formats: JPG, PNG, WebP (Max 5 MB).
+
+---
+
+## Phase 10B: Guest Experience Features
+
+All guest experience features belong strictly to the **invitation data layer** (wedding content) rather than template design configurations (presentation themes).
+
+### 1. Photo Gallery
+- **Bucket**: `invitation-gallery` (Public Read, Owner Insert/Update/Delete).
+- **Path structure**: `{user_id}/{invitation_id}/{uuid}.{ext}`
+- **Constraints**: Maximum 12 photos per invitation, max 5MB per file, JPEG/PNG/WebP only.
+- **Features**: Drag & drop upload, manual/mobile reorder buttons, replace photo, delete photo with confirmation modal, and responsive image lightbox.
+
+### 2. Live Countdown
+- **Timezone**: Canonical Malaysian Time (`Asia/Kuala_Lumpur`, UTC+8).
+- **Target**: Computed from `invitations.wedding_date` and `invitations.start_time` (defaults to 11:00:00).
+- **States**:
+  - `upcoming`: 4-column counter (`Hari`, `Jam`, `Minit`, `Saat`).
+  - `in_progress`: "🎉 Majlis sedang berlangsung" (day of the event).
+  - `ended`: "Majlis telah berlangsung" (past events).
+- **Zero negative values**: Never displays negative time.
+
+### 3. Public Guest Wishes (Doa & Bingkisan Kasih)
+- **Privacy Model**: All guest RSVP messages are **private by default** (`rsvps.show_on_invitation = false`).
+- **Owner Moderation**: Invitation owner approves/hides messages via `/dashboard/invitations/[id]/rsvp`.
+- **Public Query Strict Privacy**: The public endpoint only queries and returns `id, guest_name, message, created_at` from approved records of published non-expired invitations. Sensitive guest data (phone, email, attendance status, pax count) is **never** selected or exposed.
+
+### 4. Background Music via YouTube
+- **Input & Validation**: Canonical YouTube URL parser (`lib/youtube.ts`) supports `youtube.com/watch?v=`, `youtu.be/`, `youtube.com/shorts/`, and stores clean 11-char video IDs.
+- **Floating Audio Controller**: Minimalist floating widget positioned at `fixed bottom-6 right-6 z-40`, non-obstructive to RSVP or mobile sticky navigation bars.
+- **Playback States**: Play (pulsing sound bars), Pause (▶), Loading (spinner), Unavailable (fails gracefully without crashing the invitation).
+- **Autoplay Handling**: No assumption of unprompted browser autoplay. Volume initialized conservatively at ~35%.
+

@@ -109,6 +109,10 @@ export interface Invitation {
   allow_guest_message: boolean;
   music_enabled: boolean;
   music_key: string | null;
+  countdown_enabled?: boolean;
+  guest_wishes_enabled?: boolean;
+  music_youtube_video_id?: string | null;
+  music_loop?: boolean;
   status: InvitationStatus;
   published_at: string | null;
   expires_at: string | null;
@@ -144,6 +148,7 @@ export interface RSVP {
   attendance: RSVPAttendance;
   pax: number;
   message: string | null;
+  show_on_invitation?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -212,9 +217,10 @@ export interface PaymentProof {
 
 // ─── Joined / Extended Types ───────────────────────────────────────────────────
 
-/** Invitation with its template metadata (joined query result) */
+/** Invitation with its template metadata and gallery items (joined query result) */
 export interface InvitationWithTemplate extends Invitation {
   template: Template;
+  gallery?: InvitationGalleryItem[];
 }
 
 /** Order with its associated invitation (joined query result) */

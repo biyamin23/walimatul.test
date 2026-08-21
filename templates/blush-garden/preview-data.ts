@@ -49,8 +49,20 @@ export const BLUSH_GARDEN_PREVIEW_DATA: InvitationTemplateData = {
   rsvpDeadline: "2026-11-10",
   maxPax: 5,
   allowGuestMessage: true,
+  countdownEnabled: true,
+  guestWishesEnabled: true,
+  guestWishes: [
+    {
+      id: "wish-1",
+      guestName: "Ustaz Hamdan & Keluarga",
+      message: "Tahniah dan selamat pengantin baru buat kedua mempelai.",
+      createdAt: "2026-08-20T08:00:00Z",
+    },
+  ],
   musicEnabled: false,
   musicKey: null,
+  musicYoutubeVideoId: null,
+  musicLoop: false,
 };
 
 /**
@@ -59,23 +71,25 @@ export const BLUSH_GARDEN_PREVIEW_DATA: InvitationTemplateData = {
  */
 export const LONG_CONTENT_PREVIEW_DATA: InvitationTemplateData = {
   id: "preview-blush-garden-long",
-  groomName: "Muhammad Syafiq bin Haji Abdul Rahman",
-  groomShortName: "Muhammad Syafiq",
-  brideName: "Nur Aisyah Humaira binti Dato' Seri Ahmad Faris",
-  brideShortName: "Nur Aisyah",
-  weddingDate: "2026-12-15",
-  startTime: "12:00:00",
-  endTime: "17:30:00",
-  venueName: "Grand Ballroom, Hotel Royale Chulan Damansara",
-  venueAddress: "No. 2, Jalan PJU 7/3, Mutiara Damansara, 47810 Petaling Jaya, Selangor Darul Ehsan, Malaysia",
-  googleMapsUrl: "https://maps.google.com/?q=Royale+Chulan+Damansara",
-  wazeUrl: "https://waze.com/ul?q=Royale+Chulan+Damansara",
+  groomName: "Y.M. Raja Muhammad Danial Asyraf bin Raja Dato' Seri Kamarulzaman Al-Haj",
+  groomShortName: "Danial Asyraf",
+  brideName: "Dayang Nur Siti Nurhaliza binti Orang Kaya Mahawangsa Haji Zainuddin",
+  brideShortName: "Siti Nurhaliza",
+  weddingDate: "2026-12-19",
+  startTime: "11:30:00",
+  endTime: "16:30:00",
+  venueName:
+    "Grand Ballroom, Mandarin Oriental Kuala Lumpur, Kuala Lumpur City Centre, 50088 Kuala Lumpur",
+  venueAddress:
+    "Mandarin Oriental, Kuala Lumpur City Centre, P.O. Box 10905, 50088 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia",
+  googleMapsUrl: "https://maps.google.com/?q=Mandarin+Oriental+Kuala+Lumpur",
+  wazeUrl: "https://waze.com/ul/hw283ft4p7",
   openingMessage:
-    "Segala puji bagi Allah, Tuhan sekalian alam yang telah mempertemukan jodoh kami berdua dalam ikatan yang suci dan penuh keberkatan.",
+    "“Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang.”\n(Surah Ar-Rum: 21)",
   invitationMessage:
-    "Kami dengan sukacitanya menjemput sanak saudara, sahabat handai serta para tetamu yang dihormati untuk bersama-sama meraikan dan mendoakan kebahagiaan mempelai.",
+    "Dengan penuh rasa kesyukuran ke hadrat Ilahi serta menjunjung setinggi-tinggi hormat dan takzim, kami sekeluarga dengan berbesar hati mempersilakan Y.Bhg. Tan Sri / Puan Sri / Dato' Seri / Datin Seri / Dato' / Datin / Tuan / Puan / Encik / Cik seisi keluarga hadir bagi meraikan dan menyerikan lagi Majlis Walimatulurus putera dan puteri kami.",
   closingMessage:
-    "Kehadiran dan doa anda amat bermakna buat kami sekeluarga dalam menyempurnakan hari yang penuh bersejarah ini. Jazakumullahu Khairan Kathira.",
+    "Semoga dengan kehadiran dan untaian doa restu para hadirin yang budiman akan melimpahkan lagi keberkatan dan kerahmatan ke atas ikatan perkahwinan suci yang termeterai ini, Insya-Allah.\n\nSekalung penghargaan dan terima kasih kami ucapkan.",
   gallery: [
     {
       id: "long-photo-1",
@@ -92,8 +106,13 @@ export const LONG_CONTENT_PREVIEW_DATA: InvitationTemplateData = {
   rsvpDeadline: "2026-12-01",
   maxPax: 6,
   allowGuestMessage: true,
+  countdownEnabled: true,
+  guestWishesEnabled: false,
+  guestWishes: [],
   musicEnabled: false,
   musicKey: null,
+  musicYoutubeVideoId: null,
+  musicLoop: false,
 };
 
 /**
@@ -121,6 +140,11 @@ export const MINIMAL_PREVIEW_DATA: InvitationTemplateData = {
   rsvpDeadline: null,
   maxPax: 2,
   allowGuestMessage: false,
+  countdownEnabled: false,
+  guestWishesEnabled: false,
+  guestWishes: [],
   musicEnabled: false,
   musicKey: null,
+  musicYoutubeVideoId: null,
+  musicLoop: false,
 };

@@ -94,7 +94,7 @@ export default async function RsvpDashboardPage({
       <RsvpSummaryCards summary={summary} />
 
       {/* ── Responses List ── */}
-      <RsvpResponseList rsvps={rsvps} />
+      <RsvpResponseList rsvps={rsvps} invitationId={invitation.id} />
     </div>
   );
 }

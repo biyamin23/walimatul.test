@@ -25,6 +25,24 @@ export const SAMPLE_PREVIEW_INVITATION_DATA: InvitationTemplateData = {
   rsvpDeadline: "2026-11-14",
   maxPax: 5,
   allowGuestMessage: true,
+  countdownEnabled: true,
+  guestWishesEnabled: true,
+  guestWishes: [
+    {
+      id: "sample-wish-1",
+      guestName: "Haji Ismail & Keluarga",
+      message: "Selamat pengantin baru! Semoga mahligai yang dibina kekal hingga ke jannah.",
+      createdAt: "2026-08-20T10:00:00Z",
+    },
+    {
+      id: "sample-wish-2",
+      guestName: "Datin Faridah & Rakan-rakan",
+      message: "Barakallahu lakuma wa baraka alaikuma wa jama'a bainakuma fi khair.",
+      createdAt: "2026-08-20T12:30:00Z",
+    },
+  ],
   musicEnabled: false,
   musicKey: null,
+  musicYoutubeVideoId: null,
+  musicLoop: false,
 };

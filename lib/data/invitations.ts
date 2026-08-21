@@ -59,7 +59,8 @@ export async function getOwnInvitationById(
     .from("invitations")
     .select(`
       *,
-      template:templates (*)
+      template:templates (*),
+      gallery:invitation_gallery (*)
     `)
     .eq("id", id)
     .eq("user_id", userId)

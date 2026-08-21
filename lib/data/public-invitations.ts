@@ -4,7 +4,7 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { isReservedSlug } from "@/lib/constants/reserved-slugs";
 import { mapInvitationToTemplateData } from "@/lib/templates/map-invitation";
-import type { InvitationTemplateData } from "@/templates/types";
+import type { InvitationTemplateData, GuestWish } from "@/templates/types";
 import type { Invitation, Template } from "@/types/database";
 
 export interface PublishedInvitationResult {
@@ -84,7 +84,33 @@ export const getPublishedInvitationBySlug = cache(
     }
 
     const galleryRaw = Array.isArray(data.gallery) ? data.gallery : [];
-    const templateData = mapInvitationToTemplateData(data, galleryRaw);
+
+    // 5. Fetch approved guest wishes if enabled (Strict Privacy: only id, guest_name, message, created_at)
+    let guestWishes: GuestWish[] = [];
+    if (data.guest_wishes_enabled) {
+      const { data: wishesData, error: wishesError } = await supabase
+        .from("rsvps")
+        .select("id, guest_name, message, created_at")
+        .eq("invitation_id", data.id)
+        .eq("show_on_invitation", true)
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      if (!wishesError && wishesData) {
+        guestWishes = wishesData
+          .filter((w) => Boolean(w.message && w.message.trim()))
+          .map((w) => ({
+            id: w.id,
+            guestName: w.guest_name ? w.guest_name.trim() : "Tetamu",
+            message: w.message!.trim(),
+            createdAt: w.created_at,
+          }));
+      } else if (wishesError) {
+        console.error(`[WALIMATUL] Public guest wishes lookup error for invitation "${data.id}":`, wishesError.message);
+      }
+    }
+
+    const templateData = mapInvitationToTemplateData(data, galleryRaw, guestWishes);
 
     return {
       invitation: data,
