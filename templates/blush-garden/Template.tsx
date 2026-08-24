@@ -10,20 +10,18 @@ import { RsvpPreviewSection } from "./components/RsvpPreviewSection";
 import { ClosingSection } from "./components/ClosingSection";
 import { LiveCountdown } from "@/components/countdown/LiveCountdown";
 import { GuestWishesSection } from "@/components/wishes/GuestWishesSection";
+import { BlushSection } from "./components/BlushCard";
 
 /**
  * WALIMATUL — Blush Garden Invitation Template
  *
  * Production-ready React renderer for the Blush Garden design.
  *
- * Design characteristics:
- * - Romantic floral aesthetic with ivory (#FCF8F3), soft blush (#F5DDD6), deep green (#174F3A), and muted gold (#B8955A).
- * - Typography: Great Vibes (script names), Cormorant Garamond (ceremonial titles & dates), Inter (functional text).
+ * Standardized Major Card Design System:
+ * - Uniform major card proportions, radii (rounded-3xl), borders (#B8955A/30),
+ *   surfaces (warm ivory/blush gradient), and subtle ambient stationery shadow.
  * - Mobile-first layout with smooth editorial rhythm and max-width desktop centering.
- *
- * Architectural purity:
- * - Receives normalized InvitationTemplateData only.
- * - Zero database access or session dependencies inside this component.
+ * - Typography: Great Vibes (script names), Cormorant Garamond (ceremonial titles & dates), Inter (functional text).
  */
 export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentProps) {
   return (
@@ -53,7 +51,7 @@ export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentPr
 
           {/* Live Countdown (if enabled) */}
           {data.countdownEnabled && data.weddingDate && (
-            <div className="px-6 py-4 max-w-sm mx-auto w-full">
+            <div className="px-4 sm:px-6 py-4 max-w-lg mx-auto w-full">
               <LiveCountdown
                 weddingDate={data.weddingDate}
                 startTime={data.startTime}
@@ -82,7 +80,7 @@ export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentPr
 
           {/* 6. Public Guest Wishes Section (if enabled & approved wishes exist) */}
           {data.guestWishesEnabled && data.guestWishes && data.guestWishes.length > 0 && (
-            <div className="px-4 sm:px-6 py-8">
+            <BlushSection ariaLabel="Ucapan Tetamu">
               <GuestWishesSection
                 wishes={data.guestWishes}
                 theme={{
@@ -93,7 +91,7 @@ export function BlushGardenTemplate({ data, mode = "live" }: TemplateComponentPr
                   borderColor: "#E8DDD5",
                 }}
               />
-            </div>
+            </BlushSection>
           )}
 
           {/* 7. RSVP Preview Section */}

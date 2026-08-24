@@ -1,6 +1,7 @@
 import React from "react";
 import type { InvitationTemplateData } from "../../types";
 import { BismillahMotif, BotanicalDivider, FloralFlourish } from "./BotanicalOrnaments";
+import { BlushSection } from "./BlushCard";
 
 interface OpeningSectionProps {
   data: InvitationTemplateData;
@@ -12,10 +13,7 @@ export function OpeningSection({ data }: OpeningSectionProps) {
   }
 
   return (
-    <section
-      aria-label="Opening & Greetings"
-      className="relative px-6 py-12 sm:py-16 text-center max-w-xl mx-auto"
-    >
+    <BlushSection ariaLabel="Opening & Greetings">
       {/* Bismillah Motif */}
       <BismillahMotif className="mb-6" />
 
@@ -38,6 +36,6 @@ export function OpeningSection({ data }: OpeningSectionProps) {
       )}
 
       <BotanicalDivider className="mt-8" />
-    </section>
+    </BlushSection>
   );
 }

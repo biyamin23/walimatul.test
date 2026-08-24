@@ -2,6 +2,7 @@ import React from "react";
 import type { InvitationTemplateData } from "../../types";
 import { parseInvitationDate, formatTimeRange } from "@/lib/templates/formatters";
 import { BotanicalDivider } from "./BotanicalOrnaments";
+import { BlushCard, BlushSection } from "./BlushCard";
 
 interface EventDetailsSectionProps {
   data: InvitationTemplateData;
@@ -19,21 +20,8 @@ export function EventDetailsSection({ data }: EventDetailsSectionProps) {
   }
 
   return (
-    <section
-      aria-label="Event Schedule and Venue"
-      className="relative px-4 sm:px-6 py-10 sm:py-14 max-w-xl mx-auto text-center"
-    >
-      <div className="rounded-3xl p-6 sm:p-10 bg-[#FCF8F3] border border-[#B8955A]/30 shadow-sm relative overflow-hidden">
-        {/* Subtle decorative background accent */}
-        <div
-          className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-[#F5DDD6]/40 blur-xl pointer-events-none"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-[#F5DDD6]/40 blur-xl pointer-events-none"
-          aria-hidden="true"
-        />
-
+    <BlushSection ariaLabel="Event Schedule and Venue">
+      <BlushCard variant="major" hasGlow>
         <p className="font-cormorant text-xs font-semibold tracking-[0.25em] uppercase text-[#B8955A] mb-6">
           Aturcara Majlis
         </p>
@@ -109,7 +97,7 @@ export function EventDetailsSection({ data }: EventDetailsSectionProps) {
                 href={data.googleMapsUrl || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#174F3A] text-white font-inter text-xs sm:text-sm font-semibold shadow-sm hover:bg-[#123e2d] transition-colors focus-visible:outline-2 focus-visible:outline-[#174F3A] focus-visible:outline-offset-2"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] rounded-full bg-[#174F3A] text-white font-inter text-xs sm:text-sm font-semibold shadow-sm hover:bg-[#123e2d] transition-colors focus-visible:outline-2 focus-visible:outline-[#174F3A] focus-visible:outline-offset-2 active:scale-95"
                 aria-label="Open location in Google Maps"
               >
                 <svg
@@ -135,7 +123,7 @@ export function EventDetailsSection({ data }: EventDetailsSectionProps) {
                 href={data.wazeUrl || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#FCF8F3] border border-[#174F3A] text-[#174F3A] font-inter text-xs sm:text-sm font-semibold hover:bg-[#FCF1EE] transition-colors focus-visible:outline-2 focus-visible:outline-[#174F3A] focus-visible:outline-offset-2"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] rounded-full bg-[#FCF8F3] border border-[#174F3A] text-[#174F3A] font-inter text-xs sm:text-sm font-semibold hover:bg-[#FCF1EE] transition-colors focus-visible:outline-2 focus-visible:outline-[#174F3A] focus-visible:outline-offset-2 active:scale-95"
                 aria-label="Open location in Waze"
               >
                 <svg
@@ -156,7 +144,7 @@ export function EventDetailsSection({ data }: EventDetailsSectionProps) {
             )}
           </div>
         )}
-      </div>
-    </section>
+      </BlushCard>
+    </BlushSection>
   );
 }

@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { InvitationTemplateData } from "../../types";
 import { BotanicalDivider } from "./BotanicalOrnaments";
 import { GalleryLightbox } from "@/components/gallery/GalleryLightbox";
+import { BlushSection, BlushSectionHeader } from "./BlushCard";
 
 interface GallerySectionProps {
   data: InvitationTemplateData;
@@ -19,19 +20,14 @@ export function GallerySection({ data }: GallerySectionProps) {
   }
 
   return (
-    <section aria-label="Photo Gallery" className="relative px-4 sm:px-6 py-10 sm:py-14 max-w-xl mx-auto text-center">
-      <p className="font-cormorant text-xs font-semibold tracking-[0.25em] uppercase text-[#B8955A] mb-3">
-        Memori
-      </p>
-      <h3 className="font-cormorant text-2xl sm:text-3xl font-semibold text-[#174F3A] mb-8">
-        Galeri Foto
-      </h3>
+    <BlushSection ariaLabel="Photo Gallery">
+      <BlushSectionHeader eyebrow="Memori" title="Galeri Foto" />
 
       {/* Responsive Gallery Grid Layout */}
       {images.length === 1 && (
         <div
           onClick={() => setLightboxImage(images[0].storagePath)}
-          className="rounded-3xl overflow-hidden border-2 border-[#E8DDD5] shadow-sm bg-[#FCF1EE] cursor-pointer group relative"
+          className="max-w-lg mx-auto rounded-3xl overflow-hidden border border-[#E8DDD5] shadow-sm bg-[#FCF1EE] cursor-pointer group relative"
         >
           <Image
             src={images[0].storagePath}
@@ -50,12 +46,12 @@ export function GallerySection({ data }: GallerySectionProps) {
       )}
 
       {images.length === 2 && (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-lg mx-auto">
           {images.map((img, idx) => (
             <div
               key={img.id || idx}
               onClick={() => setLightboxImage(img.storagePath)}
-              className="rounded-2xl overflow-hidden border-2 border-[#E8DDD5] shadow-sm bg-[#FCF1EE] cursor-pointer group relative"
+              className="rounded-2xl overflow-hidden border border-[#E8DDD5] shadow-xs bg-[#FCF1EE] cursor-pointer group relative"
             >
               <Image
                 src={img.storagePath}
@@ -76,12 +72,12 @@ export function GallerySection({ data }: GallerySectionProps) {
       )}
 
       {images.length >= 3 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 max-w-lg mx-auto">
           {images.map((img, idx) => (
             <div
               key={img.id || idx}
               onClick={() => setLightboxImage(img.storagePath)}
-              className={`rounded-2xl overflow-hidden border-2 border-[#E8DDD5] shadow-sm bg-[#FCF1EE] cursor-pointer group relative ${
+              className={`rounded-2xl overflow-hidden border border-[#E8DDD5] shadow-xs bg-[#FCF1EE] cursor-pointer group relative ${
                 idx === 0 ? "col-span-2 sm:col-span-2 h-56 sm:h-72" : "col-span-1 h-44 sm:h-72"
               }`}
             >
@@ -111,6 +107,6 @@ export function GallerySection({ data }: GallerySectionProps) {
       />
 
       <BotanicalDivider className="mt-10" />
-    </section>
+    </BlushSection>
   );
 }

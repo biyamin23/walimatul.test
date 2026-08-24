@@ -7,13 +7,13 @@ interface ClosingSectionProps {
 }
 
 export function ClosingSection({ data }: ClosingSectionProps) {
-  const groom = data.groomShortName || data.groomName || "Groom";
-  const bride = data.brideShortName || data.brideName || "Bride";
+  const groom = data.groomShortName || data.groomName || "Pengantin Lelaki";
+  const bride = data.brideShortName || data.brideName || "Pengantin Perempuan";
 
   return (
     <footer
       aria-label="Closing & Blessing"
-      className="relative px-6 pt-8 pb-16 text-center max-w-xl mx-auto flex flex-col items-center"
+      className="relative w-full max-w-xl mx-auto px-4 sm:px-6 pt-8 pb-16 text-center flex flex-col items-center"
     >
       {/* Closing message or wedding doa */}
       {data.closingMessage ? (

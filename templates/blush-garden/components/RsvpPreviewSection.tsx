@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import type { InvitationTemplateData } from "../../types";
 import { formatWeddingDate } from "@/lib/templates/formatters";
 import { GuestRsvpModal } from "@/components/rsvp/GuestRsvpModal";
+import { BlushCard, BlushSection } from "./BlushCard";
 
 interface RsvpPreviewSectionProps {
   data: InvitationTemplateData;
@@ -25,11 +26,8 @@ export function RsvpPreviewSection({ data, mode = "live" }: RsvpPreviewSectionPr
     : false;
 
   return (
-    <section
-      aria-label="Pengesahan Kehadiran"
-      className="relative px-4 sm:px-6 py-10 sm:py-14 max-w-xl mx-auto text-center"
-    >
-      <div className="rounded-3xl p-6 sm:p-10 bg-gradient-to-b from-[#FCF1EE] via-[#FCF8F3] to-[#FCF1EE] border border-[#B8955A]/35 shadow-sm">
+    <BlushSection ariaLabel="Pengesahan Kehadiran">
+      <BlushCard variant="major" hasGlow>
         <p className="font-cormorant text-xs font-semibold tracking-[0.25em] uppercase text-[#B8955A] mb-2">
           Kehadiran
         </p>
@@ -107,7 +105,7 @@ export function RsvpPreviewSection({ data, mode = "live" }: RsvpPreviewSectionPr
             <button
               type="button"
               disabled
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#174F3A] text-white font-inter text-sm font-semibold tracking-wide shadow-md opacity-90 cursor-not-allowed select-none"
+              className="w-full sm:w-auto px-8 py-3.5 min-h-[44px] rounded-full bg-[#174F3A] text-white font-inter text-sm font-semibold tracking-wide shadow-md opacity-90 cursor-not-allowed select-none"
               title="Borang RSVP interaktif aktif pada pautan rasmi jemputan"
             >
               Sahkan Kehadiran (RSVP)
@@ -121,7 +119,7 @@ export function RsvpPreviewSection({ data, mode = "live" }: RsvpPreviewSectionPr
             <button
               type="button"
               disabled
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#746F6B]/30 text-[#746F6B] font-inter text-sm font-semibold tracking-wide cursor-not-allowed select-none"
+              className="w-full sm:w-auto px-8 py-3.5 min-h-[44px] rounded-full bg-[#746F6B]/30 text-[#746F6B] font-inter text-sm font-semibold tracking-wide cursor-not-allowed select-none"
             >
               RSVP Telah Ditutup
             </button>
@@ -134,24 +132,24 @@ export function RsvpPreviewSection({ data, mode = "live" }: RsvpPreviewSectionPr
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#174F3A] text-white font-inter text-sm font-semibold tracking-wide shadow-md hover:bg-[#123e2d] active:scale-95 transition-all focus-visible:outline-2 focus-visible:outline-[#174F3A] focus-visible:outline-offset-2"
+              className="w-full sm:w-auto px-8 py-3.5 min-h-[44px] rounded-full bg-[#174F3A] text-white font-inter text-sm font-semibold tracking-wide shadow-md hover:bg-[#123e2d] active:scale-95 transition-all focus-visible:outline-2 focus-visible:outline-[#174F3A] focus-visible:outline-offset-2 cursor-pointer"
             >
               Sahkan Kehadiran (RSVP)
             </button>
           </div>
         )}
-      </div>
+      </BlushCard>
 
-      {/* Interactive Guest RSVP Modal (Active in live mode) */}
-      {mode === "live" && !isDeadlinePassed && (
+      {/* Interactive Modal */}
+      {mode !== "preview" && !isDeadlinePassed && (
         <GuestRsvpModal
+          isOpen={isModalOpen}
           invitationId={data.id}
           maxPax={data.maxPax}
           allowGuestMessage={data.allowGuestMessage}
-          isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />
       )}
-    </section>
+    </BlushSection>
   );
 }
