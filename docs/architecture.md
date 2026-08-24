@@ -183,5 +183,28 @@ Multi-tenant data isolation is enforced both at the database level via RLS and a
 | 8 | Payment UI & Proof Upload (Client Flow) | ✅ Complete |
 | 8.1 | Multi-Tenant Data Isolation Security Hotfix | ✅ Complete |
 | 9 | Admin Payment Approval & Invitation Activation | ✅ Complete |
-| 10 | Receipt PDF & Approval Email Notification | Next |
+| 10A | Motion for React Card Animations & Hybrid Templates | ✅ Complete |
+| 10B | Guest Experience: Gallery, Countdown, Wishes, Music | ✅ Complete |
+| 11A | Admin Dashboard & Operations Overview Analytics | ✅ Complete |
+| 11B | Admin Users & Invitation Management | ✅ Complete |
+
+---
+
+## Phase 11B — Admin Operations Architecture
+
+1. **Admin Users Management (`/admin/users`, `/admin/users/[id]`)**:
+   - Paginated customer listing excluding admin accounts.
+   - Aggregate metrics per customer: total invitations, paid transactions count, lifetime spend (`orders.amount`).
+   - Deep customer inspection with linked invitations, wedding dates, and payment history.
+
+2. **Admin Invitations Management (`/admin/invitations`, `/admin/invitations/[id]`)**:
+   - Multi-criteria filtering: search (couple/slug), lifecycle status (`published`, `draft`, `expired`), template, payment status.
+   - Central inspection: Overview, Client relation, Template relation, Commercial snapshot, Phase 10B Feature status, and RSVP summary metrics.
+   - RSVP privacy preservation: guest phone numbers, emails, and private messages are isolated to invitation owners.
+
+3. **Controlled Expiry Extension Action (`extendInvitationExpiryAction`)**:
+   - PostgreSQL security definer RPC `public.admin_extend_invitation_expiry`.
+   - Enforces authenticated admin authorization and updates `invitations.expires_at` based on presets (+1, +3, +6, +12 months) or custom date.
+   - Extension preserves purchased duration by calculating from existing `expires_at`.
+
 

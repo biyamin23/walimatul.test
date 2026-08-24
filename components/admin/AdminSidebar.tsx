@@ -33,6 +33,26 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: "Pengguna",
+    href: "/admin/users",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.25" />
+        <path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    label: "Jemputan",
+    href: "/admin/invitations",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" strokeWidth="1.25" />
+        <path d="M2 6.5l6 4 6-4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
     label: "Templates",
     href: "/admin/templates",
     icon: (

@@ -149,10 +149,33 @@ Expiry Date: [expires_at]
 
 ---
 
+## Admin Operations Specification (Phase 11B)
+
+### 1. Customer Accounts (`/admin/users`)
+- Real-time customer overview with search by name and phone.
+- Aggregated client metrics: total invitations, completed paid orders, lifetime spend (LTV).
+- Deep customer profile view (`/admin/users/[id]`) with linked wedding invitations and transaction history.
+
+### 2. Invitation Management (`/admin/invitations`)
+- Multi-dimensional filtering: lifecycle status (`published`, `draft`, `expired`), design template, payment status (`paid`, `pending_verification`, `pending_payment`, `payment_rejected`, `no_order`).
+- Search by groom, bride, or public slug.
+- 360-degree invitation inspection (`/admin/invitations/[id]`):
+  - Overview: couple names, venue, event timing, slug, lifecycle timestamps.
+  - Client & Template relationships: direct links to customer profile and template editor.
+  - Commercial relation: snapshot order amount, snapshot validity months, payment status, receipt number.
+  - Feature summary: photo gallery count, live countdown, guest wishes, YouTube background music, opening cover.
+  - RSVP summary: total responses, attending, not attending, total pax, wishes count (with guest privacy preservation).
+
+### 3. Expiry Extension Business Rules
+- Manual admin extension preserves historical duration by adding months (+1, +3, +6, +12) directly to existing `expires_at`.
+- Custom date selection must be strictly in the future relative to the current expiration date.
+- Atomic mutation handled via security definer RPC `admin_extend_invitation_expiry`.
+
+---
+
 ## Future Plans
 
-- 12-month validity tier
-- Additional templates (Royal Gold, Minimal White, Malay Heritage)
 - PDF receipt download
 - Approval email automation
 - Admin bulk review interface
+
