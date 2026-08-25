@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { requireAuth } from "@/lib/auth/permissions";
 import { getOwnInvitationPaymentState } from "@/lib/data/payments";
+import { getPlatformSettings } from "@/lib/data/platform-settings";
 import { PaymentCheckoutClient } from "@/components/payment/PaymentCheckoutClient";
 
 export const metadata: Metadata = {
@@ -23,7 +24,11 @@ export default async function InvitationPaymentPage({
   const user = await requireAuth();
   const { id } = await params;
 
-  const data = await getOwnInvitationPaymentState(id);
+  const [data, settings] = await Promise.all([
+    getOwnInvitationPaymentState(id),
+    getPlatformSettings(),
+  ]);
+
   if (!data) {
     notFound();
   }
@@ -97,6 +102,13 @@ export default async function InvitationPaymentPage({
           initialOrder={order}
           initialProof={latestProof}
           userId={user.userId}
+          paymentInstructions={settings.manual_payment_instructions?.text}
+          supportWhatsappUrl={
+            settings.support_whatsapp?.phone
+              ? `https://wa.me/${settings.support_whatsapp.phone.replace(/[^0-9]/g, "")}`
+              : undefined
+          }
+          supportWhatsappDisplay={settings.support_whatsapp?.display}
         />
       )}
     </div>

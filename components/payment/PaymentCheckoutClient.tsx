@@ -14,6 +14,9 @@ export interface PaymentCheckoutClientProps {
   initialOrder: Order | null;
   initialProof: PaymentProof | null;
   userId: string;
+  paymentInstructions?: string;
+  supportWhatsappUrl?: string;
+  supportWhatsappDisplay?: string;
 }
 
 export function PaymentCheckoutClient({
@@ -22,6 +25,9 @@ export function PaymentCheckoutClient({
   initialOrder,
   initialProof,
   userId,
+  paymentInstructions,
+  supportWhatsappUrl,
+  supportWhatsappDisplay,
 }: PaymentCheckoutClientProps) {
   const [order, setOrder] = useState<Order | null>(initialOrder);
   const [isRetryingRejected, setIsRetryingRejected] = useState(false);
@@ -117,7 +123,11 @@ export function PaymentCheckoutClient({
       <PaymentSummary invitation={invitation} template={template} />
 
       {/* 2. Touch 'n Go Payment QR Card */}
-      <PaymentQrCard />
+      <PaymentQrCard
+        customInstructions={paymentInstructions}
+        supportWhatsappUrl={supportWhatsappUrl}
+        supportWhatsappDisplay={supportWhatsappDisplay}
+      />
 
       {/* 3. Proof Uploader */}
       {order ? (

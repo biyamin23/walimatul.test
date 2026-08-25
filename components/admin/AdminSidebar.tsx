@@ -73,6 +73,35 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
+  {
+    label: "Pengumuman",
+    href: "/admin/announcements",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M12 5.5v5M14 6.5v3M10 3.5L5 6.5H2.5A1 1 0 0 0 1.5 7.5v1a1 1 0 0 0 1 1H5l5 3V3.5Z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    label: "Log Audit",
+    href: "/admin/audit-logs",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M9 1.5H3.5A1 1 0 0 0 2.5 2.5v11a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V6L9 1.5Z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M9 1.5V6h4.5M5 8.5h6M5 11.5h4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    label: "Tetapan",
+    href: "/admin/settings",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.25" />
+        <path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+      </svg>
+    ),
+  },
 ] as const;
 
 const SECONDARY_ITEMS = [

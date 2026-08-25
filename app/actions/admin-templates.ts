@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { recordAdminAudit } from "@/lib/admin/audit";
 import {
   createTemplateSchema,
   updateTemplateSchema,
@@ -121,6 +122,23 @@ export async function createTemplateAction(
     };
   }
 
+  // Persistent admin audit log
+  await recordAdminAudit({
+    adminId: admin.userId,
+    action: "template.created",
+    entityType: "template",
+    entityId: template.id,
+    afterData: {
+      name: parsed.data.name,
+      slug: parsed.data.slug,
+      status: parsed.data.status,
+      price: parsed.data.price,
+      validity_months: parsed.data.validity_months,
+      component_key: parsed.data.component_key,
+    },
+    metadata: { name: parsed.data.name, slug: parsed.data.slug },
+  });
+
   revalidatePath("/admin/templates");
   revalidatePath("/templates");
 
@@ -210,6 +228,23 @@ export async function updateTemplateAction(
     };
   }
 
+  // Persistent admin audit log
+  await recordAdminAudit({
+    adminId: admin.userId,
+    action: "template.updated",
+    entityType: "template",
+    entityId: parsed.data.id,
+    afterData: {
+      name: parsed.data.name,
+      slug: parsed.data.slug,
+      status: parsed.data.status,
+      price: parsed.data.price,
+      validity_months: parsed.data.validity_months,
+      component_key: parsed.data.component_key,
+    },
+    metadata: { name: parsed.data.name, slug: parsed.data.slug },
+  });
+
   revalidatePath("/admin/templates");
   revalidatePath(`/admin/templates/${parsed.data.id}/edit`);
   revalidatePath(`/admin/templates/${parsed.data.id}/preview`);
@@ -255,6 +290,16 @@ export async function setTemplateStatusAction(
       error: "Gagal menukar status templat.",
     };
   }
+
+  // Persistent admin audit log
+  await recordAdminAudit({
+    adminId: admin.userId,
+    action: newStatus === "archived" ? "template.archived" : "template.updated",
+    entityType: "template",
+    entityId: id,
+    afterData: { status: newStatus },
+    metadata: { new_status: newStatus },
+  });
 
   revalidatePath("/admin/templates");
   revalidatePath(`/admin/templates/${id}/edit`);

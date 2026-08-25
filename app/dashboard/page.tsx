@@ -1,13 +1,29 @@
 import type { Metadata } from "next";
+import { ClientAnnouncementBanner } from "@/components/dashboard/ClientAnnouncementBanner";
+import { MaintenanceNoticeBanner } from "@/components/dashboard/MaintenanceNoticeBanner";
+import { getPlatformSettings } from "@/lib/data/platform-settings";
+import { BRAND } from "@/lib/constants/brand";
 
 export const metadata: Metadata = {
   title: "Dashboard — WALIMATUL",
   description: "Manage your digital wedding invitations from your WALIMATUL dashboard.",
 };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const settings = await getPlatformSettings();
+  const supportPhone = settings.support_whatsapp?.display || BRAND.supportPhone;
+  const supportWhatsappUrl = settings.support_whatsapp?.phone
+    ? `https://wa.me/${settings.support_whatsapp.phone.replace(/[^0-9]/g, "")}`
+    : BRAND.supportWhatsappUrl;
+
   return (
     <div>
+      {/* System Maintenance Notice (if enabled) */}
+      <MaintenanceNoticeBanner />
+
+      {/* Active Admin Announcement Banner (if scheduled active) */}
+      <ClientAnnouncementBanner />
+
       {/* Welcome Banner */}
       <div
         className="rounded-[var(--radius-xl)] p-6 mb-8"
@@ -60,12 +76,12 @@ export default function DashboardPage() {
           Need help?
         </h2>
         <p className="text-sm text-[var(--text-muted)] font-ui mb-4 leading-relaxed">
-          Our team is available via WhatsApp to help you set up your invitation,
+          Our team is available via WhatsApp ({supportPhone}) to help you set up your invitation,
           answer questions about features, or assist with any issues.
         </p>
         <a
           id="link-whatsapp-support"
-          href="https://wa.me/60148412018"
+          href={supportWhatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] bg-[#25D366] text-white text-sm font-semibold font-ui hover:bg-[#20bb5a] transition-colors"

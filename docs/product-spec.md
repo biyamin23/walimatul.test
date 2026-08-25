@@ -173,9 +173,34 @@ Expiry Date: [expires_at]
 
 ---
 
+## Admin Operations Specification (Phase 11C)
+
+### 1. Platform Settings (`/admin/settings`)
+- Safe operational configuration without secrets in database.
+- Support WhatsApp: automated generation of international `https://wa.me/` links and custom UI display formatting.
+- Default Invitation Validity: sets default validity (in months) for newly created templates/packages without mutating historical snapshot records.
+- Gallery Photos Limit: configurable photo limit (default 12) to ensure guest invitation performance.
+- Manual Payment Instructions: plain text guidance for client checkout experience.
+- Maintenance Notice: toggleable system notice banner.
+
+### 2. Client Announcements (`/admin/announcements`)
+- Plain text communication engine targeting client dashboards (`/dashboard`).
+- Full lifecycle management: `draft`, `active`, `archived`.
+- Precision scheduling: optional start and end date-times evaluated against client local / server time.
+- Security & RLS: client reads strictly filtered to active scheduled announcements.
+
+### 3. Persistent Admin Audit Logs (`/admin/audit-logs`)
+- Append-only audit trail logging administrative changes across Settings, Announcements, Invitations, Payments, and Templates.
+- Interactive change inspector comparing before-and-after states.
+- Immutability guaranteed at database RLS level (no delete or edit access).
+
+---
+
 ## Future Plans
 
 - PDF receipt download
 - Approval email automation
 - Admin bulk review interface
+- Reports & CSV Export (Phase 11D)
+
 

@@ -3,7 +3,17 @@ import Image from "next/image";
 import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 import { BRAND } from "@/lib/constants/brand";
 
-export function PaymentQrCard() {
+export interface PaymentQrCardProps {
+  customInstructions?: string;
+  supportWhatsappUrl?: string;
+  supportWhatsappDisplay?: string;
+}
+
+export function PaymentQrCard({
+  customInstructions,
+  supportWhatsappUrl = BRAND.supportWhatsappUrl,
+  supportWhatsappDisplay = BRAND.supportPhone,
+}: PaymentQrCardProps) {
   return (
     <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-6 text-center">
       <div>
@@ -35,32 +45,38 @@ export function PaymentQrCard() {
         <h4 className="text-xs font-bold font-ui uppercase tracking-wider text-[var(--primary)]">
           Panduan Pembayaran:
         </h4>
-        <ol className="text-xs font-ui text-[var(--text)] space-y-2 list-decimal list-inside leading-relaxed">
-          <li>
-            Buka aplikasi <strong>Touch ’n Go eWallet</strong> dan tekan <strong>Scan</strong>.
-          </li>
-          <li>
-            Imbas kod QR di atas dan masukkan jumlah tepat <strong>{PAYMENT_CONFIG.amountDetailedDisplay}</strong>.
-          </li>
-          <li>
-            Selesaikan bayaran dan <strong>simpan tangkap layar (screenshot)</strong> resit transaksi.
-          </li>
-          <li>
-            Muat naik resit tersebut di bahagian <strong>Langkah 2</strong> di bawah.
-          </li>
-        </ol>
+        {customInstructions ? (
+          <p className="text-xs font-ui text-[var(--text)] leading-relaxed whitespace-pre-wrap">
+            {customInstructions}
+          </p>
+        ) : (
+          <ol className="text-xs font-ui text-[var(--text)] space-y-2 list-decimal list-inside leading-relaxed">
+            <li>
+              Buka aplikasi <strong>Touch ’n Go eWallet</strong> dan tekan <strong>Scan</strong>.
+            </li>
+            <li>
+              Imbas kod QR di atas dan masukkan jumlah tepat <strong>{PAYMENT_CONFIG.amountDetailedDisplay}</strong>.
+            </li>
+            <li>
+              Selesaikan bayaran dan <strong>simpan tangkap layar (screenshot)</strong> resit transaksi.
+            </li>
+            <li>
+              Muat naik resit tersebut di bahagian <strong>Langkah 2</strong> di bawah.
+            </li>
+          </ol>
+        )}
       </div>
 
       <div className="pt-1">
         <p className="text-[11px] text-[var(--text-muted)] font-ui">
           Perlukan bantuan? Hubungi khidmat sokongan WhatsApp kami di{" "}
           <a
-            href={BRAND.supportWhatsappUrl}
+            href={supportWhatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-[#25D366] font-semibold hover:underline"
           >
-            {BRAND.supportWhatsapp}
+            {supportWhatsappDisplay}
           </a>
         </p>
       </div>

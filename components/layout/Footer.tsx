@@ -1,14 +1,20 @@
 import Link from "next/link";
 import { BRAND, SITE_NAV } from "@/lib/constants/brand";
 import { Container } from "@/components/ui/Container";
+import { getPlatformSettings } from "@/lib/data/platform-settings";
 
 /**
  * WALIMATUL Footer
  *
  * Brand-consistent footer with support link, navigation, and legal.
  */
-export function Footer() {
+export async function Footer() {
   const year = new Date().getFullYear();
+  const settings = await getPlatformSettings();
+  const supportPhone = settings.support_whatsapp?.display || BRAND.supportPhone;
+  const supportWhatsappUrl = settings.support_whatsapp?.phone
+    ? `https://wa.me/${settings.support_whatsapp.phone.replace(/[^0-9]/g, "")}`
+    : BRAND.supportWhatsappUrl;
 
   return (
     <footer
@@ -36,14 +42,14 @@ export function Footer() {
               Create, publish, and share your special day with one link.
             </p>
             <a
-              href={BRAND.supportWhatsappUrl}
+              href={supportWhatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] focus-visible:outline-offset-2 rounded"
-              aria-label={`Contact WALIMATUL support on WhatsApp at ${BRAND.supportPhone}`}
+              aria-label={`Contact WALIMATUL support on WhatsApp at ${supportPhone}`}
             >
               <WhatsAppIcon />
-              <span>{BRAND.supportPhone}</span>
+              <span>{supportPhone}</span>
             </a>
           </div>
 

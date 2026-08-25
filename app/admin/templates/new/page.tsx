@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth/permissions";
+import { getRuntimePlatformSetting } from "@/lib/data/platform-settings";
 import { TemplateForm } from "@/components/admin/templates/TemplateForm";
 
 export const metadata: Metadata = {
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function NewTemplatePage() {
   await requireAdmin();
+  const defaultValidity = await getRuntimePlatformSetting("default_invitation_validity_months");
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -33,7 +35,7 @@ export default async function NewTemplatePage() {
       </div>
 
       {/* ── Form Component ── */}
-      <TemplateForm />
+      <TemplateForm defaultValidityMonths={defaultValidity} />
     </div>
   );
 }

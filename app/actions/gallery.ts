@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getRuntimePlatformSetting } from "@/lib/data/platform-settings";
 
 export interface ActionResponse<T = unknown> {
   success: boolean;
@@ -9,7 +10,7 @@ export interface ActionResponse<T = unknown> {
   error?: string;
 }
 
-const MAX_GALLERY_PHOTOS = 12;
+const DEFAULT_MAX_GALLERY_PHOTOS = 12;
 
 async function getAuthUserId(): Promise<string | null> {
   const supabase = await createClient();
@@ -24,7 +25,7 @@ async function getAuthUserId(): Promise<string | null> {
  * Add a new photo to the invitation's gallery.
  * Enforces:
  * - Ownership via invitations.user_id = auth.uid()
- * - Hard limit: 12 photos maximum per invitation
+ * - Dynamic limit from platform_settings (fallback: 12 photos maximum per invitation)
  */
 export async function addGalleryPhotoAction(
   invitationId: string,
@@ -49,7 +50,14 @@ export async function addGalleryPhotoAction(
     return { success: false, error: "Jemputan tidak dijumpai atau tiada akses." };
   }
 
-  // 2. Count existing photos to enforce 12 limit
+  // 2. Determine effective max gallery photos limit from runtime platform settings
+  const runtimeLimit = await getRuntimePlatformSetting("max_gallery_photos");
+  const effectiveMaxPhotos =
+    typeof runtimeLimit === "number" && runtimeLimit > 0
+      ? runtimeLimit
+      : DEFAULT_MAX_GALLERY_PHOTOS;
+
+  // 3. Count existing photos to enforce limit
   const { data: existingPhotos, error: countError } = await supabase
     .from("invitation_gallery")
     .select("id, sort_order")
@@ -60,10 +68,10 @@ export async function addGalleryPhotoAction(
     return { success: false, error: "Gagal menyemak bilangan gambar galeri." };
   }
 
-  if (existingPhotos && existingPhotos.length >= MAX_GALLERY_PHOTOS) {
+  if (existingPhotos && existingPhotos.length >= effectiveMaxPhotos) {
     return {
       success: false,
-      error: `Had maksimum ${MAX_GALLERY_PHOTOS} gambar telah dicapai. Sila padam gambar sedia ada terlebih dahulu.`,
+      error: `Had maksimum ${effectiveMaxPhotos} gambar telah dicapai. Sila padam gambar sedia ada terlebih dahulu.`,
     };
   }
 

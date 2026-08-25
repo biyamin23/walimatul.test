@@ -21,9 +21,10 @@ import type { AdminTemplateDetail } from "@/lib/data/admin-templates";
 
 export interface TemplateFormProps {
   initialTemplate?: AdminTemplateDetail | null;
+  defaultValidityMonths?: number;
 }
 
-export function TemplateForm({ initialTemplate }: TemplateFormProps) {
+export function TemplateForm({ initialTemplate, defaultValidityMonths }: TemplateFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -39,7 +40,7 @@ export function TemplateForm({ initialTemplate }: TemplateFormProps) {
   );
   const [price, setPrice] = useState<number>(initialTemplate?.price ?? 49);
   const [validityMonths, setValidityMonths] = useState<number>(
-    initialTemplate?.validity_months ?? 6
+    initialTemplate?.validity_months ?? defaultValidityMonths ?? 6
   );
   const [status, setStatus] = useState<"draft" | "active" | "archived">(
     initialTemplate?.status || "draft"

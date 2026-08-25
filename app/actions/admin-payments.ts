@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { recordAdminAudit } from "@/lib/admin/audit";
 import {
   approvePaymentSchema,
   rejectPaymentSchema,
@@ -75,6 +76,22 @@ export async function approvePaymentAction(
     };
   }
 
+  // Persistent admin audit log
+  await recordAdminAudit({
+    adminId: admin.userId,
+    action: "payment.approved",
+    entityType: "order",
+    entityId: orderId,
+    afterData: {
+      status: "paid",
+      receipt_number: result?.receipt_number,
+    },
+    metadata: {
+      order_id: orderId,
+      receipt_number: result?.receipt_number,
+    },
+  });
+
   revalidatePath("/admin/payments");
   revalidatePath(`/admin/payments/${orderId}`);
   revalidatePath("/dashboard/billing");
@@ -134,6 +151,22 @@ export async function rejectPaymentAction(
       error: rpcError.message || "Gagal menolak pembayaran. Sila cuba lagi.",
     };
   }
+
+  // Persistent admin audit log
+  await recordAdminAudit({
+    adminId: admin.userId,
+    action: "payment.rejected",
+    entityType: "order",
+    entityId: parsed.data.orderId,
+    afterData: {
+      status: "payment_rejected",
+      rejection_reason: parsed.data.reason,
+    },
+    metadata: {
+      order_id: parsed.data.orderId,
+      reason: parsed.data.reason,
+    },
+  });
 
   revalidatePath("/admin/payments");
   revalidatePath(`/admin/payments/${parsed.data.orderId}`);

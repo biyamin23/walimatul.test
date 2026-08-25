@@ -237,6 +237,56 @@ export interface RSVPSummary {
   total_pax: number;
 }
 
+export type AnnouncementStatus = "draft" | "active" | "archived";
+
+export type AnnouncementAudience = "clients";
+
+export interface PlatformSetting {
+  key: string;
+  value: unknown;
+  description: string | null;
+  updated_at: string;
+  updated_by: string | null;
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  message: string;
+  status: AnnouncementStatus;
+  audience: AnnouncementAudience;
+  starts_at: string | null;
+  ends_at: string | null;
+  created_by: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type AdminAuditAction =
+  | "settings.updated"
+  | "announcement.created"
+  | "announcement.updated"
+  | "announcement.archived"
+  | "invitation.expiry_extended"
+  | "payment.approved"
+  | "payment.rejected"
+  | "template.created"
+  | "template.updated"
+  | "template.archived";
+
+export interface AdminAuditLog {
+  id: string;
+  admin_id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  before_data: Record<string, unknown> | null;
+  after_data: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
 // ─── Database namespace (Supabase gen types compatible shape) ─────────────────
 
 export type Database = {
@@ -277,6 +327,21 @@ export type Database = {
         Insert: Omit<PaymentProof, "id" | "created_at"> & { id?: string; created_at?: string };
         Update: never; // payment proofs are immutable
       };
+      platform_settings: {
+        Row: PlatformSetting;
+        Insert: Omit<PlatformSetting, "updated_at"> & { updated_at?: string };
+        Update: Partial<Omit<PlatformSetting, "key">>;
+      };
+      announcements: {
+        Row: Announcement;
+        Insert: Omit<Announcement, "id" | "created_at" | "updated_at"> & { id?: string; created_at?: string; updated_at?: string };
+        Update: Partial<Omit<Announcement, "id">>;
+      };
+      admin_audit_logs: {
+        Row: AdminAuditLog;
+        Insert: Omit<AdminAuditLog, "id" | "created_at"> & { id?: string; created_at?: string };
+        Update: never; // audit logs are append-only
+      };
     };
     Enums: {
       user_role: UserRole;
@@ -284,6 +349,8 @@ export type Database = {
       rsvp_attendance: RSVPAttendance;
       order_payment_status: OrderPaymentStatus;
       payment_method: PaymentMethod;
+      announcement_status: AnnouncementStatus;
+      announcement_audience: AnnouncementAudience;
     };
   };
 };

@@ -202,9 +202,26 @@ Multi-tenant data isolation is enforced both at the database level via RLS and a
    - Central inspection: Overview, Client relation, Template relation, Commercial snapshot, Phase 10B Feature status, and RSVP summary metrics.
    - RSVP privacy preservation: guest phone numbers, emails, and private messages are isolated to invitation owners.
 
-3. **Controlled Expiry Extension Action (`extendInvitationExpiryAction`)**:
-   - PostgreSQL security definer RPC `public.admin_extend_invitation_expiry`.
-   - Enforces authenticated admin authorization and updates `invitations.expires_at` based on presets (+1, +3, +6, +12 months) or custom date.
-   - Extension preserves purchased duration by calculating from existing `expires_at`.
+
+---
+
+## Phase 11C — Admin Settings, Announcements & Audit Trail Architecture
+
+1. **Platform Settings (`/admin/settings`, `lib/data/platform-settings.ts`)**:
+   - Centralized `platform_settings` table (key, value JSONB, updated_at, updated_by) accessible directly by Admins only.
+   - Constrained `SECURITY DEFINER` RPC `public.get_runtime_platform_settings()` returning allowlisted safe operational values only (`support_whatsapp`, `default_invitation_validity_months`, `max_gallery_photos`, `manual_payment_instructions`, `maintenance_notice`).
+   - Strict runtime fallback pattern ensures zero platform downtime if settings rows are unpopulated.
+   - Secrets remain strictly in server environment variables.
+
+2. **Announcements Engine (`/admin/announcements`, `/dashboard`, `lib/data/admin-announcements.ts`)**:
+   - Schema: `announcements` with title, message, status (`draft`, `active`, `archived`), audience (`clients`), and scheduled timestamps (`starts_at`, `ends_at`).
+   - Public/Client RLS restricts client reads to `status = 'active'` within valid schedule windows.
+   - Non-intrusive branded banner automatically rendered on `/dashboard`.
+
+3. **Persistent Admin Audit Trail (`/admin/audit-logs`, `lib/admin/audit.ts`)**:
+   - Schema: `admin_audit_logs` (admin_id, action, entity_type, entity_id, before_data, after_data, metadata, created_at).
+   - Append-only immutability enforced by RLS (SELECT and INSERT only for admins; no UPDATE or DELETE).
+   - Automated payload sanitization recursively strips passwords, tokens, auth secrets, and keys.
+   - Action integrations (Settings, Announcements, Templates, Expiry Extension, Payment Approval/Rejection) operate as **best-effort post-mutation audits** following successful business actions to ensure core platform and financial transactions are never blocked.
 
 

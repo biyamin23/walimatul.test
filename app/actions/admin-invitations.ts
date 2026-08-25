@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/permissions";
+import { recordAdminAudit } from "@/lib/admin/audit";
 
 export interface ExtendExpiryResponse {
   success: boolean;
@@ -33,7 +34,7 @@ export async function extendInvitationExpiryAction(payload: {
     // 2. Fetch current invitation to determine base expiration
     const { data: invitation, error: fetchError } = await supabase
       .from("invitations")
-      .select("id, status, expires_at, published_at")
+      .select("id, status, expires_at, published_at, title, slug")
       .eq("id", invitationId)
       .single();
 
@@ -94,14 +95,25 @@ export async function extendInvitationExpiryAction(payload: {
       };
     }
 
-    // 5. Safe server audit log
-    console.log("[AdminAudit] Extended invitation expiry:", {
+    // 5. Persistent admin audit log
+    await recordAdminAudit({
       adminId: user.userId,
-      adminEmail: user.email,
-      invitationId,
-      oldExpiresAt: invitation.expires_at,
-      newExpiresAt: newExpiresISO,
-      timestamp: new Date().toISOString(),
+      action: "invitation.expiry_extended",
+      entityType: "invitation",
+      entityId: invitationId,
+      beforeData: {
+        expires_at: invitation.expires_at,
+        status: invitation.status,
+      },
+      afterData: {
+        expires_at: newExpiresISO,
+        status: invitation.status === "expired" ? "published" : invitation.status,
+      },
+      metadata: {
+        extension_months: extensionMonths || null,
+        title: invitation.title,
+        slug: invitation.slug,
+      },
     });
 
     // 6. Revalidate cache
