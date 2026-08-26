@@ -224,4 +224,31 @@ Multi-tenant data isolation is enforced both at the database level via RLS and a
    - Automated payload sanitization recursively strips passwords, tokens, auth secrets, and keys.
    - Action integrations (Settings, Announcements, Templates, Expiry Extension, Payment Approval/Rejection) operate as **best-effort post-mutation audits** following successful business actions to ensure core platform and financial transactions are never blocked.
 
+---
+
+## Phase 11D — Reports, CSV Export & Advanced Analytics Architecture
+
+1. **Reports Overview & Advanced Analytics (`/admin/reports`, `lib/data/admin-reports.ts`)**:
+   - Timezone: Evaluated using `Asia/Kuala_Lumpur` (UTC+8) day/month boundaries.
+   - Presets: `7d` (daily), `30d` (daily), `90d` (weekly), `12m` (monthly), `all` (monthly), and `custom` (`from` & `to` in `YYYY-MM-DD`).
+   - Revenue Source of Truth: Strictly calculates paid revenue from `orders.amount` where `payment_status = 'paid'` (historical order snapshots). Never calculates revenue from current `templates.price`.
+   - Summary KPIs: Revenue, Paid Orders, New Users, New Invitations, Published Invitations, and Average Order Value (AOV = `revenue / paidOrders`).
+   - Prior Period Comparison: Compares equivalent prior window and calculates percentage difference (`+12.5%`, `-4.8%`, or `—` if no valid comparison denominator exists).
+   - Time-series Bucketing: Continuous date interval generation with zero-filling for missing dates.
+   - Mutually-exclusive Lifetime Status: Draf, Diterbitkan, and Tamat Tempoh (evaluating `expires_at < now()`).
+
+2. **CSV Export Engine & Security (`/admin/exports`, `lib/admin/csv.ts`, `app/admin/exports/[type]/route.ts`)**:
+   - Endpoints:
+     - `/admin/exports/users`: Client profiles, registration dates, invitation counts, paid order counts, and lifetime spend.
+     - `/admin/exports/invitations`: Invitations, couple names, slug, template name, wedding date, and lifecycle status.
+     - `/admin/exports/orders`: Orders, client IDs, amounts, validity months, payment statuses, receipt numbers, and review timestamps.
+     - `/admin/exports/rsvps`: Privacy-safe summary counts (couple, total responses, attending, not attending, total pax, public wishes count).
+     - `/admin/exports/audit-logs`: Summary audit trail records.
+     - `/admin/exports/templates`: Template usage, paid orders count, revenue, and revenue share.
+   - UTF-8 with BOM: Prefixes `\uFEFF` for native Malay text rendering in spreadsheet tools.
+   - Formula Injection Mitigation: Sanitizes cells starting with `=`, `+`, `-`, `@`, `\t`, `\r` by prefixing with `'`.
+   - Authorization: Verified server-side admin authentication via `requireAdmin()`.
+   - Row Cap: Hard ceiling of 10,000 rows per export stream.
+   - Export Audit: Every export execution logs a best-effort `export.*` action in `public.admin_audit_logs`.
+
 

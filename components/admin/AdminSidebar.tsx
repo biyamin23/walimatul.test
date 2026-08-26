@@ -83,6 +83,24 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: "Laporan",
+    href: "/admin/reports",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M1.5 13.5h13M3 10.5l3-4 3 2.5 4-5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    label: "Eksport",
+    href: "/admin/exports",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M13.5 10.5v3a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-3M8 2.5v8M5 7.5l3 3 3-3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
     label: "Log Audit",
     href: "/admin/audit-logs",
     icon: (
