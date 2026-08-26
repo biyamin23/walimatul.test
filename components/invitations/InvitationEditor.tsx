@@ -9,18 +9,24 @@ import { HybridEditorialTemplate } from "@/templates/hybrid-editorial/Template";
 import { InvitationExperience } from "./InvitationExperience";
 import { updateOwnInvitationAction } from "@/app/actions/invitations";
 import { extractYouTubeVideoId } from "@/lib/youtube";
+import { InvitationLifecyclePanel } from "./InvitationLifecyclePanel";
 import type { InvitationWithTemplate } from "@/types/database";
 import type { UpdateInvitationInput } from "@/lib/validation/invitation";
 import type { InvitationTemplateData, GalleryItem } from "@/templates/types";
+import type { ClientInvitationLifecycle } from "@/types/client-lifecycle";
 
 interface InvitationEditorProps {
   invitation: InvitationWithTemplate;
   initialMode?: "edit" | "preview";
+  lifecycle?: ClientInvitationLifecycle;
+  supportWhatsappUrl?: string;
 }
 
 export function InvitationEditor({
   invitation,
   initialMode = "edit",
+  lifecycle,
+  supportWhatsappUrl,
 }: InvitationEditorProps) {
   // ── Form State ──
   const [formValues, setFormValues] = useState<UpdateInvitationInput>({
@@ -275,6 +281,15 @@ export function InvitationEditor({
         <div className="hidden lg:grid lg:grid-cols-12 gap-8 items-start min-w-0 w-full">
           {/* Left: Scrollable Form */}
           <div className="lg:col-span-5 min-w-0 space-y-6 pb-24">
+            {lifecycle && (
+              <InvitationLifecyclePanel
+                lifecycle={lifecycle}
+                invitationId={invitation.id}
+                slug={formValues.slug || invitation.slug}
+                supportWhatsappUrl={supportWhatsappUrl}
+              />
+            )}
+
             <div className="bg-[var(--surface-warm)] p-4 rounded-xl border border-[var(--border-soft)] text-xs font-ui text-[var(--text-muted)] leading-relaxed">
               <p>
                 Perubahan pada borang akan dikemaskini secara langsung pada
@@ -348,6 +363,14 @@ export function InvitationEditor({
         <div className="lg:hidden w-full max-w-full min-w-0">
           {activeTab === "edit" ? (
             <div className="space-y-6 pb-24 w-full max-w-full min-w-0">
+              {lifecycle && (
+                <InvitationLifecyclePanel
+                  lifecycle={lifecycle}
+                  invitationId={invitation.id}
+                  slug={formValues.slug || invitation.slug}
+                  supportWhatsappUrl={supportWhatsappUrl}
+                />
+              )}
               {/* Note: Duplicate save status indicator removed. Single indicator is in top bar. */}
               <InvitationForm
                 invitationId={invitation.id}

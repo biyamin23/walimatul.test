@@ -251,4 +251,36 @@ Multi-tenant data isolation is enforced both at the database level via RLS and a
    - Row Cap: Hard ceiling of 10,000 rows per export stream.
    - Export Audit: Every export execution logs a best-effort `export.*` action in `public.admin_audit_logs`.
 
+---
+
+## Phase 12A + 12B — Client Dashboard Upgrade & Invitation Lifecycle UX Architecture
+
+1. **Derived Client Lifecycle Layer (`lib/invitations/client-lifecycle.ts`, `types/client-lifecycle.ts`)**:
+   - **Zero Schema Mutations**: Derives client-friendly stages in memory without adding redundant database enum values.
+   - **Stages**: `draft`, `awaiting_payment`, `under_review`, `payment_rejected`, `published`, `expired`, `archived`.
+   - **Priority Logic**:
+     1. `expired`: `invitation.status === 'expired'` OR `expires_at <= now()`.
+     2. `archived`: `invitation.status === 'archived'`.
+     3. `published`: `status === 'published'` and not expired.
+     4. `payment_rejected`: latest order is `payment_rejected`.
+     5. `under_review`: latest order is `pending_verification` or (`paid` before publish triggers).
+     6. `awaiting_payment`: latest order is `pending_payment` or details & slug are complete.
+     7. `draft`: required details or slug incomplete.
+   - **5-Step Deterministic Timeline**:
+     1. `Butiran` (Couple & Event details complete)
+     2. `Pautan URL` (Unique slug chosen)
+     3. `Bayaran` (Order created / Proof uploaded)
+     4. `Semakan` (Admin review)
+     5. `Diterbitkan` (Live & active)
+
+2. **Client Dashboard Architecture (`/dashboard`, `lib/data/client-dashboard.ts`)**:
+   - **Explicit User Scoping**: Queries explicitly enforce `user_id = auth.uid()` in addition to Supabase RLS.
+   - **Anti-N+1 Batching**: Batches `templates` and `orders` by sets of IDs.
+   - **Summary Metrics**: `Jumlah Jemputan`, `Jemputan Aktif`, `Draf / Dalam Proses`, `Tamat Tempoh` (with `Dalam Semakan` indicator).
+   - **Prioritized Next-Action Engine**: Selects the single highest-priority task across all client invitations (`payment_rejected` > `awaiting_payment` > `draft` > `under_review` > `expired` > `published`).
+   - **Contextual Cards & Actions**: Client invitation cards adapt action buttons based on exact lifecycle stage (`Lihat`, `Edit`, `RSVP`, `Buat Bayaran`, `Semak Status`, `Hubungi Sokongan`).
+   - **Expiry Awareness**: Tiered warnings ($\le 30$ days subtle notice, $\le 7$ days urgent alert, expired support CTA).
+   - **New-User Onboarding**: 3-step welcoming onboarding flow for clients with 0 invitations.
+
+
 
