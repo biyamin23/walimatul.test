@@ -6,6 +6,7 @@ import { PendingLink } from "@/components/ui/PendingLink";
 import { formatWeddingDate } from "@/lib/templates/formatters";
 import { deleteOwnDraftAction } from "@/app/actions/invitations";
 import { InvitationLifecycleTimeline } from "@/components/dashboard/InvitationLifecycleTimeline";
+import { InvitationQrModal } from "@/components/invitations/InvitationQrModal";
 import type { ClientInvitationWithDetails } from "@/types/client-lifecycle";
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
 export function ClientInvitationCard({ data, supportWhatsappUrl = "https://wa.me/601156281691" }: Props) {
   const { invitation, template, latestOrder, lifecycle } = data;
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -50,117 +52,125 @@ export function ClientInvitationCard({ data, supportWhatsappUrl = "https://wa.me
   };
 
   return (
-    <div className="rounded-3xl bg-[var(--surface)] border border-[var(--border)] shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden">
-      {/* ── Top Section ── */}
-      <div className="p-5 sm:p-6 space-y-4">
-        {/* Top Header: Badge & Template */}
-        <div className="flex items-center justify-between gap-2">
-          <span
-            className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold font-ui uppercase border ${
-              badgeStyles[lifecycle.badgeVariant] || badgeStyles.default
-            }`}
-          >
-            {lifecycle.badgeLabel}
-          </span>
-          <span className="text-xs font-semibold font-ui text-[var(--gold)] uppercase tracking-wide truncate">
-            {templateName}
-          </span>
-        </div>
-
-        {/* Couple Title */}
-        <div>
-          <h3 className="text-xl sm:text-2xl font-bold font-display text-[var(--text)] truncate">
-            {coupleDisplay}
-          </h3>
-          <div className="flex flex-wrap items-center gap-3 text-xs font-ui text-[var(--text-muted)] mt-1.5">
-            <span className="inline-flex items-center gap-1">
-              📅 {weddingDateDisplay}
-            </span>
-            {invitation.slug && (
-              <span className="inline-flex items-center gap-1 font-mono text-[11px] text-[var(--text-subtle)]">
-                🔗 walimatul.my/{invitation.slug}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Expiry / Stage Notice Alert */}
-        {lifecycle.expiry.warningLevel === "urgent" && (
-          <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-ui flex items-center justify-between gap-2">
-            <span className="font-semibold">⚠️ {lifecycle.expiry.message}</span>
-            <a
-              href={supportWhatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11px] font-bold text-rose-700 hover:underline shrink-0"
+    <>
+      <div className="rounded-3xl bg-[var(--surface)] border border-[var(--border)] shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden">
+        {/* ── Top Section ── */}
+        <div className="p-5 sm:p-6 space-y-4">
+          {/* Top Header: Badge & Template */}
+          <div className="flex items-center justify-between gap-2">
+            <span
+              className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold font-ui uppercase border ${
+                badgeStyles[lifecycle.badgeVariant] || badgeStyles.default
+              }`}
             >
-              Lanjutkan →
-            </a>
-          </div>
-        )}
-
-        {lifecycle.expiry.warningLevel === "subtle" && (
-          <div className="p-2.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-amber-900 text-[11px] font-ui flex items-center justify-between gap-2">
-            <span>ℹ️ {lifecycle.expiry.message}</span>
-          </div>
-        )}
-
-        {lifecycle.stage === "payment_rejected" && (
-          <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-ui space-y-1">
-            <span className="font-bold block">Bayaran Ditolak:</span>
-            <p className="text-[11px] leading-relaxed">
-              {latestOrder?.rejection_reason ||
-                "Bukti bayaran tidak dapat disahkan. Sila muat naik resit yang sah."}
-            </p>
-          </div>
-        )}
-
-        {lifecycle.stage === "under_review" && (
-          <div className="p-2.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-ui">
-            ⏳ Resit pembayaran sedang disemak oleh Admin.
-          </div>
-        )}
-
-        {/* Lifecycle Progress Timeline */}
-        <div className="pt-2">
-          <div className="flex items-center justify-between text-[11px] font-ui font-semibold text-[var(--text-muted)] mb-2">
-            <span>Kemajuan Jemputan</span>
-            <span>
-              Langkah {lifecycle.progressStep} daripada {lifecycle.totalSteps}
+              {lifecycle.badgeLabel}
+            </span>
+            <span className="text-xs font-semibold font-ui text-[var(--gold)] uppercase tracking-wide truncate">
+              {templateName}
             </span>
           </div>
-          <InvitationLifecycleTimeline timeline={lifecycle.timeline} compact />
-        </div>
-      </div>
 
-      {/* ── Footer Actions ── */}
-      <div className="px-5 py-3.5 bg-[var(--surface-warm)] border-t border-[var(--border-soft)] flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          {lifecycle.isPublished ? (
-            <>
-              <Link
-                href={`/${invitation.slug || ""}`}
+          {/* Couple Title */}
+          <div>
+            <h3 className="text-xl sm:text-2xl font-bold font-display text-[var(--text)] truncate">
+              {coupleDisplay}
+            </h3>
+            <div className="flex flex-wrap items-center gap-3 text-xs font-ui text-[var(--text-muted)] mt-1.5">
+              <span className="inline-flex items-center gap-1">
+                📅 {weddingDateDisplay}
+              </span>
+              {invitation.slug && (
+                <span className="inline-flex items-center gap-1 font-mono text-[11px] text-[var(--text-subtle)]">
+                  🔗 walimatul.my/{invitation.slug}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Expiry / Stage Notice Alert */}
+          {lifecycle.expiry.warningLevel === "urgent" && (
+            <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-ui flex items-center justify-between gap-2">
+              <span className="font-semibold">⚠️ {lifecycle.expiry.message}</span>
+              <a
+                href={supportWhatsappUrl}
                 target="_blank"
-                className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors shadow-2xs"
+                rel="noopener noreferrer"
+                className="text-[11px] font-bold text-rose-700 hover:underline shrink-0"
               >
-                Lihat Jemputan ↗
-              </Link>
-              <PendingLink
-                href={`/dashboard/invitations/${invitation.id}/edit`}
-                pendingText="Membuka..."
-                className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors"
-              >
-                Edit
-              </PendingLink>
-              <PendingLink
-                href={`/dashboard/invitations/${invitation.id}/rsvp`}
-                pendingText="Membuka..."
-                className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors"
-              >
-                RSVP
-              </PendingLink>
-            </>
-          ) : lifecycle.isExpired ? (
+                Lanjutkan →
+              </a>
+            </div>
+          )}
+
+          {lifecycle.expiry.warningLevel === "subtle" && (
+            <div className="p-2.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-amber-900 text-[11px] font-ui flex items-center justify-between gap-2">
+              <span>ℹ️ {lifecycle.expiry.message}</span>
+            </div>
+          )}
+
+          {lifecycle.stage === "payment_rejected" && (
+            <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-ui space-y-1">
+              <span className="font-bold block">Bayaran Ditolak:</span>
+              <p className="text-[11px] leading-relaxed">
+                {latestOrder?.rejection_reason ||
+                  "Bukti bayaran tidak dapat disahkan. Sila muat naik resit yang sah."}
+              </p>
+            </div>
+          )}
+
+          {lifecycle.stage === "under_review" && (
+            <div className="p-2.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-ui">
+              ⏳ Resit pembayaran sedang disemak oleh Admin.
+            </div>
+          )}
+
+          {/* Lifecycle Progress Timeline */}
+          <div className="pt-2">
+            <div className="flex items-center justify-between text-[11px] font-ui font-semibold text-[var(--text-muted)] mb-2">
+              <span>Kemajuan Jemputan</span>
+              <span>
+                Langkah {lifecycle.progressStep} daripada {lifecycle.totalSteps}
+              </span>
+            </div>
+            <InvitationLifecycleTimeline timeline={lifecycle.timeline} compact />
+          </div>
+        </div>
+
+        {/* ── Footer Actions ── */}
+        <div className="px-5 py-3.5 bg-[var(--surface-warm)] border-t border-[var(--border-soft)] flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {lifecycle.isPublished ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowShareModal(true)}
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold font-ui hover:bg-emerald-700 transition-colors shadow-2xs"
+                >
+                  <span>Kongsi 📱</span>
+                </button>
+                <Link
+                  href={`/${invitation.slug || ""}`}
+                  target="_blank"
+                  className="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors shadow-2xs"
+                >
+                  Lihat ↗
+                </Link>
+                <PendingLink
+                  href={`/dashboard/invitations/${invitation.id}/edit`}
+                  pendingText="Membuka..."
+                  className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors"
+                >
+                  Edit
+                </PendingLink>
+                <PendingLink
+                  href={`/dashboard/invitations/${invitation.id}/rsvp`}
+                  pendingText="Membuka..."
+                  className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors"
+                >
+                  RSVP
+                </PendingLink>
+              </>
+            ) : lifecycle.isExpired ? (
             <>
               <a
                 href={supportWhatsappUrl}
@@ -279,5 +289,16 @@ export function ClientInvitationCard({ data, supportWhatsappUrl = "https://wa.me
         )}
       </div>
     </div>
-  );
+
+    {/* ── Share & QR Modal ── */}
+    {invitation.slug && (
+      <InvitationQrModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        slug={invitation.slug}
+        coupleDisplay={coupleDisplay}
+      />
+    )}
+  </>
+);
 }

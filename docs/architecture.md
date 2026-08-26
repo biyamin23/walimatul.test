@@ -282,5 +282,25 @@ Multi-tenant data isolation is enforced both at the database level via RLS and a
    - **Expiry Awareness**: Tiered warnings ($\le 30$ days subtle notice, $\le 7$ days urgent alert, expired support CTA).
    - **New-User Onboarding**: 3-step welcoming onboarding flow for clients with 0 invitations.
 
+---
+
+## Phase 12C — Share Experience & QR Code Architecture
+
+1. **Share Utility Layer (`lib/invitations/share.ts`)**:
+   - **Canonical Public URL**: Derived using `getSiteUrl() + '/' + slug` (`https://walimatul.my/{slug}`).
+   - **Default WhatsApp Message**: Structured, respectful Malay invitation with couple names and public URL.
+   - **WhatsApp URL Generation**: Safe URI encoding via `https://wa.me/?text=${encodeURIComponent(message)}`.
+   - **Sanitized QR Filename**: Deterministic format `walimatul-${slug}-qr.png`.
+
+2. **On-Demand Client-Side QR Generation (`components/invitations/InvitationQrCode.tsx`, `InvitationQrModal.tsx`)**:
+   - **Zero Database / Storage Footprint**: QR codes are generated client-side from the slug on demand; no QR files are stored in Supabase Storage or database tables.
+   - **High Contrast & Scan Reliability**: Dark `#1A2E26` foreground on `#FFFFFF` background with Error Correction Level `'M'` and 2-module margin.
+   - **High-Resolution PNG Download**: Generates 1024x1024 PNG data URL directly on client using `qrcode` library.
+   - **Modal & Panel Integration**:
+     - `ClientInvitationCard`: Compact *"Kongsi 📱"* action opening `InvitationQrModal`.
+     - `InvitationLifecyclePanel`: Full `InvitationSharePanel` rendered when published and active.
+     - Strict Scope: Only visible when `status === 'published'`, `slug` exists, and not expired.
+
+
 
 

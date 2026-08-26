@@ -288,6 +288,10 @@ export function InvitationEditor({
                 lifecycle={lifecycle}
                 invitationId={invitation.id}
                 slug={formValues.slug || invitation.slug}
+                groomName={formValues.groomName || invitation.groom_name}
+                groomShortName={formValues.groomShortName || invitation.groom_short_name}
+                brideName={formValues.brideName || invitation.bride_name}
+                brideShortName={formValues.brideShortName || invitation.bride_short_name}
                 supportWhatsappUrl={supportWhatsappUrl}
               />
             )}
@@ -370,6 +374,10 @@ export function InvitationEditor({
                   lifecycle={lifecycle}
                   invitationId={invitation.id}
                   slug={formValues.slug || invitation.slug}
+                  groomName={formValues.groomName || invitation.groom_name}
+                  groomShortName={formValues.groomShortName || invitation.groom_short_name}
+                  brideName={formValues.brideName || invitation.bride_name}
+                  brideShortName={formValues.brideShortName || invitation.bride_short_name}
                   supportWhatsappUrl={supportWhatsappUrl}
                 />
               )}
