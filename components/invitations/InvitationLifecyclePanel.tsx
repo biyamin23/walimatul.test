@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { PendingLink } from "@/components/ui/PendingLink";
 import { InvitationLifecycleTimeline } from "@/components/dashboard/InvitationLifecycleTimeline";
 import type { ClientInvitationLifecycle } from "@/types/client-lifecycle";
 
@@ -60,7 +61,7 @@ export function InvitationLifecyclePanel({
               className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors shadow-2xs"
             >
               <span>Lihat Jemputan</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                 <polyline points="15 3 21 3 21 9" />
                 <line x1="10" y1="14" x2="21" y2="3" />
@@ -69,16 +70,17 @@ export function InvitationLifecyclePanel({
           )}
 
           {lifecycle.stage === "awaiting_payment" || lifecycle.stage === "payment_rejected" ? (
-            <Link
+            <PendingLink
               href={`/dashboard/invitations/${invitationId}/payment`}
+              pendingText="Membuka..."
               className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors shadow-2xs"
             >
               <span>{lifecycle.nextAction.ctaText}</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <line x1="5" y1="12" x2="19" y2="12" />
                 <polyline points="12 5 19 12 12 19" />
               </svg>
-            </Link>
+            </PendingLink>
           ) : lifecycle.isExpired ? (
             <a
               href={supportWhatsappUrl}
@@ -87,19 +89,20 @@ export function InvitationLifecyclePanel({
               className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-semibold font-ui hover:bg-amber-700 transition-colors shadow-2xs"
             >
               <span>Hubungi Sokongan</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                 <polyline points="15 3 21 3 21 9" />
                 <line x1="10" y1="14" x2="21" y2="3" />
               </svg>
             </a>
           ) : (
-            <Link
+            <PendingLink
               href={`/dashboard/invitations/${invitationId}/rsvp`}
+              pendingText="Membuka..."
               className="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-[var(--surface-warm)] border border-[var(--border)] text-[var(--text)] text-xs font-semibold font-ui hover:border-[var(--primary)] transition-colors"
             >
               RSVP Tracker
-            </Link>
+            </PendingLink>
           )}
         </div>
       </div>

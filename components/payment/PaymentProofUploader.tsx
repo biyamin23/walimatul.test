@@ -27,10 +27,13 @@ export function PaymentProofUploader({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [transactionRef, setTransactionRef] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
+  const [submitPhase, setSubmitPhase] = useState<"idle" | "uploading" | "submitting" | "success">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const isBusy = submitPhase !== "idle";
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    if (isBusy) return;
     setErrorMessage(null);
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -61,6 +64,7 @@ export function PaymentProofUploader({
   }
 
   function handleRemoveFile() {
+    if (isBusy) return;
     setSelectedFile(null);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
@@ -73,14 +77,14 @@ export function PaymentProofUploader({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (isUploading) return;
+    if (isBusy) return;
 
     if (!selectedFile) {
       setErrorMessage("Sila pilih fail bukti pembayaran terlebih dahulu.");
       return;
     }
 
-    setIsUploading(true);
+    setSubmitPhase("uploading");
     setErrorMessage(null);
 
     // Timeout guard (30 seconds) to prevent infinite pending state
@@ -120,6 +124,7 @@ export function PaymentProofUploader({
         }
 
         // 3. Submit proof via Server Action
+        setSubmitPhase("submitting");
         const result = await submitPaymentProofAction({
           orderId,
           storagePath,
@@ -139,7 +144,7 @@ export function PaymentProofUploader({
       ]);
 
       // 4. Immediately notify parent component and trigger refresh
-      setIsUploading(false);
+      setSubmitPhase("success");
       if (onSuccess) {
         onSuccess({
           storagePath,
@@ -154,7 +159,7 @@ export function PaymentProofUploader({
           ? err.message
           : "Ralat tidak dijangka berlaku. Sila cuba lagi.";
       setErrorMessage(msg);
-      setIsUploading(false);
+      setSubmitPhase("idle");
     }
   }
 
@@ -279,10 +284,11 @@ export function PaymentProofUploader({
           id="transaction-ref"
           type="text"
           maxLength={100}
+          disabled={isBusy}
           value={transactionRef}
           onChange={(e) => setTransactionRef(e.target.value)}
           placeholder="cth. TNG-1234567890"
-          className="w-full px-3.5 py-2.5 min-h-[48px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)]"
+          className="w-full px-3.5 py-2.5 min-h-[48px] rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm font-ui text-[var(--text)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all placeholder:text-[var(--text-subtle)] disabled:opacity-60 disabled:bg-gray-50"
         />
         <p className="text-[11px] font-ui text-[var(--text-subtle)]">
           Memudahkan pasukan kami memadankan transaksi anda sekiranya terdapat pertanyaan.
@@ -293,16 +299,33 @@ export function PaymentProofUploader({
       <div className="pt-2">
         <button
           type="submit"
-          disabled={!selectedFile || isUploading}
+          disabled={!selectedFile || isBusy}
+          aria-busy={isBusy}
           className="w-full py-3.5 rounded-full bg-[var(--primary)] text-white font-ui text-xs font-semibold tracking-wider uppercase hover:bg-[var(--primary-hover)] transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {isUploading ? (
+          {submitPhase === "uploading" ? (
             <>
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              Memuat Naik &amp; Menghantar...
+              Memuat Naik Resit...
+            </>
+          ) : submitPhase === "submitting" ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              Menghantar untuk Pengesahan...
+            </>
+          ) : submitPhase === "success" ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              Berjaya Dihantar...
             </>
           ) : (
             "Hantar untuk Pengesahan"

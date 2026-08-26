@@ -1,6 +1,6 @@
 import React from "react";
-import Link from "next/link";
 import type { ClientNextActionItem } from "@/types/client-lifecycle";
+import { PendingLink } from "@/components/ui/PendingLink";
 
 interface Props {
   action: ClientNextActionItem;
@@ -79,33 +79,35 @@ export function ClientNextAction({ action }: Props) {
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[var(--primary)] text-white text-xs sm:text-sm font-bold font-ui hover:bg-[var(--primary-hover)] transition-all shadow-xs"
             >
               <span>{action.ctaText}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                 <polyline points="15 3 21 3 21 9" />
                 <line x1="10" y1="14" x2="21" y2="3" />
               </svg>
             </a>
           ) : (
-            <Link
+            <PendingLink
               id="btn-next-action"
               href={action.ctaHref}
+              pendingText="Membuka..."
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[var(--primary)] text-white text-xs sm:text-sm font-bold font-ui hover:bg-[var(--primary-hover)] transition-all shadow-xs"
             >
               <span>{action.ctaText}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <line x1="5" y1="12" x2="19" y2="12" />
                 <polyline points="12 5 19 12 12 19" />
               </svg>
-            </Link>
+            </PendingLink>
           )}
 
           {action.stage !== "published" && (
-            <Link
+            <PendingLink
               href={`/dashboard/invitations/${action.invitationId}/edit`}
+              pendingText="Membuka Editor..."
               className="inline-flex items-center justify-center px-4 py-3 rounded-2xl bg-white/80 border border-[var(--border)] text-[var(--text)] text-xs sm:text-sm font-semibold font-ui hover:bg-white transition-colors"
             >
               Buka Editor
-            </Link>
+            </PendingLink>
           )}
         </div>
       </div>

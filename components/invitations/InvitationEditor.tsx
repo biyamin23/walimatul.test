@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { PendingLink } from "@/components/ui/PendingLink";
 import { InvitationForm } from "./InvitationForm";
 import { SaveStatusIndicator, type SaveStatus } from "./SaveStatusIndicator";
 import { getTemplateComponent } from "@/templates/registry";
@@ -238,9 +239,10 @@ export function InvitationEditor({
                 type="button"
                 onClick={handleManualSave}
                 disabled={saveStatus === "saving"}
+                aria-busy={saveStatus === "saving"}
                 className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 rounded-full bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] active:scale-95 transition-all shadow-xs disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
               >
-                {saveStatus === "saving" ? "Saving..." : "Save Draft"}
+                {saveStatus === "saving" ? "Menyimpan..." : "Simpan Draf"}
               </button>
             </div>
           </div>
@@ -394,15 +396,16 @@ export function InvitationEditor({
                     Selesai mengisi butiran? Teruskan ke pembayaran Touch ’n Go eWallet (RM{invitation.template?.price ?? 49}) untuk mengaktifkan jemputan rasmi anda.
                   </p>
                 </div>
-                <Link
+                <PendingLink
                   href={`/dashboard/invitations/${invitation.id}/payment`}
+                  pendingText="Membuka Pembayaran..."
                   className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-full bg-[var(--primary)] text-white font-ui text-xs font-semibold hover:bg-[var(--primary-hover)] transition-all shadow-sm"
                 >
                   <span>Teruskan ke Pembayaran (RM{invitation.template?.price ?? 49})</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
-                </Link>
+                </PendingLink>
               </div>
             </div>
           ) : (

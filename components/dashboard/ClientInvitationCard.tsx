@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
+import { PendingLink } from "@/components/ui/PendingLink";
 import { formatWeddingDate } from "@/lib/templates/formatters";
 import { deleteOwnDraftAction } from "@/app/actions/invitations";
 import { InvitationLifecycleTimeline } from "@/components/dashboard/InvitationLifecycleTimeline";
@@ -144,18 +145,20 @@ export function ClientInvitationCard({ data, supportWhatsappUrl = "https://wa.me
               >
                 Lihat Jemputan ↗
               </Link>
-              <Link
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/edit`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors"
               >
                 Edit
-              </Link>
-              <Link
+              </PendingLink>
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/rsvp`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors"
               >
                 RSVP
-              </Link>
+              </PendingLink>
             </>
           ) : lifecycle.isExpired ? (
             <>
@@ -167,63 +170,71 @@ export function ClientInvitationCard({ data, supportWhatsappUrl = "https://wa.me
               >
                 Hubungi Sokongan ↗
               </a>
-              <Link
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/edit`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors"
               >
                 Lihat Draf
-              </Link>
+              </PendingLink>
             </>
           ) : lifecycle.stage === "awaiting_payment" || lifecycle.stage === "payment_rejected" ? (
             <>
-              <Link
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/payment`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors shadow-2xs"
               >
                 Buat Bayaran
-              </Link>
-              <Link
+              </PendingLink>
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/edit`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors"
               >
                 Edit
-              </Link>
-              <Link
+              </PendingLink>
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/edit?mode=preview`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors"
               >
                 Preview
-              </Link>
+              </PendingLink>
             </>
           ) : lifecycle.stage === "under_review" ? (
             <>
-              <Link
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/payment`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold font-ui hover:bg-blue-700 transition-colors shadow-2xs"
               >
                 Semak Status Bayaran
-              </Link>
-              <Link
+              </PendingLink>
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/edit`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors"
               >
                 Edit
-              </Link>
+              </PendingLink>
             </>
           ) : (
             <>
-              <Link
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/edit`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold font-ui hover:bg-[var(--primary-hover)] transition-colors shadow-2xs"
               >
                 Edit Jemputan
-              </Link>
-              <Link
+              </PendingLink>
+              <PendingLink
                 href={`/dashboard/invitations/${invitation.id}/edit?mode=preview`}
+                pendingText="Membuka..."
                 className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[var(--border)] text-[var(--text)] text-xs font-medium font-ui hover:bg-[var(--surface-warm)] transition-colors"
               >
                 Preview
-              </Link>
+              </PendingLink>
             </>
           )}
         </div>

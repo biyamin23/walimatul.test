@@ -1,5 +1,5 @@
 import React from "react";
-import Link from "next/link";
+import { PendingLink } from "@/components/ui/PendingLink";
 
 interface Props {
   clientName: string | null;
@@ -70,17 +70,18 @@ export function ClientNewUserOnboarding({ clientName }: Props) {
 
       {/* CTA Button */}
       <div className="pt-2 flex flex-col sm:flex-row items-center gap-4">
-        <Link
+        <PendingLink
           id="btn-onboarding-browse-templates"
           href="/templates"
+          pendingText="Membuka Senarai Template..."
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-[var(--primary)] text-white text-sm font-bold font-ui hover:bg-[var(--primary-hover)] transition-all shadow-md"
         >
           <span>Pilih Template Sekarang</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <line x1="5" y1="12" x2="19" y2="12" />
             <polyline points="12 5 19 12 12 19" />
           </svg>
-        </Link>
+        </PendingLink>
         <span className="text-xs font-ui text-[var(--text-muted)]">
           ✨ Termasuk RSVP Percuma, Galeri Gambar, Pengiraan Detik &amp; Muzik Latar.
         </span>
