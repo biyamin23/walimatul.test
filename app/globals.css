@@ -390,4 +390,56 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Rose Chateau Luxury Motion Language
+   ───────────────────────────────────────────────────────────────────────────── */
 
+@keyframes chateau-breathe {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.025) rotate(0.8deg);
+    opacity: 1;
+  }
+}
+
+@keyframes chateau-seal-glow {
+  0%, 100% {
+    filter: drop-shadow(0 4px 12px rgba(107, 35, 51, 0.25));
+  }
+  50% {
+    filter: drop-shadow(0 6px 18px rgba(181, 138, 74, 0.45));
+  }
+}
+
+@keyframes chateau-bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+.animate-chateau-breathe {
+  animation: chateau-breathe 6s ease-in-out infinite;
+}
+
+.animate-chateau-seal-glow {
+  animation: chateau-seal-glow 3.5s ease-in-out infinite;
+}
+
+.animate-chateau-bob {
+  animation: chateau-bob 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-chateau-breathe,
+  .animate-chateau-seal-glow,
+  .animate-chateau-bob {
+    animation: none !important;
+    transform: none !important;
+  }
+}

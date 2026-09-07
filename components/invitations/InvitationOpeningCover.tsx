@@ -70,6 +70,17 @@ export function InvitationOpeningCover({
   const isBlushGarden = !theme?.templateKey || theme?.templateKey === "blush-garden";
   const isRoseChateau = theme?.templateKey === "rose-chateau";
 
+  const [isPressingSeal, setIsPressingSeal] = React.useState(false);
+
+  const handleRoseChateauOpen = () => {
+    if (isPressingSeal) return;
+    setIsPressingSeal(true);
+    // Tactile seal feedback (~320ms) before initiating card unfold transition
+    setTimeout(() => {
+      onOpen();
+    }, 320);
+  };
+
   // If Rose Chateau: luxurious romantic stationery with wax-seal opening
   if (isRoseChateau) {
     return (
@@ -77,28 +88,50 @@ export function InvitationOpeningCover({
         role="dialog"
         aria-modal="true"
         aria-label="Skrin Pembukaan Jemputan"
-        initial={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 1, scale: 1, y: 0 }}
         exit={
           shouldReduceMotion
             ? { opacity: 0 }
-            : { opacity: 0, scale: 1.015, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+            : {
+                opacity: 0,
+                scale: 1.04,
+                y: -20,
+                transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] },
+              }
         }
         className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-4 sm:p-6 text-center select-none overflow-hidden min-h-dvh h-dvh bg-gradient-to-b from-[#FFF8F5] via-[#FBEDEA] to-[#FFF8F5] ${chateauScript.variable} ${chateauHeading.variable} ${chateauBody.variable}`}
         style={{
           WebkitTransform: "translateZ(0)",
         }}
       >
-        {/* Corner Rose Flourishes */}
-        <ChateauRoseCorner position="top-left" className="absolute top-3 left-3 sm:top-6 sm:left-6" />
-        <ChateauRoseCorner position="top-right" className="absolute top-3 right-3 sm:top-6 sm:right-6" />
-        <ChateauRoseCorner position="bottom-left" className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6" />
-        <ChateauRoseCorner position="bottom-right" className="absolute bottom-3 right-3 sm:bottom-6 sm:right-6" />
+        <style>{`
+          @keyframes chateau-breathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.025); opacity: 1; }
+          }
+          @keyframes chateau-seal-glow {
+            0%, 100% { box-shadow: 0 8px 22px -2px rgba(107, 35, 51, 0.4), 0 0 0 0 rgba(181, 138, 74, 0); }
+            50% { box-shadow: 0 10px 28px -2px rgba(107, 35, 51, 0.5), 0 0 18px 2px rgba(181, 138, 74, 0.35); }
+          }
+        `}</style>
+
+        {/* Ambient Corner Rose Flourishes */}
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true" style={{ animation: shouldReduceMotion ? "none" : "chateau-breathe 4.5s ease-in-out infinite" }}>
+          <ChateauRoseCorner position="top-left" className="absolute top-3 left-3 sm:top-6 sm:left-6" />
+          <ChateauRoseCorner position="top-right" className="absolute top-3 right-3 sm:top-6 sm:right-6" />
+          <ChateauRoseCorner position="bottom-left" className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6" />
+          <ChateauRoseCorner position="bottom-right" className="absolute bottom-3 right-3 sm:bottom-6 sm:right-6" />
+        </div>
 
         {/* Arch Lines */}
         <ChateauArchFrame />
 
-        {/* Center Card Container */}
-        <div className="relative z-10 w-full max-w-sm sm:max-w-md mx-auto py-8 sm:py-10 px-6 sm:px-8 rounded-3xl border border-[#EAD6D8] bg-[#FFFFFF]/90 shadow-xl flex flex-col items-center justify-between min-h-[460px] sm:min-h-[500px] backdrop-blur-xs">
+        {/* Center Stationery Envelope / Card Container */}
+        <div
+          className={`relative z-10 w-full max-w-sm sm:max-w-md mx-auto py-8 sm:py-10 px-6 sm:px-8 rounded-3xl border border-[#EAD6D8] bg-[#FFFFFF]/95 shadow-2xl flex flex-col items-center justify-between min-h-[460px] sm:min-h-[500px] backdrop-blur-xs transition-transform duration-500 ${
+            isPressingSeal ? "scale-[0.985]" : ""
+          }`}
+        >
           {/* Inner hairline frame */}
           <div
             className="absolute inset-2.5 sm:inset-3 rounded-[20px] border border-[#B58A4A]/25 pointer-events-none"
@@ -144,22 +177,27 @@ export function InvitationOpeningCover({
           <div className="w-full pt-2 flex flex-col items-center">
             <button
               type="button"
-              onClick={onOpen}
+              onClick={handleRoseChateauOpen}
               aria-label="Buka jemputan perkahwinan"
-              className="group relative flex flex-col items-center gap-2 p-1.5 focus:outline-none focus:ring-2 focus:ring-[#B58A4A] focus:ring-offset-2 rounded-full cursor-pointer transition-transform duration-300 active:scale-95"
+              className={`group relative flex flex-col items-center gap-2 p-2 focus:outline-none focus:ring-2 focus:ring-[#B58A4A] focus:ring-offset-2 rounded-full cursor-pointer transition-transform duration-300 ${
+                isPressingSeal ? "scale-90" : "active:scale-95"
+              }`}
             >
               {/* Circular Embossed Wax Seal */}
               <div
-                className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-gradient-to-br from-[#7A2D3F] via-[#6B2333] to-[#48141F] shadow-lg border-2 border-[#B58A4A]/50 flex items-center justify-center relative transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
+                className={`w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-gradient-to-br from-[#7A2D3F] via-[#6B2333] to-[#48141F] shadow-lg border-2 border-[#B58A4A]/60 flex items-center justify-center relative transition-all duration-300 group-hover:scale-105 ${
+                  isPressingSeal ? "scale-95" : ""
+                }`}
                 style={{
+                  animation: !shouldReduceMotion && !isPressingSeal ? "chateau-seal-glow 3.5s ease-in-out infinite" : "none",
                   boxShadow:
-                    "0 8px 20px -2px rgba(107, 35, 51, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.4)",
+                    "0 8px 22px -2px rgba(107, 35, 51, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.4)",
                 }}
               >
-                <WaxSealEmblem className="w-10 h-10 sm:w-11 sm:h-11 drop-shadow-xs" />
+                <WaxSealEmblem isPressed={isPressingSeal} className="w-10 h-10 sm:w-11 sm:h-11 drop-shadow-xs" />
               </div>
               <span className="font-chateau-body text-[11px] font-semibold tracking-widest uppercase text-[#6B2333] group-hover:text-[#521A26] transition-colors">
-                Buka Jemputan
+                {isPressingSeal ? "Membuka..." : "Buka Jemputan"}
               </span>
             </button>
           </div>

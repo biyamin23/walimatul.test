@@ -8,9 +8,10 @@ import { EventDetailsSection } from "./components/EventDetailsSection";
 import { GallerySection } from "./components/GallerySection";
 import { RsvpPreviewSection } from "./components/RsvpPreviewSection";
 import { ClosingSection } from "./components/ClosingSection";
-import { LiveCountdown } from "@/components/countdown/LiveCountdown";
+import { ChateauCountdown } from "./components/ChateauCountdown";
 import { GuestWishesSection } from "@/components/wishes/GuestWishesSection";
 import { ChateauSection } from "./components/ChateauCard";
+import { ChateauReveal } from "./components/ChateauReveal";
 
 /**
  * WALIMATUL — Rose Chateau Invitation Template
@@ -23,8 +24,12 @@ import { ChateauSection } from "./components/ChateauCard";
  * - Warm ivory (#FFF8F5) and soft blush (#FBEDEA) surfaces
  * - Mobile-first layout with smooth vertical storytelling and centered desktop card
  * - Scoped typography: Great Vibes, Cormorant Garamond, Inter
+ * - Cinematic motion language: coordinated stagger, wax seal tactile depression,
+ *   subtle floral entrance, and progressive viewport reveals.
  */
 export function RoseChateauTemplate({ data, mode = "live" }: TemplateComponentProps) {
+  const isEditor = mode === "editor";
+
   return (
     <div
       className={`min-h-screen bg-[#F5EBE6] sm:bg-[#EFE2DC] flex flex-col items-center justify-start ${greatVibes.variable} ${cormorantGaramond.variable} ${inter.variable}`}
@@ -47,51 +52,47 @@ export function RoseChateauTemplate({ data, mode = "live" }: TemplateComponentPr
         )}
 
         <main className="flex-1 flex flex-col justify-start">
-          {/* 1. Cover / Hero Section */}
-          <CoverSection data={data} />
+          {/* 1. Cover / Hero Section with cinematic entrance sequence */}
+          <CoverSection data={data} mode={mode} />
 
-          {/* Live Countdown (if enabled) */}
+          {/* Live Countdown (if enabled) with staggered counter reveal */}
           {data.countdownEnabled && data.weddingDate && (
             <div className="px-4 sm:px-6 py-4 max-w-lg mx-auto w-full">
-              <LiveCountdown
+              <ChateauCountdown
                 weddingDate={data.weddingDate}
                 startTime={data.startTime}
-                theme={{
-                  accentColor: "#B58A4A",
-                  surfaceColor: "#FBEDEA",
-                  textColor: "#6B2333",
-                  secondaryTextColor: "#766467",
-                  borderColor: "#EAD6D8",
-                }}
+                mode={mode}
               />
             </div>
           )}
 
           {/* 2. Opening Greetings & Quotation */}
-          <OpeningSection data={data} />
+          <OpeningSection data={data} mode={mode} />
 
-          {/* 3. Formal Couple Presentation */}
-          <CoupleSection data={data} />
+          {/* 3. Formal Couple Presentation with left/right ceremonial reveal */}
+          <CoupleSection data={data} mode={mode} />
 
           {/* 4. Event Schedule, Date & Venue */}
-          <EventDetailsSection data={data} />
+          <EventDetailsSection data={data} mode={mode} />
 
-          {/* 5. Photo Gallery (if enabled & images exist) */}
-          <GallerySection data={data} />
+          {/* 5. Photo Gallery (if enabled & images exist) with staggered scale cards */}
+          <GallerySection data={data} mode={mode} />
 
           {/* 6. Public Guest Wishes Section (if enabled & wishes exist) */}
           {data.guestWishesEnabled && data.guestWishes && data.guestWishes.length > 0 && (
             <ChateauSection ariaLabel="Ucapan Tetamu">
-              <GuestWishesSection
-                wishes={data.guestWishes}
-                theme={{
-                  accentColor: "#B58A4A",
-                  surfaceColor: "#FFFFFF",
-                  textColor: "#6B2333",
-                  secondaryTextColor: "#766467",
-                  borderColor: "#EAD6D8",
-                }}
-              />
+              <ChateauReveal variant="fade-up" duration={700} disabled={isEditor}>
+                <GuestWishesSection
+                  wishes={data.guestWishes}
+                  theme={{
+                    accentColor: "#B58A4A",
+                    surfaceColor: "#FFFFFF",
+                    textColor: "#6B2333",
+                    secondaryTextColor: "#766467",
+                    borderColor: "#EAD6D8",
+                  }}
+                />
+              </ChateauReveal>
             </ChateauSection>
           )}
 
@@ -99,9 +100,10 @@ export function RoseChateauTemplate({ data, mode = "live" }: TemplateComponentPr
           <RsvpPreviewSection data={data} mode={mode} />
 
           {/* 8. Closing Blessing & Attribution */}
-          <ClosingSection data={data} />
+          <ClosingSection data={data} mode={mode} />
         </main>
       </div>
     </div>
   );
 }
+
