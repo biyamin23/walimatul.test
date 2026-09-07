@@ -28,6 +28,7 @@ Next.js 16.3.1 (App Router)
 │   ├── types.ts                — Shared InvitationTemplateData & TemplateComponentProps contract
 │   ├── registry.ts             — component_key → React component map
 │   ├── blush-garden/           — Coded Blush Garden template component
+│   ├── rose-chateau/           — Premium Rose Chateau template (romantic stationery, wax-seal opening, deep wine & blush)
 │   └── hybrid-editorial/       — Configurable Hybrid Editorial renderer with overlay animation & Motion for React card animations
 │       └── motion/             — Reusable MotionReveal, MotionStagger, and MotionHero primitives
 │   ├── database.ts             — All DB row types, enums, Database namespace
@@ -71,6 +72,7 @@ invitations table in Supabase
 1. **Wedding data belongs to the invitation. Design belongs to the template.**
 2. The template renderer receives normalized `InvitationTemplateData` and never accesses database rows or editor state directly.
 3. Live preview updates immediately from local state without waiting for network roundtrips.
+4. **Rose Chateau Template**: Reuses shared invitation lifecycle, RSVP modal, gallery lightbox, YouTube background music, and countdown logic while introducing a romantic stationery visual system with an embossed wax-seal opening cover and deep wine/blush tones.
 
 ---
 

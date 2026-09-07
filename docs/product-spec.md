@@ -14,7 +14,7 @@
 
 | Property | Value |
 |---|---|
-| Coded Template | Blush Garden (RM49.00 / 6 months) |
+| Coded Templates | Blush Garden (RM49.00 / 6 months), Rose Chateau (RM49.00 / 6 months) |
 | Hybrid Templates | Configurable (e.g. Royal Gold, RM69 / 12 months) |
 | Payment model | One-time payment per invitation. No recurring subscriptions. |
 | Payment method | Touch 'n Go eWallet QR transfer + screenshot proof verification |

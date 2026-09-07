@@ -4,6 +4,17 @@ import React, { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { BotanicalCorner, BotanicalDivider } from "@/templates/blush-garden/components/BotanicalOrnaments";
 import { greatVibes, cormorantGaramond, inter } from "@/templates/blush-garden/fonts";
+import {
+  ChateauRoseCorner,
+  ChateauFloralDivider,
+  ChateauArchFrame,
+  WaxSealEmblem,
+} from "@/templates/rose-chateau/components/ChateauOrnaments";
+import {
+  greatVibes as chateauScript,
+  cormorantGaramond as chateauHeading,
+  inter as chateauBody,
+} from "@/templates/rose-chateau/fonts";
 
 export interface OpeningCoverTheme {
   templateKey?: string;
@@ -57,6 +68,105 @@ export function InvitationOpeningCover({
     : null;
 
   const isBlushGarden = !theme?.templateKey || theme?.templateKey === "blush-garden";
+  const isRoseChateau = theme?.templateKey === "rose-chateau";
+
+  // If Rose Chateau: luxurious romantic stationery with wax-seal opening
+  if (isRoseChateau) {
+    return (
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Skrin Pembukaan Jemputan"
+        initial={{ opacity: 1, scale: 1 }}
+        exit={
+          shouldReduceMotion
+            ? { opacity: 0 }
+            : { opacity: 0, scale: 1.015, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+        }
+        className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-4 sm:p-6 text-center select-none overflow-hidden min-h-dvh h-dvh bg-gradient-to-b from-[#FFF8F5] via-[#FBEDEA] to-[#FFF8F5] ${chateauScript.variable} ${chateauHeading.variable} ${chateauBody.variable}`}
+        style={{
+          WebkitTransform: "translateZ(0)",
+        }}
+      >
+        {/* Corner Rose Flourishes */}
+        <ChateauRoseCorner position="top-left" className="absolute top-3 left-3 sm:top-6 sm:left-6" />
+        <ChateauRoseCorner position="top-right" className="absolute top-3 right-3 sm:top-6 sm:right-6" />
+        <ChateauRoseCorner position="bottom-left" className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6" />
+        <ChateauRoseCorner position="bottom-right" className="absolute bottom-3 right-3 sm:bottom-6 sm:right-6" />
+
+        {/* Arch Lines */}
+        <ChateauArchFrame />
+
+        {/* Center Card Container */}
+        <div className="relative z-10 w-full max-w-sm sm:max-w-md mx-auto py-8 sm:py-10 px-6 sm:px-8 rounded-3xl border border-[#EAD6D8] bg-[#FFFFFF]/90 shadow-xl flex flex-col items-center justify-between min-h-[460px] sm:min-h-[500px] backdrop-blur-xs">
+          {/* Inner hairline frame */}
+          <div
+            className="absolute inset-2.5 sm:inset-3 rounded-[20px] border border-[#B58A4A]/25 pointer-events-none"
+            aria-hidden="true"
+          />
+
+          {/* Top Eyebrow */}
+          <div className="pt-2">
+            <span className="font-chateau-heading text-xs sm:text-sm font-semibold tracking-[0.3em] uppercase text-[#B58A4A] block">
+              Walimatulurus
+            </span>
+          </div>
+
+          {/* Couple Names */}
+          <div className="my-auto py-6 flex flex-col items-center w-full">
+            <h1
+              className="font-chateau-script text-[#6B2333] leading-[1.2] text-center select-none"
+              style={{
+                fontSize: "clamp(2.5rem, 9vw, 4.25rem)",
+                textShadow: "0 1px 2px rgba(107, 35, 51, 0.08)",
+              }}
+            >
+              <span className="inline-block max-w-full break-words px-2">{groomName}</span>
+              <span
+                className="block my-1 font-chateau-heading italic text-[#B58A4A] text-xl sm:text-2xl font-light"
+                aria-hidden="true"
+              >
+                &amp;
+              </span>
+              <span className="inline-block max-w-full break-words px-2">{brideName}</span>
+            </h1>
+
+            <ChateauFloralDivider className="my-4" />
+
+            {formattedDate && (
+              <p className="font-chateau-heading text-xs sm:text-sm font-semibold tracking-wider text-[#6B2333]/90 uppercase">
+                {formattedDate}
+              </p>
+            )}
+          </div>
+
+          {/* Wax Seal CTA Button */}
+          <div className="w-full pt-2 flex flex-col items-center">
+            <button
+              type="button"
+              onClick={onOpen}
+              aria-label="Buka jemputan perkahwinan"
+              className="group relative flex flex-col items-center gap-2 p-1.5 focus:outline-none focus:ring-2 focus:ring-[#B58A4A] focus:ring-offset-2 rounded-full cursor-pointer transition-transform duration-300 active:scale-95"
+            >
+              {/* Circular Embossed Wax Seal */}
+              <div
+                className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-gradient-to-br from-[#7A2D3F] via-[#6B2333] to-[#48141F] shadow-lg border-2 border-[#B58A4A]/50 flex items-center justify-center relative transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
+                style={{
+                  boxShadow:
+                    "0 8px 20px -2px rgba(107, 35, 51, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.4)",
+                }}
+              >
+                <WaxSealEmblem className="w-10 h-10 sm:w-11 sm:h-11 drop-shadow-xs" />
+              </div>
+              <span className="font-chateau-body text-[11px] font-semibold tracking-widest uppercase text-[#6B2333] group-hover:text-[#521A26] transition-colors">
+                Buka Jemputan
+              </span>
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   // If Blush Garden: use authentic Blush Garden visual identity
   if (isBlushGarden) {

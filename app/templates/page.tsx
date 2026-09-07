@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 /** Brand palette for each template — fallback when no thumbnail exists */
 const TEMPLATE_PALETTES: Record<string, string[]> = {
   "blush-garden": ["#FCF8F3", "#F5DDD6", "#174F3A", "#B8955A"],
+  "rose-chateau": ["#FFF8F5", "#FBEDEA", "#6B2333", "#C8A46B"],
   "royal-gold": ["#1A1A1A", "#B8955A", "#D4B07A", "#F0E6D0"],
   "minimal-white": ["#FFFFFF", "#F0F0F0", "#222222", "#888888"],
   "malay-heritage": ["#F5F0E8", "#8B0000", "#D4AF37", "#2E4A2E"],

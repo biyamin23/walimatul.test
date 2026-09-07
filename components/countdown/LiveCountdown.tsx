@@ -187,6 +187,7 @@ export function LiveCountdown({
             style={{ backgroundColor: surface, borderColor: border }}
           >
             <span
+              suppressHydrationWarning
               className="text-xl sm:text-2xl md:text-3xl font-bold font-display leading-none tracking-tight"
               style={{ color: text }}
             >

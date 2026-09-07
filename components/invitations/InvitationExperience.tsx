@@ -318,19 +318,6 @@ export function InvitationExperience({
           onToggle={toggleFloatingAudio}
         />
       )}
-
-      {/* Editor Preview Helper Controls (Editor mode only) */}
-      {mode === "editor" && data.openingCoverEnabled && (
-        <div className="fixed top-3 right-3 z-30">
-          <button
-            type="button"
-            onClick={() => setIsOpened((prev) => !prev)}
-            className="px-3 py-1.5 rounded-full bg-black/70 hover:bg-black text-white text-[11px] font-ui font-semibold shadow-md backdrop-blur-xs transition-all cursor-pointer flex items-center gap-1.5"
-          >
-            <span>{isOpened ? "👁️ Uji Skrin Pembukaan" : "✕ Tutup Skrin"}</span>
-          </button>
-        </div>
-      )}
     </div>
   );
 }
