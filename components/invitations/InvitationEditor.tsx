@@ -194,7 +194,7 @@ export function InvitationEditor({
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] max-w-full overflow-x-hidden">
       {/* ── Compact Sticky Top Bar ── */}
-      <header className="sticky top-0 z-40 bg-[var(--surface)] border-b border-[var(--border)] px-3 sm:px-4 py-2 sm:py-3 shadow-xs">
+      <header className="sticky top-0 z-20 bg-[var(--surface)] border-b border-[var(--border)] px-3 sm:px-4 py-2 sm:py-3 shadow-xs">
         <div className="max-w-7xl mx-auto flex flex-col gap-2">
           {/* Top Row: Navigation, Title & Save Status */}
           <div className="flex items-center justify-between gap-2 min-w-0 w-full">
