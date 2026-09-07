@@ -59,30 +59,16 @@ export function DashboardMobileHeader({ profile, email }: DashboardMobileHeaderP
   return (
     <>
       <header
-        className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-[var(--surface)] border-b border-[var(--border)] shadow-xs shrink-0"
+        className="lg:hidden sticky top-0 z-30 flex items-center gap-3 px-3 sm:px-4 py-2 bg-[var(--surface)] border-b border-[var(--border)] shadow-xs shrink-0"
         role="banner"
       >
-        {/* Brand identity */}
-        <Link
-          href="/dashboard"
-          className="inline-flex flex-col leading-none focus-visible:outline-2 focus-visible:outline-[var(--primary)] rounded"
-          aria-label={`${BRAND.name} — Ke Dashboard`}
-        >
-          <span className="font-display text-lg font-bold text-[var(--primary)] tracking-wide">
-            {BRAND.name}
-          </span>
-          <span className="text-[9px] tracking-widest uppercase text-[var(--gold)] font-ui">
-            {BRAND.signature}
-          </span>
-        </Link>
-
-        {/* Mobile Menu Trigger Button (☰) */}
+        {/* Mobile Menu Trigger Button (☰) — Left-aligned */}
         <button
           id="client-mobile-menu-toggle"
           data-testid="client-mobile-menu-button"
           type="button"
           onClick={() => setDrawerOpen(true)}
-          className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--surface-warm)] border border-[var(--border)] text-[var(--text)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
+          className="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[var(--surface-warm)] border border-[var(--border)] text-[var(--text)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--primary)] shrink-0 cursor-pointer"
           aria-label="Buka menu navigasi"
           aria-expanded={drawerOpen}
           aria-controls="client-mobile-menu"
@@ -103,6 +89,20 @@ export function DashboardMobileHeader({ profile, email }: DashboardMobileHeaderP
             <line x1="4" y1="18" x2="20" y2="18" />
           </svg>
         </button>
+
+        {/* Brand identity — immediately beside hamburger */}
+        <Link
+          href="/dashboard"
+          className="inline-flex flex-col leading-none focus-visible:outline-2 focus-visible:outline-[var(--primary)] rounded py-1"
+          aria-label={`${BRAND.name} — Ke Dashboard`}
+        >
+          <span className="font-display text-lg font-bold text-[var(--primary)] tracking-wide leading-tight">
+            {BRAND.name}
+          </span>
+          <span className="text-[9px] tracking-widest uppercase text-[var(--gold)] font-ui leading-tight">
+            {BRAND.signature}
+          </span>
+        </Link>
       </header>
 
       {/* Controlled Mobile Drawer */}
