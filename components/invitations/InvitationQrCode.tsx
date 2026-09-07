@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import QRCode from "qrcode";
 import { getQrFilename } from "@/lib/invitations/share";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
@@ -12,6 +11,15 @@ export interface InvitationQrCodeProps {
   size?: number;
   showDownloadButton?: boolean;
   className?: string;
+}
+
+/**
+ * Helper to dynamically load qrcode library on demand.
+ * Prevents bundling ~30KB qrcode library into initial page load.
+ */
+async function loadQrCodeModule() {
+  const mod = await import("qrcode");
+  return mod.default || mod;
 }
 
 export function InvitationQrCode({
@@ -29,18 +37,31 @@ export function InvitationQrCode({
   useEffect(() => {
     if (!canvasRef.current || !publicUrl) return;
 
-    QRCode.toCanvas(canvasRef.current, publicUrl, {
-      width: size,
-      margin: 2,
-      errorCorrectionLevel: "M",
-      color: {
-        dark: "#1A2E26",
-        light: "#FFFFFF",
-      },
-    }).catch((err) => {
-      console.error("[WALIMATUL] QR generation error:", err);
-      setError("Gagal menjana imej QR Code.");
-    });
+    let isMounted = true;
+
+    loadQrCodeModule()
+      .then((QRCode) => {
+        if (!isMounted || !canvasRef.current) return;
+        return QRCode.toCanvas(canvasRef.current, publicUrl, {
+          width: size,
+          margin: 2,
+          errorCorrectionLevel: "M",
+          color: {
+            dark: "#1A2E26",
+            light: "#FFFFFF",
+          },
+        });
+      })
+      .catch((err) => {
+        if (isMounted) {
+          console.error("[WALIMATUL] QR generation error:", err);
+          setError("Gagal menjana imej QR Code.");
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, [publicUrl, size]);
 
   async function handleDownloadPng() {
@@ -49,6 +70,8 @@ export function InvitationQrCode({
     try {
       setIsGenerating(true);
       setError(null);
+
+      const QRCode = await loadQrCodeModule();
 
       // Generate high-resolution 1024x1024 data URL
       const dataUrl = await QRCode.toDataURL(publicUrl, {

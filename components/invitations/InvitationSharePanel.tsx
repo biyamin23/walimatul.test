@@ -220,12 +220,14 @@ export function InvitationSharePanel({
       </div>
 
       {/* ── QR Modal ── */}
-      <InvitationQrModal
-        isOpen={showQrModal}
-        onClose={() => setShowQrModal(false)}
-        slug={slug}
-        coupleDisplay={coupleDisplay}
-      />
+      {showQrModal && (
+        <InvitationQrModal
+          isOpen={showQrModal}
+          onClose={() => setShowQrModal(false)}
+          slug={slug}
+          coupleDisplay={coupleDisplay}
+        />
+      )}
     </>
   );
 }

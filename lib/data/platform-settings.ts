@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
 import { BRAND } from "@/lib/constants/brand";
@@ -38,8 +39,9 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettingsMap = {
 /**
  * Fetch client-safe platform settings from the database via SECURITY DEFINER RPC.
  * Server-only, typed, and resilient to missing records or non-admin client contexts.
+ * Wrapped in React cache() for request-scoped deduplication.
  */
-export async function getPlatformSettings(): Promise<PlatformSettingsMap> {
+export const getPlatformSettings = cache(async (): Promise<PlatformSettingsMap> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("get_runtime_platform_settings");
@@ -83,7 +85,7 @@ export async function getPlatformSettings(): Promise<PlatformSettingsMap> {
   }
 
   return map;
-}
+});
 
 /**
  * Server-only helper to read a single setting at runtime with safe fallback.

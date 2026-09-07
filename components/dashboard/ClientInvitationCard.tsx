@@ -291,7 +291,7 @@ export function ClientInvitationCard({ data, supportWhatsappUrl = "https://wa.me
     </div>
 
     {/* ── Share & QR Modal ── */}
-    {invitation.slug && (
+    {invitation.slug && showShareModal && (
       <InvitationQrModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}

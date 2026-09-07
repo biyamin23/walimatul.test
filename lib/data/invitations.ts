@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { Invitation, InvitationWithTemplate } from "@/types/database";
+import type { Invitation, InvitationWithTemplate, Order } from "@/types/database";
 
 /**
  * WALIMATUL — Invitation Data Access Layer (Server-Only)
@@ -133,3 +133,37 @@ export async function createDraftInvitation(
 
   return (data as Invitation) ?? null;
 }
+
+/**
+ * Fetch only the latest order for an invitation owned by the current user.
+ * Lightweight helper specifically designed for editor lifecycle derivation
+ * without re-fetching templates or payment proofs.
+ */
+export async function getOwnInvitationLatestOrder(
+  invitationId: string
+): Promise<Order | null> {
+  const supabase = await createClient();
+
+  const { data: claimsData, error: claimsError } =
+    await supabase.auth.getClaims();
+
+  if (claimsError || !claimsData?.claims?.sub) {
+    return null;
+  }
+  const userId = claimsData.claims.sub;
+
+  const { data: orders, error } = await supabase
+    .from("orders")
+    .select("id, invitation_id, user_id, payment_status, amount, created_at, receipt_number, rejection_reason, validity_months")
+    .eq("invitation_id", invitationId)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (error || !orders || orders.length === 0) {
+    return null;
+  }
+
+  return (orders[0] as unknown as Order) ?? null;
+}
+

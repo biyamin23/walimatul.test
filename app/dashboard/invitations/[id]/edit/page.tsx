@@ -2,8 +2,7 @@ import React from "react";
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { requireClient } from "@/lib/auth/permissions";
-import { getOwnInvitationById } from "@/lib/data/invitations";
-import { getOwnInvitationPaymentState } from "@/lib/data/payments";
+import { getOwnInvitationById, getOwnInvitationLatestOrder } from "@/lib/data/invitations";
 import { getPlatformSettings } from "@/lib/data/platform-settings";
 import { BRAND } from "@/lib/constants/brand";
 import { deriveClientInvitationLifecycle } from "@/lib/invitations/client-lifecycle";
@@ -36,9 +35,10 @@ export default async function EditInvitationPage({
     redirect("/dashboard/invitations");
   }
 
-  const [invitation, paymentState, settings] = await Promise.all([
+  // Parallelize: 1. Invitation + Template + Gallery, 2. Latest Order, 3. Platform Settings (cached)
+  const [invitation, latestOrder, settings] = await Promise.all([
     getOwnInvitationById(id),
-    getOwnInvitationPaymentState(id),
+    getOwnInvitationLatestOrder(id),
     getPlatformSettings(),
   ]);
 
@@ -52,7 +52,7 @@ export default async function EditInvitationPage({
 
   const lifecycle = deriveClientInvitationLifecycle({
     invitation,
-    latestOrder: paymentState?.order || null,
+    latestOrder,
     supportWhatsappUrl,
   });
 

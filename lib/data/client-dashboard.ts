@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser } from "@/lib/auth/get-user";
 import { getPlatformSettings } from "@/lib/data/platform-settings";
 import { BRAND } from "@/lib/constants/brand";
 import { deriveClientInvitationLifecycle } from "@/lib/invitations/client-lifecycle";
@@ -24,37 +25,36 @@ export function pickRelevantOrder(orders: Order[]): Order | null {
 
 /**
  * Fetch all client dashboard data with explicit auth scoping (user_id = auth.uid()).
+ * Optimized with request-cached auth, parallelized independent queries, and reduced payload projections.
  */
 export async function getClientDashboardData(): Promise<ClientDashboardData | null> {
-  const supabase = await createClient();
-
-  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
-  if (claimsError || !claimsData?.claims?.sub) {
+  // Reuse request-cached authenticated user & profile (0ms if already called in layout)
+  const authData = await getAuthenticatedUser();
+  if (!authData?.userId) {
     return null;
   }
-  const userId = claimsData.claims.sub;
+  const userId = authData.userId;
+  const clientName = authData.profile?.full_name || null;
 
-  // 1. Fetch profile & platform settings in parallel
-  const [profileRes, settings] = await Promise.all([
-    supabase.from("profiles").select("id, full_name, phone").eq("id", userId).maybeSingle(),
+  const supabase = await createClient();
+
+  // 1. Parallelize Tier 1: Platform settings (cached) + Client invitations
+  const [settings, invRes] = await Promise.all([
     getPlatformSettings(),
+    supabase
+      .from("invitations")
+      .select("id, user_id, template_id, slug, groom_name, groom_short_name, bride_name, bride_short_name, wedding_date, venue_name, status, expires_at, created_at, updated_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false }),
   ]);
 
-  const clientName = profileRes.data?.full_name || null;
   const supportPhone = settings.support_whatsapp?.display || BRAND.supportPhone;
   const supportWhatsappUrl = settings.support_whatsapp?.phone
     ? `https://wa.me/${settings.support_whatsapp.phone.replace(/[^0-9]/g, "")}`
     : BRAND.supportWhatsappUrl;
 
-  // 2. Fetch all client invitations explicitly scoped by user_id
-  const { data: rawInvitations, error: invError } = await supabase
-    .from("invitations")
-    .select("*")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
-
-  if (invError || !rawInvitations) {
-    console.error("[WALIMATUL] Error loading client invitations:", invError?.message);
+  if (invRes.error || !invRes.data) {
+    console.error("[WALIMATUL] Error loading client invitations:", invRes.error?.message);
     return {
       clientName,
       summary: {
@@ -71,19 +71,19 @@ export async function getClientDashboardData(): Promise<ClientDashboardData | nu
     };
   }
 
-  const invitations = rawInvitations as Invitation[];
+  const invitations = invRes.data as unknown as Invitation[];
   const invIds = invitations.map((i) => i.id);
   const templateIds = Array.from(new Set(invitations.map((i) => i.template_id).filter(Boolean)));
 
-  // 3. Batch fetch templates & orders for these invitations (avoiding N+1 loops)
+  // 2. Batch fetch templates & orders for these invitations in parallel (avoiding N+1 loops)
   const [templatesRes, ordersRes] = await Promise.all([
     templateIds.length > 0
-      ? supabase.from("templates").select("id, name, slug, thumbnail_url").in("id", templateIds)
+      ? supabase.from("templates").select("id, name, slug, thumbnail_url, price").in("id", templateIds)
       : { data: [] },
     invIds.length > 0
       ? supabase
           .from("orders")
-          .select("*")
+          .select("id, invitation_id, user_id, payment_status, amount, created_at, receipt_number, rejection_reason, validity_months")
           .eq("user_id", userId)
           .in("invitation_id", invIds)
           .order("created_at", { ascending: false })
@@ -96,7 +96,7 @@ export async function getClientDashboardData(): Promise<ClientDashboardData | nu
   }
 
   const ordersByInvMap = new Map<string, Order[]>();
-  for (const o of (ordersRes.data || []) as Order[]) {
+  for (const o of (ordersRes.data || []) as unknown as Order[]) {
     const list = ordersByInvMap.get(o.invitation_id) || [];
     list.push(o);
     ordersByInvMap.set(o.invitation_id, list);

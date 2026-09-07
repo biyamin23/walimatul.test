@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser } from "@/lib/auth/get-user";
 import { checkPaymentEligibility, type PaymentEligibilityResult } from "@/lib/validation/payment";
 import type { Invitation, Order, PaymentProof, Template } from "@/types/database";
 
@@ -23,32 +24,46 @@ export interface BillingOrderItem extends Order {
 
 /**
  * Fetch the payment state, template, and existing order/proof for a specific invitation.
+ * Parallelized to avoid sequential waterfall round trips.
  */
 export async function getOwnInvitationPaymentState(
   invitationId: string
 ): Promise<InvitationPaymentStateResult | null> {
+  const authData = await getAuthenticatedUser();
+  if (!authData?.userId) {
+    return null;
+  }
+  const userId = authData.userId;
+
   const supabase = await createClient();
 
-  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
-  if (claimsError || !claimsData?.claims?.sub) {
+  // 1 & 2. Fetch invitation with template and existing active/latest order in parallel
+  const [invRes, ordersRes] = await Promise.all([
+    supabase
+      .from("invitations")
+      .select(`
+        *,
+        template:templates (*)
+      `)
+      .eq("id", invitationId)
+      .eq("user_id", userId)
+      .single(),
+    supabase
+      .from("orders")
+      .select(`
+        *,
+        proofs:payment_proofs (*)
+      `)
+      .eq("invitation_id", invitationId)
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1),
+  ]);
+
+  if (invRes.error || !invRes.data) {
     return null;
   }
-  const userId = claimsData.claims.sub;
-
-  // 1. Fetch invitation with template
-  const { data: invitation, error: invError } = await supabase
-    .from("invitations")
-    .select(`
-      *,
-      template:templates (*)
-    `)
-    .eq("id", invitationId)
-    .eq("user_id", userId)
-    .single();
-
-  if (invError || !invitation) {
-    return null;
-  }
+  const invitation = invRes.data;
 
   const templateRaw = Array.isArray(invitation.template)
     ? invitation.template[0]
@@ -58,29 +73,18 @@ export async function getOwnInvitationPaymentState(
     return null;
   }
 
-  // 2. Fetch existing active or latest order
-  const { data: orders } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("invitation_id", invitationId)
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  const order = orders && orders.length > 0 ? orders[0] : null;
-
-  // 3. Fetch latest proof if order exists
+  const rawOrder = ordersRes.data && ordersRes.data.length > 0 ? ordersRes.data[0] : null;
+  let order: Order | null = null;
   let latestProof: PaymentProof | null = null;
-  if (order) {
-    const { data: proofs } = await supabase
-      .from("payment_proofs")
-      .select("*")
-      .eq("order_id", order.id)
-      .order("submitted_at", { ascending: false })
-      .limit(1);
 
+  if (rawOrder) {
+    const { proofs, ...orderFields } = rawOrder as typeof rawOrder & { proofs?: PaymentProof[] };
+    order = orderFields as Order;
     if (proofs && proofs.length > 0) {
-      latestProof = proofs[0];
+      const sortedProofs = [...proofs].sort(
+        (a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()
+      );
+      latestProof = sortedProofs[0];
     }
   }
 

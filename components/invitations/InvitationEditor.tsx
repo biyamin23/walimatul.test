@@ -23,6 +23,21 @@ interface InvitationEditorProps {
   supportWhatsappUrl?: string;
 }
 
+const PREVIEW_GUEST_WISHES = [
+  {
+    id: "preview-wish-1",
+    guestName: "Haji Ismail & Keluarga",
+    message: "Selamat pengantin baru! Semoga mahligai yang dibina sentiasa dilimpahi sakinah, mawaddah dan rahmah.",
+    createdAt: "2026-08-01T12:00:00.000Z",
+  },
+  {
+    id: "preview-wish-2",
+    guestName: "Zulkifli & Sarah",
+    message: "Barakallahu lakuma wa baraka alaikuma wa jama'a bainakuma fi khair.",
+    createdAt: "2026-08-01T14:30:00.000Z",
+  },
+];
+
 export function InvitationEditor({
   invitation,
   initialMode = "edit",
@@ -105,20 +120,7 @@ export function InvitationEditor({
     openingCoverEnabled: formValues.openingCoverEnabled ?? true,
     countdownEnabled: formValues.countdownEnabled ?? false,
     guestWishesEnabled: formValues.guestWishesEnabled ?? false,
-    guestWishes: [
-      {
-        id: "preview-wish-1",
-        guestName: "Haji Ismail & Keluarga",
-        message: "Selamat pengantin baru! Semoga mahligai yang dibina sentiasa dilimpahi sakinah, mawaddah dan rahmah.",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: "preview-wish-2",
-        guestName: "Zulkifli & Sarah",
-        message: "Barakallahu lakuma wa baraka alaikuma wa jama'a bainakuma fi khair.",
-        createdAt: new Date().toISOString(),
-      },
-    ],
+    guestWishes: PREVIEW_GUEST_WISHES,
     musicEnabled: formValues.musicEnabled ?? false,
     musicKey: null,
     musicYoutubeVideoId: resolvedYoutubeId,

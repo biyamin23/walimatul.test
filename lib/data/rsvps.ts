@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser } from "@/lib/auth/get-user";
 import type { Invitation, RSVP } from "@/types/database";
 
 export interface RsvpSummaryMetrics {
@@ -55,43 +56,43 @@ export interface ClientInvitationRsvpOverviewItem {
 export async function getOwnInvitationRsvps(
   invitationId: string
 ): Promise<OwnInvitationRsvpsResult | null> {
+  // 1. Get authenticated user ID from request-cached claims
+  const authData = await getAuthenticatedUser();
+  if (!authData?.userId) {
+    return null;
+  }
+  const userId = authData.userId;
+
   const supabase = await createClient();
 
-  // 1. Get authenticated user ID from cryptographically verified claims
-  const { data: claimsData, error: claimsError } =
-    await supabase.auth.getClaims();
-  if (claimsError || !claimsData?.claims?.sub) {
+  // 2 & 3. Parallelize fetching invitation ownership and RSVPs list
+  const [invRes, rsvpsRes] = await Promise.all([
+    supabase
+      .from("invitations")
+      .select(
+        "id, groom_name, groom_short_name, bride_name, bride_short_name, wedding_date, status, slug, max_pax, rsvp_deadline, rsvp_enabled"
+      )
+      .eq("id", invitationId)
+      .eq("user_id", userId)
+      .single(),
+    supabase
+      .from("rsvps")
+      .select("id, invitation_id, guest_name, attendance, pax, message, show_on_invitation, created_at, updated_at")
+      .eq("invitation_id", invitationId)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  if (invRes.error || !invRes.data) {
     return null;
   }
-  const userId = claimsData.claims.sub;
+  const invitation = invRes.data;
 
-  // 2. Fetch invitation verifying owner
-  const { data: invitation, error: invError } = await supabase
-    .from("invitations")
-    .select(
-      "id, groom_name, groom_short_name, bride_name, bride_short_name, wedding_date, status, slug, max_pax, rsvp_deadline, rsvp_enabled"
-    )
-    .eq("id", invitationId)
-    .eq("user_id", userId)
-    .single();
-
-  if (invError || !invitation) {
-    return null;
-  }
-
-  // 3. Fetch RSVP responses
-  const { data: rsvps, error: rsvpsError } = await supabase
-    .from("rsvps")
-    .select("*")
-    .eq("invitation_id", invitationId)
-    .order("created_at", { ascending: false });
-
-  if (rsvpsError) {
-    console.error("[WALIMATUL] Error fetching RSVPs:", rsvpsError.message);
+  if (rsvpsRes.error) {
+    console.error("[WALIMATUL] Error fetching RSVPs:", rsvpsRes.error.message);
     return null;
   }
 
-  const list = rsvps || [];
+  const list = (rsvpsRes.data || []) as unknown as RSVP[];
 
   // 4. Calculate summary metrics
   const totalResponses = list.length;

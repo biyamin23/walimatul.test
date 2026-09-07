@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { LoadingSpinner } from "./LoadingSpinner";
 
@@ -21,11 +21,15 @@ export function PendingLink({
   onClick,
   ...props
 }: PendingLinkProps) {
-  const router = useRouter();
+  const pathname = usePathname();
   const [isNavigating, setIsNavigating] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [lastPathname, setLastPathname] = useState(pathname);
 
-  const active = isNavigating || isPending;
+  // Reset navigating state during render when route successfully changes (React recommended pattern)
+  if (lastPathname !== pathname) {
+    setLastPathname(pathname);
+    setIsNavigating(false);
+  }
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     // If external link, or modified click (Ctrl/Cmd/Shift/Alt/Middle click), let default browser link handle it
@@ -43,7 +47,8 @@ export function PendingLink({
       return;
     }
 
-    if (active) {
+    // If already navigating, block duplicate clicks
+    if (isNavigating) {
       e.preventDefault();
       return;
     }
@@ -52,24 +57,21 @@ export function PendingLink({
       onClick(e);
     }
 
-    e.preventDefault();
+    // Do NOT call e.preventDefault()!
+    // Allow Next.js <Link> to perform native prefetch-cached router transition.
     setIsNavigating(true);
-
-    startTransition(() => {
-      router.push(href);
-    });
   }
 
   return (
     <Link
       href={href}
       onClick={handleClick}
-      aria-busy={active}
-      aria-disabled={active}
-      className={`${className} ${active ? "pointer-events-none opacity-90 cursor-wait" : ""}`}
+      aria-busy={isNavigating}
+      aria-disabled={isNavigating}
+      className={`${className} ${isNavigating ? "pointer-events-none opacity-90 cursor-wait" : ""}`}
       {...props}
     >
-      {active ? (
+      {isNavigating ? (
         <span className="inline-flex items-center justify-center gap-1.5 animate-in fade-in duration-150">
           {showSpinner && <LoadingSpinner size={spinnerSize} />}
           <span>{pendingText || children}</span>
@@ -80,3 +82,4 @@ export function PendingLink({
     </Link>
   );
 }
+

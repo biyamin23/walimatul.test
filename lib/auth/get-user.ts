@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { UserProfile } from "@/types";
 
@@ -7,14 +8,15 @@ import type { UserProfile } from "@/types";
  *
  * Fetches the currently authenticated Supabase user AND their profile row.
  * Uses getClaims() which validates the JWT signature — safe for page/data protection.
+ * Wrapped in React cache() for request-scoped deduplication across layouts and pages.
  *
  * Returns null if no valid session exists.
  */
-export async function getAuthenticatedUser(): Promise<{
+export const getAuthenticatedUser = cache(async (): Promise<{
   userId: string;
   email: string;
   profile: UserProfile | null;
-} | null> {
+} | null> => {
   const supabase = await createClient();
 
   // Use getClaims() — validates JWT signature via WebCrypto. NEVER use getSession().
@@ -45,4 +47,4 @@ export async function getAuthenticatedUser(): Promise<{
     email,
     profile: profile as UserProfile,
   };
-}
+});
