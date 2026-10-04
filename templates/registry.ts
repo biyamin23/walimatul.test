@@ -23,6 +23,7 @@ import type { TemplateComponent, TemplateRegistryEntry } from "./types";
 import { BlushGardenTemplate } from "./blush-garden/Template";
 import { HybridEditorialTemplate } from "./hybrid-editorial/Template";
 import { RoseChateauTemplate } from "./rose-chateau/Template";
+import { ToileRoyaleTemplate } from "./toile-royale/Template";
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
@@ -40,6 +41,11 @@ const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     componentKey: "rose-chateau",
     name: "Rose Chateau",
     component: RoseChateauTemplate,
+  },
+  "toile-royale": {
+    componentKey: "toile-royale",
+    name: "Toile Royale",
+    component: ToileRoyaleTemplate,
   },
   "hybrid-editorial": {
     componentKey: "hybrid-editorial",
